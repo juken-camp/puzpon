@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+    <title>🐱 NEKOPON MATCH 🐱</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            overflow: hidden;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'M PLUS Rounded 1c', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #faf8f5 0%, #f0ede8 50%, #e8e4df 100%);
+            color: #8b4513;
+            font-weight: bold;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            overflow: hidden;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-text-size-adjust: none;
+            -moz-text-size-adjust: none;
+            -ms-text-size-adjust: none;
+            text-size-adjust: none;
+        }
+
+        .title {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Fredoka One', cursive;
+            font-size: 28px;
+            color: #d2691e;
+            text-shadow: 3px 3px 12px rgba(139,69,19,0.3);
+            z-index: 1001;
+            letter-spacing: 1px;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            white-space: nowrap;
+            opacity: 0;
+            animation: title-enter 1.5s ease-out 0.2s forwards;
+            background: linear-gradient(45deg, #d2691e, #ff7f50, #ffd700);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .title:hover {
+            transform: translateX(-50%) scale(1.05);
+        }
+
+        .title.title-bounce {
+            animation: title-bounce 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        @keyframes title-enter {
+            0% { 
+                opacity: 0; 
+                transform: translateX(-50%) translateY(-30px) scale(0.8); 
+            }
+            60% { 
+                opacity: 1; 
+                transform: translateX(-50%) translateY(5px) scale(1.1); 
+            }
+            80% { 
+                transform: translateX(-50%) translateY(-2px) scale(1.05); 
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateX(-50%) translateY(0) scale(1); 
+            }
+        }
+
+        @keyframes title-bounce {
+            0% { transform: translateX(-50%) scale(1) rotate(0deg); }
+            15% { transform: translateX(-50%) scale(1.15) rotate(3deg); }
+            30% { transform: translateX(-50%) scale(1.28) rotate(-2deg); }
+            45% { transform: translateX(-50%) scale(1.35) rotate(2deg); }
+            60% { transform: translateX(-50%) scale(1.25) rotate(-1deg); }
+            75% { transform: translateX(-50%) scale(1.12) rotate(1deg); }
+            85% { transform: translateX(-50%) scale(1.05) rotate(-0.5deg); }
+            95% { transform: translateX(-50%) scale(1.02) rotate(0.2deg); }
+            100% { transform: translateX(-50%) scale(1) rotate(0deg); }
+        }
+
+        .cat-icon {
+            display: inline-block;
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            font-size: 30px;
+            margin: 0 4px;
+            animation: cat-icon-sparkle 3s ease-in-out infinite;
+        }
+
+        .cat-icon:hover {
+            transform: scale(1.3) rotate(20deg);
+        }
+
+        .cat-icon.bounce {
+            animation: cat-bounce 0.8s ease-in-out;
+        }
+
+        @keyframes cat-icon-sparkle {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.08) rotate(3deg); }
+            50% { transform: scale(1.15) rotate(-2deg); }
+            75% { transform: scale(1.08) rotate(2deg); }
+        }
+
+        @keyframes cat-bounce {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.5) rotate(20deg); }
+            50% { transform: scale(1.7) rotate(-15deg); }
+            75% { transform: scale(1.4) rotate(18deg); }
+        }
+
+        .header {
+            position: absolute;
+            top: 55px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(255,255,255,0.4);
+            padding: 6px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(20px);
+            box-shadow: 
+                0 8px 32px rgba(139,69,19,0.15),
+                inset 0 1px 0 rgba(255,255,255,0.3);
+            opacity: 0;
+            animation: header-enter 1.2s ease-out 0.8s forwards;
+        }
+
+        @keyframes header-enter {
+            0% { 
+                opacity: 0; 
+                transform: translateX(-50%) translateY(-20px) scale(0.9); 
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateX(-50%) translateY(0) scale(1); 
+            }
+        }
+
+        .score-item {
+            font-size: 14px;
+            color: #8b4513;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            opacity: 1;
+            cursor: pointer;
+            border-radius: 15px;
+            padding: 4px 6px;
+            position: relative;
+        }
+
+        .score-item:hover {
+            background: rgba(255,255,255,0.25);
+            transform: scale(1.08);
+        }
+
+        .score-item.pulse {
+            animation: score-pulse 0.6s ease-in-out !important;
+        }
+
+        @keyframes score-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.25); filter: brightness(1.6); }
+        }
+
+        .game-board {
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 320px;
+            height: 320px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 15px;
+            padding: 10px;
+            box-shadow: 
+                0 8px 32px rgba(139,69,19,0.15),
+                inset 0 1px 0 rgba(255,255,255,0.3);
+            backdrop-filter: blur(15px);
+            opacity: 0;
+            animation: board-enter 1s ease-out 1.2s forwards;
+        }
+
+        @keyframes board-enter {
+            0% { 
+                opacity: 0; 
+                transform: translateX(-50%) scale(0.8) rotate(-5deg); 
+            }
+            60% { 
+                opacity: 1; 
+                transform: translateX(-50%) scale(1.05) rotate(2deg); 
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateX(-50%) scale(1) rotate(0deg); 
+            }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            gap: 2px;
+            width: 100%;
+            height: 100%;
+            background: rgba(139,69,19,0.1);
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .cell {
+            background: rgba(255,255,255,0.3);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border: 1px solid rgba(139,69,19,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .cell:hover {
+            background: rgba(255,255,255,0.5);
+            transform: scale(1.05);
+        }
+
+        .cell.highlight {
+            background: rgba(255,215,0,0.4);
+            box-shadow: 0 0 15px rgba(255,215,0,0.6);
+            animation: cell-glow 0.5s ease-in-out;
+        }
+
+        @keyframes cell-glow {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .cell.selected {
+            background: rgba(255,105,180,0.4);
+            box-shadow: 0 0 10px rgba(255,105,180,0.8);
+            transform: scale(1.1);
+        }
+
+        .cat-piece {
+            font-size: 28px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            user-select: none;
+            filter: drop-shadow(0 2px 6px rgba(139,69,19,0.2));
+            position: relative;
+            z-index: 10;
+        }
+
+        .cat-piece:hover {
+            transform: scale(1.2) rotate(5deg);
+            filter: drop-shadow(0 4px 12px rgba(139,69,19,0.3)) brightness(1.2);
+        }
+
+        .cat-piece.dragging {
+            transform: scale(1.4) rotate(15deg);
+            z-index: 1000;
+            filter: drop-shadow(0 8px 20px rgba(139,69,19,0.4)) brightness(1.3);
+            pointer-events: none;
+        }
+
+        .cat-piece.falling {
+            animation: fall-bounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .cat-piece.matching {
+            animation: match-disappear 0.8s ease-in-out forwards;
+        }
+
+        .cat-piece.special-bomb {
+            animation: special-pulse 2s ease-in-out infinite;
+        }
+
+        .cat-piece.special-rainbow {
+            animation: rainbow-shine 3s ease-in-out infinite;
+        }
+
+        @keyframes fall-bounce {
+            0% { transform: translateY(-100px) scale(0.8); opacity: 0.7; }
+            60% { transform: translateY(5px) scale(1.2); opacity: 1; }
+            80% { transform: translateY(-2px) scale(1.1); }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        @keyframes match-disappear {
+            0% { transform: scale(1) rotate(0deg); opacity: 1; }
+            50% { transform: scale(1.5) rotate(180deg); opacity: 0.8; }
+            100% { transform: scale(2) rotate(360deg); opacity: 0; }
+        }
+
+        @keyframes special-pulse {
+            0%, 100% { 
+                transform: scale(1); 
+                filter: brightness(1) drop-shadow(0 2px 6px rgba(139,69,19,0.2)); 
+            }
+            50% { 
+                transform: scale(1.1); 
+                filter: brightness(1.5) drop-shadow(0 0 15px rgba(255,69,0,0.6)); 
+            }
+        }
+
+        @keyframes rainbow-shine {
+            0%, 100% { 
+                filter: brightness(1) hue-rotate(0deg) drop-shadow(0 2px 6px rgba(139,69,19,0.2)); 
+            }
+            33% { 
+                filter: brightness(1.3) hue-rotate(120deg) drop-shadow(0 0 10px rgba(0,255,0,0.5)); 
+            }
+            66% { 
+                filter: brightness(1.3) hue-rotate(240deg) drop-shadow(0 0 10px rgba(0,0,255,0.5)); 
+            }
+        }
+
+        .floating-score {
+            position: absolute;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: #ff6347;
+            pointer-events: none;
+            z-index: 800;
+            text-shadow: 2px 2px 8px rgba(139,69,19,0.3);
+            animation: float-up 2s ease-out forwards;
+            white-space: nowrap;
+        }
+
+        .floating-score.combo {
+            font-size: 24px;
+            color: #ff1493;
+            animation: float-combo 2.5s ease-out forwards;
+        }
+
+        .floating-score.special {
+            font-size: 28px;
+            color: #ff0000;
+            animation: float-special 3s ease-out forwards;
+        }
+
+        @keyframes float-up {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-80px) scale(1.5); }
+        }
+
+        @keyframes float-combo {
+            0% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+            50% { opacity: 1; transform: translateY(-40px) scale(2) rotate(180deg); }
+            100% { opacity: 0; transform: translateY(-120px) scale(3) rotate(360deg); }
+        }
+
+        @keyframes float-special {
+            0% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+            30% { opacity: 1; transform: translateY(-30px) scale(2.5) rotate(120deg); }
+            60% { opacity: 1; transform: translateY(-80px) scale(4) rotate(240deg); }
+            100% { opacity: 0; transform: translateY(-150px) scale(6) rotate(720deg); }
+        }
+
+        .msg {
+            position: absolute;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: #8b4513;
+            pointer-events: none;
+            z-index: 700;
+            animation: float 2s ease-out forwards;
+            text-shadow: 1px 1px 4px rgba(255,255,255,0.8);
+            white-space: nowrap;
+        }
+
+        @keyframes float {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-60px) scale(1.3); }
+        }
+
+        .combo-text {
+            position: absolute;
+            font-family: 'Fredoka One', cursive;
+            font-size: 36px;
+            font-weight: bold;
+            color: #ff1493;
+            pointer-events: none;
+            z-index: 900;
+            text-shadow: 3px 3px 12px rgba(139,69,19,0.5);
+            animation: combo-appear 2.5s ease-out forwards;
+            white-space: nowrap;
+        }
+
+        @keyframes combo-appear {
+            0% { opacity: 0; transform: scale(0) rotate(-180deg); }
+            20% { opacity: 1; transform: scale(2) rotate(0deg); }
+            80% { opacity: 1; transform: scale(1.5) rotate(10deg); }
+            100% { opacity: 0; transform: scale(0.5) rotate(180deg); }
+        }
+
+        .particle {
+            position: absolute;
+            font-size: 16px;
+            pointer-events: none;
+            z-index: 400;
+            animation: particle-burst 1.5s ease-out forwards;
+        }
+
+        @keyframes particle-burst {
+            0% { opacity: 1; transform: scale(0) rotate(0deg); }
+            20% { opacity: 1; transform: scale(1.2) rotate(180deg); }
+            100% { opacity: 0; transform: scale(0.4) rotate(540deg) translateY(-60px); }
+        }
+
+        .level-info {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            font-size: 14px;
+            color: #8b4513;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(139,69,19,0.1);
+            opacity: 0;
+            animation: level-info-enter 1s ease-out 2s forwards;
+        }
+
+        @keyframes level-info-enter {
+            0% { 
+                opacity: 0; 
+                transform: translateX(-50%) translateY(20px); 
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateX(-50%) translateY(0); 
+            }
+        }
+
+        .level-complete {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(139,69,19,0.95);
+            color: white;
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 2000;
+            font-family: 'Fredoka One', cursive;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            animation: level-complete-appear 1s ease-out;
+        }
+
+        @keyframes level-complete-appear {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5) rotate(-180deg); }
+            60% { opacity: 1; transform: translate(-50%, -50%) scale(1.1) rotate(0deg); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+        }
+
+        .level-complete h2 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #ff6347;
+        }
+
+        .level-complete p {
+            font-size: 14px;
+            margin-bottom: 15px;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+        }
+
+        .level-complete button {
+            background: linear-gradient(145deg, #d2691e, #ff7f50);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(210,105,30,0.3);
+        }
+
+        .level-complete button:hover {
+            background: linear-gradient(145deg, #ff7f50, #ff6347);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(210,105,30,0.4);
+        }
+
+        /* スマホ対応 */
+        @media (max-width: 480px) {
+            .title {
+                font-size: 24px;
+                top: 12px;
+            }
+
+            .cat-icon {
+                font-size: 26px;
+                margin: 0 3px;
+            }
+
+            .header {
+                top: 45px;
+                gap: 12px;
+                padding: 5px 16px;
+            }
+
+            .score-item {
+                font-size: 12px;
+                gap: 3px;
+            }
+
+            .game-board {
+                top: 85px;
+                width: 280px;
+                height: 280px;
+                padding: 8px;
+            }
+
+            .cat-piece {
+                font-size: 22px;
+            }
+
+            .level-info {
+                bottom: 50px;
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            .floating-score {
+                font-size: 16px;
+            }
+
+            .combo-text {
+                font-size: 28px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .game-board {
+                width: 260px;
+                height: 260px;
+            }
+
+            .cat-piece {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="title" id="titleElement">
+        <span class="cat-icon" id="leftCat">🐱</span>NEKOPON MATCH<span class="cat-icon" id="rightCat">🐱</span>
+    </div>
+
+    <div class="header">
+        <div class="score-item" id="scoreItem">⭐ <span id="score">0</span></div>
+        <div class="score-item" id="levelItem">🏆 LV.<span id="level">1</span></div>
+        <div class="score-item" id="targetItem">🎯 <span id="target">1000</span></div>
+        <div class="score-item" id="movesItem">🎮 <span id="moves">30</span></div>
+    </div>
+
+    <div class="game-board">
+        <div class="grid" id="gameGrid"></div>
+    </div>
+
+    <div class="level-info" id="levelInfo">
+        同じ猫を3匹以上並べて消そう！
+    </div>
+
+    <script>
+        class NekoponMatch {
+            constructor() {
+                this.score = 0;
+                this.level = 1;
+                this.moves = 30;
+                this.target = 1000;
+                this.combo = 0;
+                this.grid = [];
+                this.selectedCell = null;
+                this.isAnimating = false;
+                this.audioContext = null;
+
+                // 猫の種類（レベルに応じて増加）
+                this.basicCats = ['😺', '😸', '😻', '🙀'];
+                this.allCats = [
+                    '😺', '😸', '😻', '🙀', '😿', '😾', '🐱', '🐈', 
+                    '🐈‍⬛', '🦁', '🐯', '👑😺', '👑😸', '👑😻'
+                ];
+
+                // 特殊猫
+                this.specialCats = {
+                    bomb: '💣',    // 爆弾猫：周囲8マスを消去
+                    rainbow: '🌈', // 虹猫：どの色ともマッチ
+                    ice: '🧊',     // 氷猫：2回マッチが必要
+                    stone: '🗿'    // 石猫：動かせない障害物
+                };
+
+                // メッセージ
+                this.matchMessages = [
+                    'にゃん♪', 'かわいい！', 'すてき〜', 'やったね！', 'ぺろぺろ',
+                    'もふもふ', 'ふわふわ♪', 'きゃー♪', 'だいすき！', 'にゃんにゃん'
+                ];
+
+                this.comboMessages = [
+                    'コンボ♪', 'すごいにゃ！', 'れんさ〜！', 'びっくり！', 'さいこう♪',
+                    'やばいにゃ！', 'でんせつ！', 'かみにゃん！', 'ありえない！', 'てんし♪'
+                ];
+
+                this.init();
+            }
+
+            init() {
+                // 画面固定
+                this.enforceScreenLock();
+
+                // グリッド作成
+                this.createGrid();
+
+                // イベントリスナー設定
+                this.setupEventListeners();
+
+                // 音声初期化
+                document.addEventListener('click', () => this.initSound(), {once: true});
+                document.addEventListener('touchstart', () => this.initSound(), {once: true});
+
+                // ハプティックフィードバック対応
+                this.vibrate = (pattern) => {
+                    if ('vibrate' in navigator) {
+                        navigator.vibrate(pattern);
+                    }
+                };
+
+                // 初期猫配置
+                this.fillGrid();
+                this.updateUI();
+            }
+
+            enforceScreenLock() {
+                document.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                }, { passive: false });
+
+                document.addEventListener('gesturestart', (e) => {
+                    e.preventDefault();
+                });
+
+                let lastTouchEnd = 0;
+                document.addEventListener('touchend', (e) => {
+                    const now = (new Date()).getTime();
+                    if (now - lastTouchEnd <= 300) {
+                        e.preventDefault();
+                    }
+                    lastTouchEnd = now;
+                }, false);
+            }
+
+            createGrid() {
+                const gridElement = document.getElementById('gameGrid');
+                this.grid = [];
+
+                for (let row = 0; row < 8; row++) {
+                    this.grid[row] = [];
+                    for (let col = 0; col < 8; col++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'cell';
+                        cell.dataset.row = row;
+                        cell.dataset.col = col;
+                        
+                        gridElement.appendChild(cell);
+                        this.grid[row][col] = {
+                            element: cell,
+                            cat: null,
+                            special: null
+                        };
+                    }
+                }
+            }
+
+            setupEventListeners() {
+                // タイトルのタップ
+                document.getElementById('titleElement').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.bounceTitle();
+                });
+
+                // タイトル猫のタップ
+                document.getElementById('leftCat').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.bounceCat('left');
+                });
+
+                document.getElementById('rightCat').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.bounceCat('right');
+                });
+
+                // グリッドのクリック・ドラッグイベント
+                document.getElementById('gameGrid').addEventListener('click', (e) => {
+                    this.handleCellClick(e);
+                });
+
+                // ドラッグイベント
+                let isDragging = false;
+                let dragStart = null;
+
+                document.getElementById('gameGrid').addEventListener('mousedown', (e) => {
+                    if (this.isAnimating) return;
+                    isDragging = true;
+                    dragStart = this.getCellFromEvent(e);
+                    if (dragStart) {
+                        this.selectCell(dragStart.row, dragStart.col);
+                    }
+                });
+
+                document.getElementById('gameGrid').addEventListener('mousemove', (e) => {
+                    if (!isDragging || !dragStart || this.isAnimating) return;
+                    const dragEnd = this.getCellFromEvent(e);
+                    if (dragEnd && this.isAdjacent(dragStart, dragEnd)) {
+                        this.attemptSwap(dragStart, dragEnd);
+                        isDragging = false;
+                        dragStart = null;
+                    }
+                });
+
+                document.getElementById('gameGrid').addEventListener('mouseup', () => {
+                    isDragging = false;
+                    dragStart = null;
+                });
+
+                // タッチイベント
+                document.getElementById('gameGrid').addEventListener('touchstart', (e) => {
+                    if (this.isAnimating) return;
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    dragStart = this.getCellFromEvent(touch);
+                    if (dragStart) {
+                        this.selectCell(dragStart.row, dragStart.col);
+                    }
+                });
+
+                document.getElementById('gameGrid').addEventListener('touchmove', (e) => {
+                    if (!dragStart || this.isAnimating) return;
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    const dragEnd = this.getCellFromEvent(touch);
+                    if (dragEnd && this.isAdjacent(dragStart, dragEnd)) {
+                        this.attemptSwap(dragStart, dragEnd);
+                        dragStart = null;
+                    }
+                });
+
+                document.getElementById('gameGrid').addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    dragStart = null;
+                });
+            }
+
+            getCellFromEvent(e) {
+                const element = document.elementFromPoint(e.clientX, e.clientY);
+                if (element && element.classList.contains('cell')) {
+                    return {
+                        row: parseInt(element.dataset.row),
+                        col: parseInt(element.dataset.col)
+                    };
+                }
+                return null;
+            }
+
+            isAdjacent(cell1, cell2) {
+                const rowDiff = Math.abs(cell1.row - cell2.row);
+                const colDiff = Math.abs(cell1.col - cell2.col);
+                return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
+            }
+
+            handleCellClick(e) {
+                if (this.isAnimating) return;
+                
+                const cell = this.getCellFromEvent(e);
+                if (!cell) return;
+
+                if (this.selectedCell === null) {
+                    this.selectCell(cell.row, cell.col);
+                } else {
+                    if (this.selectedCell.row === cell.row && this.selectedCell.col === cell.col) {
+                        this.deselectCell();
+                    } else if (this.isAdjacent(this.selectedCell, cell)) {
+                        this.attemptSwap(this.selectedCell, cell);
+                    } else {
+                        this.deselectCell();
+                        this.selectCell(cell.row, cell.col);
+                    }
+                }
+            }
+
+            selectCell(row, col) {
+                this.deselectCell();
+                if (this.grid[row][col].cat && this.grid[row][col].special !== 'stone') {
+                    this.selectedCell = { row, col };
+                    this.grid[row][col].element.classList.add('selected');
+                }
+            }
+
+            deselectCell() {
+                if (this.selectedCell) {
+                    this.grid[this.selectedCell.row][this.selectedCell.col].element.classList.remove('selected');
+                    this.selectedCell = null;
+                }
+            }
+
+            async attemptSwap(cell1, cell2) {
+                if (this.moves <= 0) return;
+
+                this.deselectCell();
+                
+                // 石猫は動かせない
+                if (this.grid[cell1.row][cell1.col].special === 'stone' || 
+                    this.grid[cell2.row][cell2.col].special === 'stone') {
+                    this.playSound('error');
+                    return;
+                }
+
+                // 猫を交換
+                this.swapCats(cell1, cell2);
+                this.moves--;
+
+                // マッチをチェック
+                const matches = this.findMatches();
+                
+                if (matches.length > 0) {
+                    this.playSound('swap');
+                    this.vibrate([50]);
+                    await this.processMatches();
+                } else {
+                    // マッチしない場合は元に戻す
+                    setTimeout(() => {
+                        this.swapCats(cell1, cell2);
+                        this.playSound('error');
+                    }, 300);
+                }
+
+                this.updateUI();
+                
+                // ゲーム終了チェック
+                if (this.moves <= 0) {
+                    this.checkGameEnd();
+                }
+            }
+
+            swapCats(cell1, cell2) {
+                const temp = {
+                    cat: this.grid[cell1.row][cell1.col].cat,
+                    special: this.grid[cell1.row][cell1.col].special
+                };
+                
+                this.setCat(cell1.row, cell1.col, this.grid[cell2.row][cell2.col].cat, this.grid[cell2.row][cell2.col].special);
+                this.setCat(cell2.row, cell2.col, temp.cat, temp.special);
+            }
+
+            setCat(row, col, cat, special = null) {
+                const cell = this.grid[row][col];
+                cell.cat = cat;
+                cell.special = special;
+                
+                if (cat) {
+                    let catElement = cell.element.querySelector('.cat-piece');
+                    if (!catElement) {
+                        catElement = document.createElement('div');
+                        catElement.className = 'cat-piece';
+                        cell.element.appendChild(catElement);
+                    }
+                    
+                    catElement.textContent = cat;
+                    catElement.className = 'cat-piece';
+                    
+                    if (special === 'bomb') {
+                        catElement.classList.add('special-bomb');
+                    } else if (special === 'rainbow') {
+                        catElement.classList.add('special-rainbow');
+                    }
+                } else {
+                    const catElement = cell.element.querySelector('.cat-piece');
+                    if (catElement) {
+                        catElement.remove();
+                    }
+                }
+            }
+
+            fillGrid() {
+                const availableCats = this.getAvailableCats();
+                
+                for (let row = 0; row < 8; row++) {
+                    for (let col = 0; col < 8; col++) {
+                        if (!this.grid[row][col].cat) {
+                            let cat;
+                            let attempts = 0;
+                            
+                            // 初期配置では3マッチにならないようにする
+                            do {
+                                cat = availableCats[Math.floor(Math.random() * availableCats.length)];
+                                attempts++;
+                            } while (attempts < 10 && this.wouldCreateMatch(row, col, cat));
+                            
+                            // 特殊猫の生成（低確率）
+                            let special = null;
+                            if (this.level >= 3 && Math.random() < 0.05) {
+                                special = 'bomb';
+                            } else if (this.level >= 5 && Math.random() < 0.03) {
+                                special = 'rainbow';
+                            } else if (this.level >= 7 && Math.random() < 0.02) {
+                                special = 'stone';
+                            }
+                            
+                            this.setCat(row, col, cat, special);
+                        }
+                    }
+                }
+            }
+
+            getAvailableCats() {
+                if (this.level <= 5) {
+                    return this.basicCats;
+                } else if (this.level <= 10) {
+                    return this.basicCats.concat(this.allCats.slice(4, 6));
+                } else if (this.level <= 20) {
+                    return this.allCats.slice(0, 8);
+                } else {
+                    return this.allCats;
+                }
+            }
+
+            wouldCreateMatch(row, col, cat) {
+                // 水平チェック
+                let count = 1;
+                for (let c = col - 1; c >= 0 && this.grid[row][c].cat === cat; c--) count++;
+                for (let c = col + 1; c < 8 && this.grid[row][c].cat === cat; c++) count++;
+                if (count >= 3) return true;
+
+                // 垂直チェック
+                count = 1;
+                for (let r = row - 1; r >= 0 && this.grid[r][col].cat === cat; r--) count++;
+                for (let r = row + 1; r < 8 && this.grid[r][col].cat === cat; r++) count++;
+                if (count >= 3) return true;
+
+                return false;
+            }
+
+            findMatches() {
+                const matches = [];
+                const visited = new Set();
+
+                // 水平マッチを探す
+                for (let row = 0; row < 8; row++) {
+                    for (let col = 0; col < 6; col++) {
+                        const cat = this.grid[row][col].cat;
+                        if (!cat) continue;
+
+                        const match = [{ row, col }];
+                        for (let c = col + 1; c < 8; c++) {
+                            if (this.grid[row][c].cat === cat || this.grid[row][c].special === 'rainbow') {
+                                match.push({ row, col: c });
+                            } else {
+                                break;
+                            }
+                        }
+
+                        if (match.length >= 3) {
+                            matches.push(match);
+                        }
+                    }
+                }
+
+                // 垂直マッチを探す
+                for (let col = 0; col < 8; col++) {
+                    for (let row = 0; row < 6; row++) {
+                        const cat = this.grid[row][col].cat;
+                        if (!cat) continue;
+
+                        const match = [{ row, col }];
+                        for (let r = row + 1; r < 8; r++) {
+                            if (this.grid[r][col].cat === cat || this.grid[r][col].special === 'rainbow') {
+                                match.push({ row: r, col });
+                            } else {
+                                break;
+                            }
+                        }
+
+                        if (match.length >= 3) {
+                            matches.push(match);
+                        }
+                    }
+                }
+
+                return matches;
+            }
+
+            async processMatches() {
+                this.isAnimating = true;
+                let totalMatches = 0;
+                this.combo = 0;
+
+                while (true) {
+                    const matches = this.findMatches();
+                    if (matches.length === 0) break;
+
+                    this.combo++;
+                    totalMatches += matches.length;
+
+                    // マッチした猫をハイライト
+                    const allMatchedCells = [];
+                    matches.forEach(match => {
+                        match.forEach(cell => {
+                            allMatchedCells.push(cell);
+                            this.grid[cell.row][cell.col].element.classList.add('highlight');
+                        });
+                    });
+
+                    await this.delay(500);
+
+                    // スコア計算
+                    let matchScore = 0;
+                    matches.forEach(match => {
+                        const baseScore = match.length * 10;
+                        const comboMultiplier = this.combo;
+                        matchScore += baseScore * comboMultiplier;
+
+                        // 特殊猫の処理
+                        match.forEach(cell => {
+                            if (this.grid[cell.row][cell.col].special === 'bomb') {
+                                this.explodeBomb(cell.row, cell.col);
+                            }
+                        });
+                    });
+
+                    this.score += matchScore;
+
+                    // エフェクト表示
+                    this.showMatchEffects(allMatchedCells, matchScore);
+
+                    // 猫を消去
+                    allMatchedCells.forEach(cell => {
+                        const catElement = this.grid[cell.row][cell.col].element.querySelector('.cat-piece');
+                        if (catElement) {
+                            catElement.classList.add('matching');
+                        }
+                        this.grid[cell.row][cell.col].element.classList.remove('highlight');
+                    });
+
+                    await this.delay(800);
+
+                    // 実際に削除
+                    allMatchedCells.forEach(cell => {
+                        this.setCat(cell.row, cell.col, null);
+                    });
+
+                    // 落下処理
+                    await this.dropCats();
+                    
+                    // 新しい猫を補充
+                    this.fillEmptyCells();
+                    
+                    await this.delay(300);
+                }
+
+                // コンボメッセージ
+                if (this.combo > 1) {
+                    this.showComboMessage();
+                }
+
+                this.isAnimating = false;
+                this.updateUI();
+                
+                // レベルクリアチェック
+                if (this.score >= this.target) {
+                    this.levelComplete();
+                }
+            }
+
+            explodeBomb(row, col) {
+                // 周囲8マスを爆発
+                for (let r = Math.max(0, row - 1); r <= Math.min(7, row + 1); r++) {
+                    for (let c = Math.max(0, col - 1); c <= Math.min(7, col + 1); c++) {
+                        if (r !== row || c !== col) {
+                            this.setCat(r, c, null);
+                            this.createParticles(r * 35 + 160, c * 35 + 240, ['💥', '✨', '🌟'], 3);
+                        }
+                    }
+                }
+                this.playSound('explosion');
+                this.vibrate([100, 50, 100]);
+            }
+
+            async dropCats() {
+                let dropped = false;
+                
+                for (let col = 0; col < 8; col++) {
+                    let writeRow = 7;
+                    for (let readRow = 7; readRow >= 0; readRow--) {
+                        if (this.grid[readRow][col].cat) {
+                            if (readRow !== writeRow) {
+                                const cat = this.grid[readRow][col].cat;
+                                const special = this.grid[readRow][col].special;
+                                
+                                this.setCat(readRow, col, null);
+                                this.setCat(writeRow, col, cat, special);
+                                
+                                const catElement = this.grid[writeRow][col].element.querySelector('.cat-piece');
+                                if (catElement) {
+                                    catElement.classList.add('falling');
+                                    setTimeout(() => {
+                                        catElement.classList.remove('falling');
+                                    }, 600);
+                                }
+                                
+                                dropped = true;
+                            }
+                            writeRow--;
+                        }
+                    }
+                }
+                
+                if (dropped) {
+                    this.playSound('drop');
+                    await this.delay(600);
+                }
+            }
+
+            fillEmptyCells() {
+                const availableCats = this.getAvailableCats();
+                
+                for (let col = 0; col < 8; col++) {
+                    for (let row = 0; row < 8; row++) {
+                        if (!this.grid[row][col].cat) {
+                            const cat = availableCats[Math.floor(Math.random() * availableCats.length)];
+                            this.setCat(row, col, cat);
+                            
+                            const catElement = this.grid[row][col].element.querySelector('.cat-piece');
+                            if (catElement) {
+                                catElement.classList.add('falling');
+                                setTimeout(() => {
+                                    catElement.classList.remove('falling');
+                                }, 600);
+                            }
+                        }
+                    }
+                }
+            }
+
+            showMatchEffects(cells, score) {
+                // スコア表示
+                if (cells.length > 0) {
+                    const firstCell = cells[0];
+                    const x = firstCell.col * 35 + 200;
+                    const y = firstCell.row * 35 + 240;
+                    
+                    this.showFloatingScore(score, x, y, this.combo > 1 ? 'combo' : 'normal');
+                    
+                    // メッセージ表示
+                    const messages = this.combo > 1 ? this.comboMessages : this.matchMessages;
+                    const message = messages[Math.floor(Math.random() * messages.length)];
+                    this.showMsg(message, x, y);
+                    
+                    // パーティクル
+                    this.createParticles(x, y, ['✨', '💫', '🌟', '💖'], cells.length);
+                }
+            }
+
+            showComboMessage() {
+                const comboText = document.createElement('div');
+                comboText.className = 'combo-text';
+                comboText.textContent = `${this.combo}コンボ！`;
+                comboText.style.left = '50%';
+                comboText.style.top = '50%';
+                comboText.style.transform = 'translate(-50%, -50%)';
+                document.body.appendChild(comboText);
+                
+                setTimeout(() => comboText.remove(), 2500);
+                
+                this.playSound('combo');
+                this.vibrate([80, 40, 80, 40, 120]);
+            }
+
+            levelComplete() {
+                this.playSound('levelup');
+                this.vibrate([200, 100, 200, 100, 300]);
+
+                const levelCompleteEl = document.createElement('div');
+                levelCompleteEl.className = 'level-complete';
+                levelCompleteEl.innerHTML = `
+                    <h2>🎉 レベル${this.level}クリア！ 🎉</h2>
+                    <p>スコア: ${this.formatNum(this.score)}</p>
+                    <p>残り手数: ${this.moves}</p>
+                    <button onclick="game.nextLevel()">次のレベル</button>
+                `;
+                document.body.appendChild(levelCompleteEl);
+            }
+
+            nextLevel() {
+                // レベルアップ
+                this.level++;
+                this.target = Math.floor(this.target * 1.5);
+                this.moves = Math.max(25, 30 - Math.floor(this.level / 3));
+                
+                // UI削除
+                const levelCompleteEl = document.querySelector('.level-complete');
+                if (levelCompleteEl) levelCompleteEl.remove();
+                
+                // グリッドリセット
+                this.clearGrid();
+                this.fillGrid();
+                this.updateUI();
+                this.updateLevelInfo();
+            }
+
+            checkGameEnd() {
+                if (this.score >= this.target) {
+                    this.levelComplete();
+                } else {
+                    // ゲームオーバー
+                    this.playSound('gameover');
+                    this.vibrate([300, 200, 300]);
+                    
+                    const gameOverEl = document.createElement('div');
+                    gameOverEl.className = 'level-complete';
+                    gameOverEl.innerHTML = `
+                        <h2>😿 ゲームオーバー 😿</h2>
+                        <p>最終スコア: ${this.formatNum(this.score)}</p>
+                        <p>到達レベル: ${this.level}</p>
+                        <button onclick="game.restart()">もう一度</button>
+                    `;
+                    document.body.appendChild(gameOverEl);
+                }
+            }
+
+            restart() {
+                // ゲーム状態リセット
+                this.score = 0;
+                this.level = 1;
+                this.target = 1000;
+                this.moves = 30;
+                this.combo = 0;
+                
+                // UI削除
+                const gameOverEl = document.querySelector('.level-complete');
+                if (gameOverEl) gameOverEl.remove();
+                
+                // グリッドリセット
+                this.clearGrid();
+                this.fillGrid();
+                this.updateUI();
+                this.updateLevelInfo();
+            }
+
+            clearGrid() {
+                for (let row = 0; row < 8; row++) {
+                    for (let col = 0; col < 8; col++) {
+                        this.setCat(row, col, null);
+                    }
+                }
+            }
+
+            updateLevelInfo() {
+                const levelInfo = document.getElementById('levelInfo');
+                if (this.level === 1) {
+                    levelInfo.textContent = '同じ猫を3匹以上並べて消そう！';
+                } else if (this.level <= 3) {
+                    levelInfo.textContent = 'コンボで高得点を狙おう！';
+                } else if (this.level <= 5) {
+                    levelInfo.textContent = '爆弾猫💣で大爆発を起こそう！';
+                } else if (this.level <= 10) {
+                    levelInfo.textContent = '虹猫🌈はどの色ともマッチするよ！';
+                } else {
+                    levelInfo.textContent = '石猫🗿は動かせません。戦略的にプレイしよう！';
+                }
+            }
+
+            // UI・エフェクト・音響関連（前作と同様）
+            bounceTitle() {
+                const titleElement = document.getElementById('titleElement');
+                titleElement.classList.add('title-bounce');
+
+                this.playSound('title');
+                this.vibrate([100, 50, 100]);
+
+                const rect = titleElement.getBoundingClientRect();
+                this.createParticles(rect.left + rect.width/2, rect.top + rect.height/2, ['💫', '✨', '🌟', '💖'], 6);
+
+                this.score += 20;
+                this.showFloatingScore(20, rect.left + rect.width/2, rect.top + rect.height/2);
+                this.showMsg('NEKOPON MATCH♪', rect.left + rect.width/2, rect.top + rect.height/2);
+
+                setTimeout(() => titleElement.classList.remove('title-bounce'), 1200);
+                this.updateUI();
+            }
+
+            bounceCat(side) {
+                const catId = side === 'left' ? 'leftCat' : 'rightCat';
+                const catElement = document.getElementById(catId);
+
+                catElement.classList.add('bounce');
+                this.playSound('purr');
+                this.vibrate([40]);
+
+                const rect = catElement.getBoundingClientRect();
+                this.createParticles(rect.left + rect.width/2, rect.top + rect.height/2, ['💫', '✨'], 2);
+
+                this.score += 5;
+                this.showFloatingScore(5, rect.left + rect.width/2, rect.top + rect.height/2);
+                this.showMsg('にゃん♪', rect.left + rect.width/2, rect.top + rect.height/2);
+
+                setTimeout(() => catElement.classList.remove('bounce'), 800);
+                this.updateUI();
+            }
+
+            initSound() {
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.log('Audio not supported');
+                }
+            }
+
+            playSound(type) {
+                if (!this.audioContext) return;
+
+                try {
+                    if (this.audioContext.state === 'suspended') {
+                        this.audioContext.resume();
+                    }
+
+                    const oscillator = this.audioContext.createOscillator();
+                    const gainNode = this.audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(this.audioContext.destination);
+
+                    let frequency, duration;
+
+                    switch(type) {
+                        case 'swap':
+                            frequency = 600;
+                            duration = 0.2;
+                            break;
+                        case 'match':
+                            frequency = 800;
+                            duration = 0.4;
+                            break;
+                        case 'combo':
+                            frequency = 1200;
+                            duration = 0.8;
+                            break;
+                        case 'drop':
+                            frequency = 400;
+                            duration = 0.3;
+                            break;
+                        case 'explosion':
+                            frequency = 200;
+                            duration = 0.6;
+                            break;
+                        case 'levelup':
+                            frequency = 1500;
+                            duration = 1.2;
+                            break;
+                        case 'error':
+                            frequency = 150;
+                            duration = 0.3;
+                            break;
+                        case 'purr':
+                            frequency = 300;
+                            duration = 1.0;
+                            break;
+                        case 'title':
+                            frequency = 900;
+                            duration = 1.5;
+                            break;
+                        case 'gameover':
+                            frequency = 100;
+                            duration = 2.0;
+                            break;
+                        default:
+                            frequency = 440;
+                            duration = 0.3;
+                    }
+
+                    oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(frequency * 0.6, this.audioContext.currentTime + duration);
+
+                    gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
+
+                    oscillator.start(this.audioContext.currentTime);
+                    oscillator.stop(this.audioContext.currentTime + duration);
+                } catch (e) {
+                    // Audio error - ignore
+                }
+            }
+
+            showFloatingScore(points, x, y, type = 'normal') {
+                const el = document.createElement('div');
+                el.className = `floating-score ${type}`;
+                el.textContent = `+${this.formatNum(points)}`;
+                el.style.left = Math.min(x, window.innerWidth - 80) + 'px';
+                el.style.top = Math.min(y, window.innerHeight - 40) + 'px';
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), type === 'special' ? 3000 : (type === 'combo' ? 2500 : 2000));
+            }
+
+            showMsg(text, x, y) {
+                const el = document.createElement('div');
+                el.className = 'msg';
+                el.textContent = text;
+                el.style.left = Math.min(x, window.innerWidth - 60) + 'px';
+                el.style.top = Math.min(y + 30, window.innerHeight - 30) + 'px';
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 2000);
+            }
+
+            createParticles(x, y, emojis, count) {
+                for (let i = 0; i < count; i++) {
+                    setTimeout(() => {
+                        const el = document.createElement('div');
+                        el.className = 'particle';
+                        el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                        el.style.left = (x + (Math.random() - 0.5) * 40) + 'px';
+                        el.style.top = (y + (Math.random() - 0.5) * 40) + 'px';
+                        document.body.appendChild(el);
+                        setTimeout(() => el.remove(), 1500);
+                    }, i * 30);
+                }
+            }
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            updateUI() {
+                document.getElementById('score').textContent = this.formatNum(this.score);
+                document.getElementById('level').textContent = this.level;
+                document.getElementById('target').textContent = this.formatNum(this.target);
+                document.getElementById('moves').textContent = this.moves;
+
+                // プログレスの色変更
+                const targetItem = document.getElementById('targetItem');
+                if (this.score >= this.target) {
+                    targetItem.style.color = '#ff6347';
+                    targetItem.style.filter = 'brightness(1.3)';
+                } else {
+                    targetItem.style.color = '#8b4513';
+                    targetItem.style.filter = 'brightness(1)';
+                }
+
+                const movesItem = document.getElementById('movesItem');
+                if (this.moves <= 5) {
+                    movesItem.style.color = '#ff6347';
+                    movesItem.style.filter = 'brightness(1.3)';
+                } else {
+                    movesItem.style.color = '#8b4513';
+                    movesItem.style.filter = 'brightness(1)';
+                }
+            }
+
+            formatNum(n) {
+                if (n >= 1e9) return Math.floor(n / 1e9) + 'B';
+                if (n >= 1e6) return Math.floor(n / 1e6) + 'M';
+                if (n >= 1e3) return Math.floor(n / 1e3) + 'K';
+                return Math.floor(n).toString();
+            }
+        }
+
+        // グローバル変数として設定
+        const game = new NekoponMatch();
+    </script>
+</body>
+</html>
