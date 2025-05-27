@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+    <title>🐱 NEKOPON MATCH 🐱</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            overflow: hidden;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'M PLUS Rounded 1c', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #faf8f5 0%, #f0ede8 50%, #e8e4df 100%);
+            color: #8b4513;
+            font-weight: bold;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            overflow: hidden;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-text-size-adjust: none;
+            -moz-text-size-adjust: none;
+            -ms-text-size-adjust: none;
+            text-size-adjust: none;
+        }
+
+        .title {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Fredoka One', cursive;
+            font-size: 32px;
+            color: #d2691e;
+            text-shadow: 3px 3px 12px rgba(139,69,19,0.3);
+            z-index: 1001;
+            letter-spacing: 2px;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.3s ease;
+            white-space: nowrap;
+            background: linear-gradient(45deg, #d2691e, #ff7f50, #ffd700);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .title:active {
+            transform: translateX(-50%) scale(1.1);
+        }
+
+        .header {
+            position: absolute;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(255,255,255,0.5);
+            padding: 12px 24px;
+            border-radius: 25px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(139,69,19,0.15);
+        }
+
+        .score-item {
+            font-size: 18px;
+            color: #8b4513;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 15px;
+            padding: 8px 12px;
+            transition: all 0.3s ease;
+            min-width: 60px;
+            justify-content: center;
+        }
+
+        .score-item:active {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+
+        .game-container {
+            position: absolute;
+            top: 140px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 360px;
+            max-width: 90vw;
+        }
+
+        .game-board {
+            width: 100%;
+            background: rgba(255,255,255,0.3);
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 8px 32px rgba(139,69,19,0.15);
+            backdrop-filter: blur(15px);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: repeat(6, 1fr);
+            gap: 8px;
+            width: 100%;
+            aspect-ratio: 1;
+            background: rgba(139,69,19,0.1);
+            border-radius: 15px;
+            padding: 10px;
+        }
+
+        .cell {
+            background: rgba(255,255,255,0.4);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            min-height: 45px;
+        }
+
+        .cell:active {
+            transform: scale(0.95);
+        }
+
+        .cell.empty {
+            background: rgba(139,69,19,0.1);
+            border: 2px dashed rgba(139,69,19,0.3);
+        }
+
+        .cell.selected {
+            background: rgba(255,215,0,0.6);
+            border: 3px solid #ffd700;
+            box-shadow: 0 0 20px rgba(255,215,0,0.8);
+            transform: scale(1.1);
+        }
+
+        .cell.highlight {
+            background: rgba(255,105,180,0.5);
+            box-shadow: 0 0 15px rgba(255,105,180,0.8);
+            animation: match-glow 0.6s ease-in-out;
+        }
+
+        @keyframes match-glow {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        .cat-piece {
+            font-size: 36px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+            filter: drop-shadow(0 3px 8px rgba(139,69,19,0.3));
+            position: relative;
+            z-index: 10;
+        }
+
+        .cat-piece:active {
+            transform: scale(1.2);
+        }
+
+        .cat-piece.falling {
+            animation: fall-bounce 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .cat-piece.matching {
+            animation: match-disappear 1s ease-in-out forwards;
+        }
+
+        @keyframes fall-bounce {
+            0% { transform: translateY(-60px) scale(0.5); opacity: 0.5; }
+            60% { transform: translateY(8px) scale(1.3); opacity: 1; }
+            80% { transform: translateY(-3px) scale(1.1); }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        @keyframes match-disappear {
+            0% { transform: scale(1) rotate(0deg); opacity: 1; }
+            50% { transform: scale(1.8) rotate(180deg); opacity: 0.8; }
+            100% { transform: scale(2.5) rotate(360deg); opacity: 0; }
+        }
+
+        .instructions {
+            background: rgba(255,255,255,0.4);
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 15px;
+            text-align: center;
+            font-size: 16px;
+            color: #8b4513;
+            line-height: 1.4;
+            backdrop-filter: blur(10px);
+        }
+
+        .start-button {
+            background: linear-gradient(145deg, #ff7f50, #ff6347);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(255,99,71,0.4);
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+        }
+
+        .start-button:active {
+            transform: translateY(2px) scale(0.98);
+            box-shadow: 0 4px 15px rgba(255,99,71,0.6);
+        }
+
+        .tutorial-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .tutorial-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            max-width: 350px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .tutorial-content h3 {
+            font-size: 24px;
+            color: #d2691e;
+            margin-bottom: 15px;
+            font-family: 'Fredoka One', cursive;
+        }
+
+        .tutorial-content p {
+            font-size: 16px;
+            color: #8b4513;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .tutorial-button {
+            background: linear-gradient(145deg, #d2691e, #ff7f50);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+        }
+
+        .tutorial-button:active {
+            transform: scale(0.95);
+        }
+
+        .floating-score {
+            position: absolute;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #ff6347;
+            pointer-events: none;
+            z-index: 800;
+            text-shadow: 2px 2px 8px rgba(139,69,19,0.3);
+            animation: float-up 2s ease-out forwards;
+            white-space: nowrap;
+        }
+
+        .floating-score.combo {
+            font-size: 28px;
+            color: #ff1493;
+            animation: float-combo 2.5s ease-out forwards;
+        }
+
+        @keyframes float-up {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-80px) scale(1.5); }
+        }
+
+        @keyframes float-combo {
+            0% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+            50% { opacity: 1; transform: translateY(-40px) scale(2) rotate(180deg); }
+            100% { opacity: 0; transform: translateY(-100px) scale(2.5) rotate(360deg); }
+        }
+
+        .msg {
+            position: absolute;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #8b4513;
+            pointer-events: none;
+            z-index: 700;
+            animation: float-msg 2s ease-out forwards;
+            text-shadow: 1px 1px 4px rgba(255,255,255,0.8);
+            white-space: nowrap;
+        }
+
+        @keyframes float-msg {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-60px) scale(1.3); }
+        }
+
+        .combo-text {
+            position: absolute;
+            font-family: 'Fredoka One', cursive;
+            font-size: 40px;
+            font-weight: bold;
+            color: #ff1493;
+            pointer-events: none;
+            z-index: 900;
+            text-shadow: 3px 3px 12px rgba(139,69,19,0.5);
+            animation: combo-appear 2.5s ease-out forwards;
+            white-space: nowrap;
+        }
+
+        @keyframes combo-appear {
+            0% { opacity: 0; transform: scale(0) rotate(-180deg); }
+            20% { opacity: 1; transform: scale(2) rotate(0deg); }
+            80% { opacity: 1; transform: scale(1.5) rotate(10deg); }
+            100% { opacity: 0; transform: scale(0.5) rotate(180deg); }
+        }
+
+        .particle {
+            position: absolute;
+            font-size: 20px;
+            pointer-events: none;
+            z-index: 400;
+            animation: particle-burst 1.5s ease-out forwards;
+        }
+
+        @keyframes particle-burst {
+            0% { opacity: 1; transform: scale(0) rotate(0deg); }
+            20% { opacity: 1; transform: scale(1.2) rotate(180deg); }
+            100% { opacity: 0; transform: scale(0.4) rotate(540deg) translateY(-60px); }
+        }
+
+        .level-complete {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(139,69,19,0.95);
+            color: white;
+            padding: 30px;
+            border-radius: 25px;
+            text-align: center;
+            z-index: 2000;
+            font-family: 'Fredoka One', cursive;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            max-width: 320px;
+        }
+
+        .level-complete h2 {
+            font-size: 28px;
+            margin-bottom: 15px;
+            color: #ff6347;
+        }
+
+        .level-complete p {
+            font-size: 16px;
+            margin-bottom: 20px;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+        }
+
+        .level-complete button {
+            background: linear-gradient(145deg, #d2691e, #ff7f50);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(210,105,30,0.3);
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+        }
+
+        .level-complete button:active {
+            transform: translateY(2px) scale(0.95);
+        }
+
+        /* スマホ対応 */
+        @media (max-width: 480px) {
+            .title {
+                font-size: 28px;
+                top: 15px;
+            }
+
+            .header {
+                top: 60px;
+                gap: 15px;
+                padding: 10px 20px;
+            }
+
+            .score-item {
+                font-size: 16px;
+                gap: 6px;
+                padding: 6px 10px;
+                min-width: 50px;
+            }
+
+            .game-container {
+                top: 120px;
+                width: 340px;
+            }
+
+            .cat-piece {
+                font-size: 32px;
+            }
+
+            .instructions {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .tutorial-content {
+                max-width: 300px;
+                padding: 25px;
+            }
+
+            .tutorial-content h3 {
+                font-size: 20px;
+            }
+
+            .tutorial-content p {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .game-container {
+                width: 320px;
+            }
+
+            .cat-piece {
+                font-size: 28px;
+            }
+
+            .cell {
+                min-height: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="title" id="titleElement">🐱 NEKOPON MATCH 🐱</div>
+
+    <div class="header">
+        <div class="score-item" id="scoreItem">⭐ <span id="score">0</span></div>
+        <div class="score-item" id="levelItem">🏆 <span id="level">1</span></div>
+        <div class="score-item" id="targetItem">🎯 <span id="target">500</span></div>
+        <div class="score-item" id="movesItem">🎮 <span id="moves">20</span></div>
+    </div>
+
+    <div class="game-container">
+        <div class="game-board">
+            <div class="grid" id="gameGrid"></div>
+        </div>
+        
+        <div class="instructions" id="instructions">
+            同じ猫を3つ以上並べて消そう！<br>
+            <strong>タップして選択 → 隣の猫とタップで交換</strong>
+        </div>
+        
+        <button class="start-button" id="startButton">ゲームスタート！</button>
+    </div>
+
+    <div class="tutorial-overlay" id="tutorialOverlay" style="display: none;">
+        <div class="tutorial-content">
+            <h3>🐱 遊び方 🐱</h3>
+            <p>①猫をタップして選択<br>②隣接する猫をタップして交換<br>③同じ猫を3つ以上並べて消去！</p>
+            <button class="tutorial-button" onclick="game.closeTutorial()">わかった！</button>
+        </div>
+    </div>
+
+    <script>
+        class NekoponMatch {
+            constructor() {
+                this.score = 0;
+                this.level = 1;
+                this.moves = 20;
+                this.target = 500;
+                this.combo = 0;
+                this.grid = [];
+                this.selectedCell = null;
+                this.isAnimating = false;
+                this.gameStarted = false;
+                this.audioContext = null;
+
+                // 猫の種類（シンプルに4種類から開始）
+                this.availableCats = ['😺', '😸', '😻', '🙀'];
+
+                // メッセージ
+                this.matchMessages = [
+                    'にゃん♪', 'かわいい！', 'すてき〜', 'やったね！', 'ぺろぺろ',
+                    'もふもふ', 'ふわふわ♪', 'きゃー♪', 'だいすき！', 'にゃんにゃん'
+                ];
+
+                this.comboMessages = [
+                    'コンボ♪', 'すごいにゃ！', 'れんさ〜！', 'びっくり！', 'さいこう♪'
+                ];
+
+                this.init();
+            }
+
+            init() {
+                // 画面固定
+                this.enforceScreenLock();
+
+                // グリッド作成（最初は空）
+                this.createEmptyGrid();
+
+                // イベントリスナー設定
+                this.setupEventListeners();
+
+                // 音声初期化
+                document.addEventListener('click', () => this.initSound(), {once: true});
+                document.addEventListener('touchstart', () => this.initSound(), {once: true});
+
+                // ハプティックフィードバック対応
+                this.vibrate = (pattern) => {
+                    if ('vibrate' in navigator) {
+                        navigator.vibrate(pattern);
+                    }
+                };
+
+                this.updateUI();
+            }
+
+            enforceScreenLock() {
+                document.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                }, { passive: false });
+
+                document.addEventListener('gesturestart', (e) => {
+                    e.preventDefault();
+                });
+
+                let lastTouchEnd = 0;
+                document.addEventListener('touchend', (e) => {
+                    const now = (new Date()).getTime();
+                    if (now - lastTouchEnd <= 300) {
+                        e.preventDefault();
+                    }
+                    lastTouchEnd = now;
+                }, false);
+            }
+
+            createEmptyGrid() {
+                const gridElement = document.getElementById('gameGrid');
+                gridElement.innerHTML = '';
+                this.grid = [];
+
+                for (let row = 0; row < 6; row++) {
+                    this.grid[row] = [];
+                    for (let col = 0; col < 6; col++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'cell empty';
+                        cell.dataset.row = row;
+                        cell.dataset.col = col;
+                        
+                        gridElement.appendChild(cell);
+                        this.grid[row][col] = {
+                            element: cell,
+                            cat: null
+                        };
+                    }
+                }
+            }
+
+            setupEventListeners() {
+                // タイトルのタップ
+                document.getElementById('titleElement').addEventListener('click', (e) => {
+                    this.bounceTitle();
+                });
+
+                // スコア項目のタップ
+                document.getElementById('scoreItem').addEventListener('click', () => this.showTutorial());
+                document.getElementById('levelItem').addEventListener('click', () => this.showTutorial());
+                document.getElementById('targetItem').addEventListener('click', () => this.showTutorial());
+                document.getElementById('movesItem').addEventListener('click', () => this.showTutorial());
+
+                // スタートボタン
+                document.getElementById('startButton').addEventListener('click', () => {
+                    this.startGame();
+                });
+
+                // グリッドのタップイベント
+                document.getElementById('gameGrid').addEventListener('click', (e) => {
+                    this.handleCellClick(e);
+                });
+            }
+
+            startGame() {
+                if (this.gameStarted) return;
+                
+                this.gameStarted = true;
+                document.getElementById('startButton').style.display = 'none';
+                document.getElementById('instructions').innerHTML = '猫をタップして選択してね！';
+                
+                this.playSound('start');
+                this.vibrate([100]);
+                
+                // 猫を段階的に配置
+                this.fillGridGradually();
+            }
+
+            async fillGridGradually() {
+                // 下の行から徐々に猫を配置
+                for (let row = 5; row >= 0; row--) {
+                    for (let col = 0; col < 6; col++) {
+                        await this.delay(100);
+                        let cat;
+                        let attempts = 0;
+                        
+                        // 最初は3マッチにならないようにする
+                        do {
+                            cat = this.availableCats[Math.floor(Math.random() * this.availableCats.length)];
+                            attempts++;
+                        } while (attempts < 10 && this.wouldCreateMatch(row, col, cat));
+                        
+                        this.setCat(row, col, cat);
+                        
+                        const catElement = this.grid[row][col].element.querySelector('.cat-piece');
+                        if (catElement) {
+                            catElement.classList.add('falling');
+                            setTimeout(() => {
+                                catElement.classList.remove('falling');
+                            }, 800);
+                        }
+                    }
+                }
+                
+                this.playSound('ready');
+                document.getElementById('instructions').innerHTML = '同じ猫を3つ以上並べて消そう！';
+            }
+
+            handleCellClick(e) {
+                if (!this.gameStarted || this.isAnimating || this.moves <= 0) return;
+                
+                const cell = this.getCellFromEvent(e);
+                if (!cell) return;
+
+                const row = cell.row;
+                const col = cell.col;
+
+                if (!this.grid[row][col].cat) return;
+
+                if (this.selectedCell === null) {
+                    // 猫を選択
+                    this.selectCell(row, col);
+                } else {
+                    if (this.selectedCell.row === row && this.selectedCell.col === col) {
+                        // 同じセルをタップ → 選択解除
+                        this.deselectCell();
+                    } else if (this.isAdjacent(this.selectedCell, {row, col})) {
+                        // 隣接セルをタップ → 交換
+                        this.attemptSwap(this.selectedCell, {row, col});
+                    } else {
+                        // 非隣接セルをタップ → 選択変更
+                        this.deselectCell();
+                        this.selectCell(row, col);
+                    }
+                }
+            }
+
+            getCellFromEvent(e) {
+                const element = document.elementFromPoint(e.clientX, e.clientY);
+                if (element && element.classList.contains('cell')) {
+                    return {
+                        row: parseInt(element.dataset.row),
+                        col: parseInt(element.dataset.col)
+                    };
+                }
+                // 猫の絵文字をクリックした場合
+                if (element && element.classList.contains('cat-piece')) {
+                    const cell = element.closest('.cell');
+                    if (cell) {
+                        return {
+                            row: parseInt(cell.dataset.row),
+                            col: parseInt(cell.dataset.col)
+                        };
+                    }
+                }
+                return null;
+            }
+
+            isAdjacent(cell1, cell2) {
+                const rowDiff = Math.abs(cell1.row - cell2.row);
+                const colDiff = Math.abs(cell1.col - cell2.col);
+                return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
+            }
+
+            selectCell(row, col) {
+                this.deselectCell();
+                this.selectedCell = { row, col };
+                this.grid[row][col].element.classList.add('selected');
+                this.playSound('select');
+                this.vibrate([30]);
+            }
+
+            deselectCell() {
+                if (this.selectedCell) {
+                    this.grid[this.selectedCell.row][this.selectedCell.col].element.classList.remove('selected');
+                    this.selectedCell = null;
+                }
+            }
+
+            async attemptSwap(cell1, cell2) {
+                this.deselectCell();
+                
+                // 猫を交換
+                this.swapCats(cell1, cell2);
+                this.moves--;
+
+                // マッチをチェック
+                const matches = this.findMatches();
+                
+                if (matches.length > 0) {
+                    this.playSound('swap');
+                    this.vibrate([50]);
+                    await this.processMatches();
+                } else {
+                    // マッチしない場合は元に戻す
+                    setTimeout(() => {
+                        this.swapCats(cell1, cell2);
+                        this.playSound('error');
+                        this.showMsg('マッチしません', window.innerWidth/2, window.innerHeight/2);
+                    }, 300);
+                    this.moves++; // 手数を戻す
+                }
+
+                this.updateUI();
+                
+                // ゲーム終了チェック
+                if (this.moves <= 0) {
+                    this.checkGameEnd();
+                }
+            }
+
+            swapCats(cell1, cell2) {
+                const temp = this.grid[cell1.row][cell1.col].cat;
+                this.setCat(cell1.row, cell1.col, this.grid[cell2.row][cell2.col].cat);
+                this.setCat(cell2.row, cell2.col, temp);
+            }
+
+            setCat(row, col, cat) {
+                const cell = this.grid[row][col];
+                cell.cat = cat;
+                
+                if (cat) {
+                    let catElement = cell.element.querySelector('.cat-piece');
+                    if (!catElement) {
+                        catElement = document.createElement('div');
+                        catElement.className = 'cat-piece';
+                        cell.element.appendChild(catElement);
+                    }
+                    
+                    catElement.textContent = cat;
+                    cell.element.classList.remove('empty');
+                } else {
+                    const catElement = cell.element.querySelector('.cat-piece');
+                    if (catElement) {
+                        catElement.remove();
+                    }
+                    cell.element.classList.add('empty');
+                }
+            }
+
+            wouldCreateMatch(row, col, cat) {
+                // 水平チェック
+                let count = 1;
+                for (let c = col - 1; c >= 0 && this.grid[row][c].cat === cat; c--) count++;
+                for (let c = col + 1; c < 6 && this.grid[row][c].cat === cat; c++) count++;
+                if (count >= 3) return true;
+
+                // 垂直チェック
+                count = 1;
+                for (let r = row - 1; r >= 0 && this.grid[r][col].cat === cat; r--) count++;
+                for (let r = row + 1; r < 6 && this.grid[r][col].cat === cat; r++) count++;
+                if (count >= 3) return true;
+
+                return false;
+            }
+
+            findMatches() {
+                const matches = [];
+
+                // 水平マッチを探す
+                for (let row = 0; row < 6; row++) {
+                    for (let col = 0; col < 4; col++) {
+                        const cat = this.grid[row][col].cat;
+                        if (!cat) continue;
+
+                        const match = [{ row, col }];
+                        for (let c = col + 1; c < 6; c++) {
+                            if (this.grid[row][c].cat === cat) {
+                                match.push({ row, col: c });
+                            } else {
+                                break;
+                            }
+                        }
+
+                        if (match.length >= 3) {
+                            matches.push(match);
+                        }
+                    }
+                }
+
+                // 垂直マッチを探す
+                for (let col = 0; col < 6; col++) {
+                    for (let row = 0; row < 4; row++) {
+                        const cat = this.grid[row][col].cat;
+                        if (!cat) continue;
+
+                        const match = [{ row, col }];
+                        for (let r = row + 1; r < 6; r++) {
+                            if (this.grid[r][col].cat === cat) {
+                                match.push({ row: r, col });
+                            } else {
+                                break;
+                            }
+                        }
+
+                        if (match.length >= 3) {
+                            matches.push(match);
+                        }
+                    }
+                }
+
+                return matches;
+            }
+
+            async processMatches() {
+                this.isAnimating = true;
+                this.combo = 0;
+
+                while (true) {
+                    const matches = this.findMatches();
+                    if (matches.length === 0) break;
+
+                    this.combo++;
+
+                    // マッチした猫をハイライト
+                    const allMatchedCells = [];
+                    matches.forEach(match => {
+                        match.forEach(cell => {
+                            allMatchedCells.push(cell);
+                            this.grid[cell.row][cell.col].element.classList.add('highlight');
+                        });
+                    });
+
+                    await this.delay(600);
+
+                    // スコア計算
+                    let matchScore = 0;
+                    matches.forEach(match => {
+                        const baseScore = match.length * 50;
+                        const comboMultiplier = this.combo;
+                        matchScore += baseScore * comboMultiplier;
+                    });
+
+                    this.score += matchScore;
+
+                    // エフェクト表示
+                    this.showMatchEffects(allMatchedCells, matchScore);
+
+                    // 猫を消去
+                    allMatchedCells.forEach(cell => {
+                        const catElement = this.grid[cell.row][cell.col].element.querySelector('.cat-piece');
+                        if (catElement) {
+                            catElement.classList.add('matching');
+                        }
+                        this.grid[cell.row][cell.col].element.classList.remove('highlight');
+                    });
+
+                    await this.delay(1000);
+
+                    // 実際に削除
+                    allMatchedCells.forEach(cell => {
+                        this.setCat(cell.row, cell.col, null);
+                    });
+
+                    // 落下処理
+                    await this.dropCats();
+                    
+                    // 新しい猫を補充
+                    this.fillEmptyCells();
+                    
+                    await this.delay(400);
+                }
+
+                // コンボメッセージ
+                if (this.combo > 1) {
+                    this.showComboMessage();
+                }
+
+                this.isAnimating = false;
+                this.updateUI();
+                
+                // レベルクリアチェック
+                if (this.score >= this.target) {
+                    this.levelComplete();
+                }
+            }
+
+            async dropCats() {
+                let dropped = false;
+                
+                for (let col = 0; col < 6; col++) {
+                    let writeRow = 5;
+                    for (let readRow = 5; readRow >= 0; readRow--) {
+                        if (this.grid[readRow][col].cat) {
+                            if (readRow !== writeRow) {
+                                const cat = this.grid[readRow][col].cat;
+                                
+                                this.setCat(readRow, col, null);
+                                this.setCat(writeRow, col, cat);
+                                
+                                const catElement = this.grid[writeRow][col].element.querySelector('.cat-piece');
+                                if (catElement) {
+                                    catElement.classList.add('falling');
+                                    setTimeout(() => {
+                                        catElement.classList.remove('falling');
+                                    }, 800);
+                                }
+                                
+                                dropped = true;
+                            }
+                            writeRow--;
+                        }
+                    }
+                }
+                
+                if (dropped) {
+                    this.playSound('drop');
+                    await this.delay(800);
+                }
+            }
+
+            fillEmptyCells() {
+                for (let col = 0; col < 6; col++) {
+                    for (let row = 0; row < 6; row++) {
+                        if (!this.grid[row][col].cat) {
+                            const cat = this.availableCats[Math.floor(Math.random() * this.availableCats.length)];
+                            this.setCat(row, col, cat);
+                            
+                            const catElement = this.grid[row][col].element.querySelector('.cat-piece');
+                            if (catElement) {
+                                catElement.classList.add('falling');
+                                setTimeout(() => {
+                                    catElement.classList.remove('falling');
+                                }, 800);
+                            }
+                        }
+                    }
+                }
+            }
+
+            showMatchEffects(cells, score) {
+                if (cells.length > 0) {
+                    const firstCell = cells[0];
+                    const x = window.innerWidth / 2;
+                    const y = window.innerHeight / 2;
+                    
+                    this.showFloatingScore(score, x, y, this.combo > 1 ? 'combo' : 'normal');
+                    
+                    const messages = this.combo > 1 ? this.comboMessages : this.matchMessages;
+                    const message = messages[Math.floor(Math.random() * messages.length)];
+                    this.showMsg(message, x, y + 40);
+                    
+                    this.createParticles(x, y, ['✨', '💫', '🌟', '💖'], cells.length);
+                }
+            }
+
+            showComboMessage() {
+                const comboText = document.createElement('div');
+                comboText.className = 'combo-text';
+                comboText.textContent = `${this.combo}コンボ！`;
+                comboText.style.left = '50%';
+                comboText.style.top = '50%';
+                comboText.style.transform = 'translate(-50%, -50%)';
+                document.body.appendChild(comboText);
+                
+                setTimeout(() => comboText.remove(), 2500);
+                
+                this.playSound('combo');
+                this.vibrate([80, 40, 80, 40, 120]);
+            }
+
+            showTutorial() {
+                document.getElementById('tutorialOverlay').style.display = 'flex';
+            }
+
+            closeTutorial() {
+                document.getElementById('tutorialOverlay').style.display = 'none';
+            }
+
+            levelComplete() {
+                this.playSound('levelup');
+                this.vibrate([200, 100, 200, 100, 300]);
+
+                const levelCompleteEl = document.createElement('div');
+                levelCompleteEl.className = 'level-complete';
+                levelCompleteEl.innerHTML = `
+                    <h2>🎉 レベル${this.level}クリア！ 🎉</h2>
+                    <p>スコア: ${this.formatNum(this.score)}</p>
+                    <p>ボーナス: +${this.moves * 10}点</p>
+                    <button onclick="game.nextLevel()">次のレベル</button>
+                `;
+                document.body.appendChild(levelCompleteEl);
+                
+                // ボーナス点追加
+                this.score += this.moves * 10;
+                this.updateUI();
+            }
+
+            nextLevel() {
+                this.level++;
+                this.target = Math.floor(this.target * 1.4);
+                this.moves = Math.max(15, 25 - Math.floor(this.level / 3));
+                
+                // レベル5以降は猫の種類を増やす
+                if (this.level === 5) {
+                    this.availableCats = ['😺', '😸', '😻', '🙀', '😿'];
+                } else if (this.level === 10) {
+                    this.availableCats = ['😺', '😸', '😻', '🙀', '😿', '😾'];
+                }
+                
+                const levelCompleteEl = document.querySelector('.level-complete');
+                if (levelCompleteEl) levelCompleteEl.remove();
+                
+                this.createEmptyGrid();
+                this.gameStarted = false;
+                document.getElementById('startButton').style.display = 'block';
+                document.getElementById('startButton').textContent = `レベル${this.level}スタート！`;
+                document.getElementById('instructions').innerHTML = `レベル${this.level}：目標${this.formatNum(this.target)}点！`;
+                
+                this.updateUI();
+            }
+
+            checkGameEnd() {
+                if (this.score >= this.target) {
+                    this.levelComplete();
+                } else {
+                    this.playSound('gameover');
+                    this.vibrate([300, 200, 300]);
+                    
+                    const gameOverEl = document.createElement('div');
+                    gameOverEl.className = 'level-complete';
+                    gameOverEl.innerHTML = `
+                        <h2>😿 ゲームオーバー 😿</h2>
+                        <p>最終スコア: ${this.formatNum(this.score)}</p>
+                        <p>到達レベル: ${this.level}</p>
+                        <button onclick="game.restart()">もう一度</button>
+                    `;
+                    document.body.appendChild(gameOverEl);
+                }
+            }
+
+            restart() {
+                this.score = 0;
+                this.level = 1;
+                this.target = 500;
+                this.moves = 20;
+                this.combo = 0;
+                this.availableCats = ['😺', '😸', '😻', '🙀'];
+                
+                const gameOverEl = document.querySelector('.level-complete');
+                if (gameOverEl) gameOverEl.remove();
+                
+                this.createEmptyGrid();
+                this.gameStarted = false;
+                document.getElementById('startButton').style.display = 'block';
+                document.getElementById('startButton').textContent = 'ゲームスタート！';
+                document.getElementById('instructions').innerHTML = '同じ猫を3つ以上並べて消そう！<br><strong>タップして選択 → 隣の猫とタップで交換</strong>';
+                
+                this.updateUI();
+            }
+
+            // UI・エフェクト・音響関連
+            bounceTitle() {
+                this.playSound('title');
+                this.vibrate([80]);
+
+                this.score += 10;
+                this.showFloatingScore(10, window.innerWidth/2, 100);
+                this.showMsg('NEKOPON MATCH♪', window.innerWidth/2, 130);
+                this.createParticles(window.innerWidth/2, 100, ['💫', '✨', '🌟'], 4);
+
+                this.updateUI();
+            }
+
+            initSound() {
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.log('Audio not supported');
+                }
+            }
+
+            playSound(type) {
+                if (!this.audioContext) return;
+
+                try {
+                    if (this.audioContext.state === 'suspended') {
+                        this.audioContext.resume();
+                    }
+
+                    const oscillator = this.audioContext.createOscillator();
+                    const gainNode = this.audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(this.audioContext.destination);
+
+                    let frequency, duration;
+
+                    switch(type) {
+                        case 'select':
+                            frequency = 600;
+                            duration = 0.1;
+                            break;
+                        case 'swap':
+                            frequency = 800;
+                            duration = 0.3;
+                            break;
+                        case 'match':
+                            frequency = 1000;
+                            duration = 0.5;
+                            break;
+                        case 'combo':
+                            frequency = 1400;
+                            duration = 0.8;
+                            break;
+                        case 'drop':
+                            frequency = 400;
+                            duration = 0.4;
+                            break;
+                        case 'levelup':
+                            frequency = 1600;
+                            duration = 1.2;
+                            break;
+                        case 'error':
+                            frequency = 200;
+                            duration = 0.3;
+                            break;
+                        case 'start':
+                            frequency = 800;
+                            duration = 0.8;
+                            break;
+                        case 'ready':
+                            frequency = 1200;
+                            duration = 0.6;
+                            break;
+                        case 'title':
+                            frequency = 1000;
+                            duration = 1.0;
+                            break;
+                        case 'gameover':
+                            frequency = 150;
+                            duration = 2.0;
+                            break;
+                        default:
+                            frequency = 440;
+                            duration = 0.3;
+                    }
+
+                    oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(frequency * 0.7, this.audioContext.currentTime + duration);
+
+                    gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
+
+                    oscillator.start(this.audioContext.currentTime);
+                    oscillator.stop(this.audioContext.currentTime + duration);
+                } catch (e) {
+                    // Audio error - ignore
+                }
+            }
+
+            showFloatingScore(points, x, y, type = 'normal') {
+                const el = document.createElement('div');
+                el.className = `floating-score ${type}`;
+                el.textContent = `+${this.formatNum(points)}`;
+                el.style.left = Math.min(x, window.innerWidth - 80) + 'px';
+                el.style.top = Math.min(y, window.innerHeight - 50) + 'px';
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), type === 'combo' ? 2500 : 2000);
+            }
+
+            showMsg(text, x, y) {
+                const el = document.createElement('div');
+                el.className = 'msg';
+                el.textContent = text;
+                el.style.left = Math.min(x, window.innerWidth - 100) + 'px';
+                el.style.top = Math.min(y, window.innerHeight - 40) + 'px';
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 2000);
+            }
+
+            createParticles(x, y, emojis, count) {
+                for (let i = 0; i < count; i++) {
+                    setTimeout(() => {
+                        const el = document.createElement('div');
+                        el.className = 'particle';
+                        el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                        el.style.left = (x + (Math.random() - 0.5) * 60) + 'px';
+                        el.style.top = (y + (Math.random() - 0.5) * 60) + 'px';
+                        document.body.appendChild(el);
+                        setTimeout(() => el.remove(), 1500);
+                    }, i * 50);
+                }
+            }
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            updateUI() {
+                document.getElementById('score').textContent = this.formatNum(this.score);
+                document.getElementById('level').textContent = this.level;
+                document.getElementById('target').textContent = this.formatNum(this.target);
+                document.getElementById('moves').textContent = this.moves;
+
+                // 色の変更
+                const targetItem = document.getElementById('targetItem');
+                if (this.score >= this.target) {
+                    targetItem.style.color = '#ff6347';
+                } else {
+                    targetItem.style.color = '#8b4513';
+                }
+
+                const movesItem = document.getElementById('movesItem');
+                if (this.moves <= 3) {
+                    movesItem.style.color = '#ff6347';
+                } else {
+                    movesItem.style.color = '#8b4513';
+                }
+            }
+
+            formatNum(n) {
+                if (n >= 1e6) return Math.floor(n / 1e6) + 'M';
+                if (n >= 1e3) return Math.floor(n / 1e3) + 'K';
+                return Math.floor(n).toString();
+            }
+        }
+
+        // グローバル変数として設定
+        const game = new NekoponMatch();
+    </script>
+</body>
+</html>
