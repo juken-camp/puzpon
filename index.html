@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>最速テスト版</title>
+  <style>
+    body {
+      background: #1a1a2e;
+      color: white;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    
+    .btn {
+      background: #333;
+      border: 1px solid #666;
+      color: white;
+      padding: 10px 15px;
+      margin: 3px;
+      cursor: pointer;
+      border-radius: 4px;
+      display: inline-block;
+      width: 120px;
+      text-align: center;
+    }
+    
+    .btn:hover {
+      background: #555;
+    }
+    
+    .btn.active {
+      background: #0066cc;
+    }
+  </style>
+</head>
+<body>
+
+<h2>🎯 最速反応テスト</h2>
+
+<div id="container"></div>
+<button id="start" disabled style="margin-top: 20px; padding: 15px 30px;">開始</button>
+
+<script>
+let selected = '';
+let activeBtn = null;
+
+const subjects = [
+  '🗺️中１地理', '🗺️中２地理', '🏛️中１歴史', '🏛️中２歴史', '🏛️中３歴史', '⚖️公民',
+  '🧪中１化学', '🧪中２化学', '🧪中３化学', '🧬中１生物', '🧬中２生物', '🧬中３生物',
+  '⚛️中１物理', '⚛️中２物理', '⚛️中３物理', '🌍中１地学', '🌍中２地学', '🌍中３地学'
+];
+
+const container = document.getElementById('container');
+const startBtn = document.getElementById('start');
+
+subjects.forEach((subject, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'btn';
+  btn.textContent = subject;
+  
+  btn.onclick = function() {
+    if (activeBtn) activeBtn.classList.remove('active');
+    this.classList.add('active');
+    activeBtn = this;
+    selected = i;
+    startBtn.disabled = false;
+  };
+  
+  container.appendChild(btn);
+});
+
+startBtn.onclick = () => {
+  if (selected !== '') {
+    alert(`${subjects[selected]} 選択完了！`);
+  }
+};
+</script>
+
+</body>
+</html>
