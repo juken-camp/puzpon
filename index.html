@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>JUKEN★QUEST – Ultimate Edition</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #0a0a0f 0%, #1a0a2e 50%, #0a0a0f 100%);
+      font-family: sans-serif;
+      min-height: 100vh;
+      color: white;
+    }
+    
+    /* 軽量化されたボタンスタイル */
+    .neon-button {
+      background: linear-gradient(45deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2));
+      border: 1px solid #00ffff;
+      color: white;
+      border-radius: 12px;
+      transition: transform 0.1s ease; /* アニメーション高速化 */
+      cursor: pointer;
+    }
+    
+    .neon-button:hover {
+      transform: translateY(-1px); /* エフェクト軽量化 */
+    }
+    
+    .subject-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      color: white;
+      padding: 12px 8px;
+      margin: 4px;
+      cursor: pointer;
+      transition: all 0.1s ease; /* 高速化 */
+      text-align: center;
+      display: inline-block;
+      width: 140px;
+    }
+    
+    .subject-btn:hover {
+      border-color: #00ffff;
+      transform: translateY(-2px);
+    }
+    
+    .subject-btn.active {
+      background: rgba(139, 92, 246, 0.4);
+      border-color: #8b5cf6;
+      transform: translateY(-2px);
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8); /* blur削除 */
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+    
+    .modal.show {
+      display: flex;
+    }
+    
+    .game-card {
+      background: rgba(15, 15, 25, 0.9);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      border-radius: 15px;
+      padding: 20px;
+      margin: 10px;
+    }
+    
+    /* 通知（シンプル版） */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 255, 65, 0.9);
+      color: white;
+      padding: 15px 20px;
+      border-radius: 10px;
+      transform: translateX(400px);
+      transition: transform 0.3s ease;
+      z-index: 1001;
+      max-width: 300px;
+    }
+    
+    .notification.show {
+      transform: translateX(0);
+    }
+  </style>
+</head>
+<body class="p-4">
+
+<!-- 教科選択モーダル -->
+<div id="subjectModal" class="modal show">
+  <div class="game-card max-w-4xl">
+    <h2 class="text-2xl font-bold text-center mb-4 text-cyan-400">🎯 教科選択</h2>
+    <p class="text-center text-gray-300 mb-6">学習したい分野を選んでクエストを開始！</p>
+    
+    <div id="subjectContainer" class="text-center mb-6">
+      <!-- JavaScriptで生成 -->
+    </div>
+    
+    <div class="text-center">
+      <button id="startGame" class="neon-button px-8 py-3 text-lg font-bold disabled:opacity-40 disabled:cursor-not-allowed">
+        🚀 クエスト開始
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- メインゲーム画面 -->
+<div id="gameArea" style="display: none;">
+  <div class="game-card text-center mb-4">
+    <h1 class="text-3xl font-bold text-cyan-400">JUKEN★QUEST</h1>
+    <div id="currentSubject" class="mt-2 text-xl font-bold text-yellow-400"></div>
+  </div>
+  
+  <div class="game-card mb-4">
+    <h3 class="font-bold text-xl mb-4 text-cyan-400">📊 ステータス</h3>
+    <div id="stats" class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+      <!-- JavaScriptで更新 -->
+    </div>
+  </div>
+  
+  <div class="game-card mb-4">
+    <h3 class="font-bold text-xl mb-4 text-cyan-400">⚡ パワーアップ</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <button id="upgradeAttack" class="neon-button p-3">
+        <div>⚔️ 攻撃力強化</div>
+        <div class="text-sm opacity-70">コスト: ¥<span id="attackCost">100</span></div>
+      </button>
+      
+      <button id="upgradeCrit" class="neon-button p-3">
+        <div>💥 クリティカル強化</div>
+        <div class="text-sm opacity-70">コスト: ¥<span id="critCost">200</span></div>
+      </button>
+      
+      <button id="upgradeDefense" class="neon-button p-3">
+        <div>🛡️ 防御力強化</div>
+        <div class="text-sm opacity-70">コスト: ¥<span id="defenseCost">150</span></div>
+      </button>
+    </div>
+  </div>
+  
+  <div class="text-center">
+    <button id="manualQuizButton" class="neon-button px-6 py-3 text-lg">
+      🧠 問題にチャレンジ！
+    </button>
+    <button id="changeSubject" class="neon-button px-6 py-3 text-lg ml-4">
+      📚 教科変更
+    </button>
+  </div>
+</div>
+
+<!-- クイズモーダル -->
+<div id="quizModal" class="modal">
+  <div class="game-card max-w-lg">
+    <h2 class="font-bold text-xl text-center mb-4 text-cyan-400">🧠 ナレッジバトル！</h2>
+    
+    <div class="space-y-4">
+      <p id="quizQ" class="text-base font-medium text-center"></p>
+      <div id="quizOptions" class="space-y-2"></div>
+      
+      <div id="quizExplanation" class="bg-gray-800 rounded-lg p-3 min-h-[60px] flex items-center justify-center">
+        <p id="quizMsg" class="text-center text-sm"></p>
+      </div>
+      
+      <div class="flex gap-2">
+        <button id="quizNext" class="flex-1 neon-button py-2">🔥 次の問題</button>
+        <button id="quizBack" class="flex-1 neon-button py-2">🏠 戻る</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 通知 -->
+<div id="notification" class="notification">
+  <div id="notificationText"></div>
+</div>
+
+<script>
+// 簡易サウンドシステム
+class SimpleSound {
+  playClick() {
+    // サウンド処理を一時的にコメントアウト
+    // console.log('Click sound');
+  }
+  
+  playCorrect() {
+    // console.log('Correct sound');
+  }
+  
+  playWrong() {
+    // console.log('Wrong sound');
+  }
+}
+
+const soundSystem = new SimpleSound();
+
+// ミニマム問題データベース
+const problemDatabase = {
+  'geography_1': [
+    {q:"日本の最北端の島は？", opts:["択捉島","沖ノ鳥島","与那国島","南鳥島"], ans:0, exp:"北方領土の一つです。"},
+    {q:"日本の最南端の島は？", opts:["択捉島","与那国島","沖ノ鳥島","南鳥島"], ans:2, exp:"東京都にある島です。"},
+    {q:"面積が最も大きい大陸は？", opts:["アフリカ大陸","ユーラシア大陸","北アメリカ大陸","南極大陸"], ans:1, exp:"アジアとヨーロッパを含みます。"},
+  ],
+  'history_1': [
+    {q:"1603年に江戸幕府を開いた人物は？", opts:["織田信長","徳川家康","豊臣秀吉","徳川家光"], ans:1, exp:"関ヶ原の戦いに勝利しました。"},
+    {q:"1192年に鎌倉幕府を開いた人物は？", opts:["平清盛","源頼朝","北条時政","足利尊氏"], ans:1, exp:"日本初の武家政権です。"},
+    {q:"794年に都を移した天皇は？", opts:["聖武天皇","桓武天皇","天武天皇","光仁天皇"], ans:1, exp:"平安京を建設しました。"},
+  ],
+  'chemistry_1': [
+    {q:"石灰石と塩酸の反応で発生する気体は？", opts:["酸素","二酸化炭素","水素","アンモニア"], ans:1, exp:"二酸化炭素が発生します。"},
+    {q:"亜鉛と塩酸の反応で発生する気体は？", opts:["酸素","水素","二酸化炭素","塩素"], ans:1, exp:"金属と酸の反応で水素が発生します。"},
+    {q:"空気の成分で約78%を占める気体は？", opts:["酸素","窒素","二酸化炭素","アルゴン"], ans:1, exp:"空気の約8割は窒素です。"},
+  ]
+};
+
+// ゲーム変数
+let coins = 0;
+let dps = 10;
+let critRate = 5;
+let defense = 0;
+let killCount = 0;
+let currentSubject = '';
+
+let attackCost = 100;
+let critCost = 200;
+let defenseCost = 150;
+
+let gameTimer = null;
+
+// 通知機能
+function showNotification(text) {
+  const notification = document.getElementById('notification');
+  const notificationText = document.getElementById('notificationText');
+  
+  notificationText.textContent = text;
+  notification.classList.add('show');
+  
+  setTimeout(() => {
+    notification.classList.remove('show');
+  }, 3000);
+}
+
+// ステータス更新（軽量版）
+function renderStats() {
+  const statsDiv = document.getElementById('stats');
+  statsDiv.innerHTML = `
+    <div class="bg-gray-800 rounded p-3">
+      <div class="flex justify-between">
+        <span>💰 コイン</span>
+        <span class="text-yellow-400">${coins.toLocaleString()}</span>
+      </div>
+    </div>
+    <div class="bg-gray-800 rounded p-3">
+      <div class="flex justify-between">
+        <span>⚔️ 攻撃力</span>
+        <span class="text-red-400">${dps}/秒</span>
+      </div>
+    </div>
+    <div class="bg-gray-800 rounded p-3">
+      <div class="flex justify-between">
+        <span>💥 クリティカル</span>
+        <span class="text-yellow-400">${critRate}%</span>
+      </div>
+    </div>
+    <div class="bg-gray-800 rounded p-3">
+      <div class="flex justify-between">
+        <span>🏆 撃破数</span>
+        <span class="text-purple-400">${killCount}</span>
+      </div>
+    </div>
+  `;
+  
+  // コスト表示更新
+  document.getElementById('attackCost').textContent = attackCost;
+  document.getElementById('critCost').textContent = critCost;
+  document.getElementById('defenseCost').textContent = defenseCost;
+  
+  // ボタン有効/無効
+  document.getElementById('upgradeAttack').disabled = coins < attackCost;
+  document.getElementById('upgradeCrit').disabled = coins < critCost;
+  document.getElementById('upgradeDefense').disabled = coins < defenseCost;
+}
+
+// 教科選択（改善版）
+function initSubjectSelection() {
+  const container = document.getElementById('subjectContainer');
+  const startButton = document.getElementById('startGame');
+  let selectedSubject = '';
+  let activeButton = null;
+  
+  const subjects = [
+    {id: 'geography_1', icon: '🗺️', name: '中１地理'},
+    {id: 'history_1', icon: '🏛️', name: '中１歴史'},
+    {id: 'chemistry_1', icon: '🧪', name: '中１化学'},
+    // 必要に応じて追加
+  ];
+  
+  container.innerHTML = "";
+  
+  subjects.forEach(subject => {
+    const btn = document.createElement('button');
+    btn.className = 'subject-btn';
+    btn.innerHTML = `
+      <div style="font-size: 1.5rem; margin-bottom: 4px;">${subject.icon}</div>
+      <div style="font-size: 0.8rem; font-weight: bold;">${subject.name}</div>
+    `;
+    
+    // 最適化されたクリックハンドラー
+    btn.onclick = function() {
+      soundSystem.playClick();
+      
+      // 前のアクティブボタンがあれば削除
+      if (activeButton && activeButton !== this) {
+        activeButton.classList.remove('active');
+      }
+      
+      // 新しいボタンをアクティブに
+      this.classList.add('active');
+      activeButton = this;
+      selectedSubject = subject.id;
+      startButton.disabled = false;
+    };
+    
+    container.appendChild(btn);
+  });
+  
+  startButton.disabled = true;
+  startButton.onclick = function() {
+    if (selectedSubject) {
+      soundSystem.playCorrect();
+      currentSubject = selectedSubject;
+      
+      // 画面切り替え
+      document.getElementById('subjectModal').classList.remove('show');
+      document.getElementById('gameArea').style.display = 'block';
+      
+      const subjectNames = {
+        'geography_1': '🗺️ 中１地理クエスト',
+        'history_1': '🏛️ 中１歴史クエスト',
+        'chemistry_1': '🧪 中１化学クエスト'
+      };
+      
+      document.getElementById('currentSubject').textContent = subjectNames[currentSubject];
+      startGameLoop();
+    }
+  };
+}
+
+// ゲームループ（軽量版）
+function startGameLoop() {
+  renderStats();
+  showNotification('🚀 クエスト開始！');
+  
+  // 軽量化されたバトルループ（3秒間隔）
+  gameTimer = setInterval(() => {
+    const isCrit = Math.random() * 100 < critRate;
+    const damage = isCrit ? dps * 2 : dps;
+    
+    const coinReward = 50;
+    coins += coinReward;
+    killCount++;
+    
+    if (isCrit) {
+      showNotification('💥 クリティカルヒット！');
+    }
+    
+    renderStats();
+  }, 3000); // 3秒間隔
+}
+
+// 強化ボタン
+function initUpgradeButtons() {
+  document.getElementById('upgradeAttack').onclick = () => {
+    if (coins >= attackCost) {
+      soundSystem.playCorrect();
+      coins -= attackCost;
+      dps += 10;
+      attackCost = Math.floor(attackCost * 1.5);
+      showNotification('⚔️ 攻撃力が強化されました！');
+      renderStats();
+    }
+  };
+
+  document.getElementById('upgradeCrit').onclick = () => {
+    if (coins >= critCost) {
+      soundSystem.playCorrect();
+      coins -= critCost;
+      critRate += 5;
+      critCost = Math.floor(critCost * 1.8);
+      showNotification('💥 クリティカル率が向上しました！');
+      renderStats();
+    }
+  };
+
+  document.getElementById('upgradeDefense').onclick = () => {
+    if (coins >= defenseCost) {
+      soundSystem.playCorrect();
+      coins -= defenseCost;
+      defense += 10;
+      defenseCost = Math.floor(defenseCost * 1.6);
+      showNotification('🛡️ 防御力が向上しました！');
+      renderStats();
+    }
+  };
+}
+
+// クイズ機能（軽量版）
+function openQuiz() {
+  const problems = problemDatabase[currentSubject];
+  if (!problems || problems.length === 0) return;
+  
+  const quiz = problems[Math.floor(Math.random() * problems.length)];
+  
+  const modal = document.getElementById('quizModal');
+  const qEl = document.getElementById('quizQ');
+  const optDiv = document.getElementById('quizOptions');
+  const msgEl = document.getElementById('quizMsg');
+  const nextBtn = document.getElementById('quizNext');
+  const backBtn = document.getElementById('quizBack');
+  
+  qEl.textContent = quiz.q;
+  optDiv.innerHTML = '';
+  msgEl.textContent = '';
+  
+  nextBtn.disabled = true;
+  nextBtn.style.opacity = '0.3';
+  backBtn.disabled = true;
+  backBtn.style.opacity = '0.3';
+  
+  quiz.opts.forEach((txt, i) => {
+    const btn = document.createElement('button');
+    btn.textContent = txt;
+    btn.className = 'neon-button w-full p-3';
+    btn.onclick = () => {
+      if (i === quiz.ans) {
+        soundSystem.playCorrect();
+        msgEl.innerHTML = `🎉 正解！${quiz.exp || ''}`;
+        msgEl.style.color = '#00ff41';
+        coins += 100;
+        showNotification('正解！ボーナスコインを獲得！');
+      } else {
+        soundSystem.playWrong();
+        msgEl.innerHTML = `❌ 不正解。正解は「${quiz.opts[quiz.ans]}」です。`;
+        msgEl.style.color = '#ff8800';
+      }
+      
+      [...optDiv.children].forEach(b => b.disabled = true);
+      nextBtn.disabled = false;
+      nextBtn.style.opacity = '1';
+      backBtn.disabled = false;
+      backBtn.style.opacity = '1';
+      renderStats();
+    };
+    optDiv.appendChild(btn);
+  });
+  
+  nextBtn.onclick = () => {
+    soundSystem.playClick();
+    openQuiz();
+  };
+
+  backBtn.onclick = () => {
+    soundSystem.playClick();
+    modal.classList.remove('show');
+  };
+  
+  modal.classList.add('show');
+}
+
+// 初期化
+document.addEventListener('DOMContentLoaded', () => {
+  initSubjectSelection();
+  initUpgradeButtons();
+  
+  document.getElementById('manualQuizButton').onclick = () => {
+    soundSystem.playClick();
+    openQuiz();
+  };
+  
+  document.getElementById('changeSubject').onclick = () => {
+    soundSystem.playClick();
+    if (gameTimer) {
+      clearInterval(gameTimer);
+      gameTimer = null;
+    }
+    document.getElementById('gameArea').style.display = 'none';
+    document.getElementById('subjectModal').classList.add('show');
+  };
+});
+</script>
+
+</body>
+</html>
