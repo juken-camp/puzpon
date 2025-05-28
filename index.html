@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>JUKEN★QUEST – Ultimate Edition</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --neon-cyan: #00ffff;
+      --neon-pink: #ff00ff;
+      --neon-purple: #8b00ff;
+      --neon-green: #00ff41;
+      --neon-yellow: #ffff00;
+      --dark-bg: #0a0a0f;
+      --card-bg: rgba(15, 15, 25, 0.95);
+      --glass-bg: rgba(255, 255, 255, 0.05);
+    }
+    
+    body {  
+      font-family: "Noto Sans JP", sans-serif;  
+      background: linear-gradient(135deg, #0a0a0f 0%, #1a0a2e 25%, #16213e 50%, #0f3460 75%, #0a0a0f 100%);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+      min-height: 100vh;
+      touch-action: manipulation;
+      overflow-x: hidden;
+    }
+    
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    .container-spacing {
+      margin: 0 auto;
+      max-width: 95%;
+      width: 100%;
+    }
+    
+    @media (min-width: 640px) {
+      .container-spacing {
+        max-width: 600px;
+      }
+    }
+    
+    @media (min-width: 768px) {
+      .container-spacing {
+        max-width: 768px;
+      }
+    }
+    
+    @media (min-width: 1024px) {
+      .container-spacing {
+        max-width: 1024px;
+      }
+    }
+    
+    .game-title {
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
+      font-size: clamp(1.8rem, 5vw, 3.5rem);
+      background: linear-gradient(45deg, var(--neon-cyan), var(--neon-pink), var(--neon-purple));
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: neonPulse 3s ease-in-out infinite, gradientShift 6s ease infinite;
+      text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+      filter: drop-shadow(0 0 20px rgba(255, 0, 255, 0.3));
+      text-align: center;
+      letter-spacing: 0.1em;
+    }
+    
+    @keyframes neonPulse {
+      0%, 100% { 
+        filter: drop-shadow(0 0 20px rgba(255, 0, 255, 0.3)) brightness(1);
+        transform: scale(1);
+      }
+      50% { 
+        filter: drop-shadow(0 0 40px rgba(0, 255, 255, 0.8)) brightness(1.2);
+        transform: scale(1.02);
+      }
+    }
+    
+    .neon-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      border-radius: 20px;
+      box-shadow: 
+        0 0 30px rgba(0, 255, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .neon-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+      animation: shimmer 3s infinite;
+    }
+    
+    @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+    
+    .neon-button {
+      background: linear-gradient(45deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2));
+      border: 1px solid var(--neon-cyan);
+      color: white;
+      font-weight: 700;
+      border-radius: 12px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+    }
+    
+    .neon-button:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 10px 40px rgba(0, 255, 255, 0.5);
+      border-color: var(--neon-pink);
+    }
+    
+    .neon-button:active {
+      transform: translateY(0) scale(0.98);
+    }
+    
+    .neon-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    .neon-button:hover::before {
+      left: 100%;
+    }
+    
+    .upgrade-button {
+      background: linear-gradient(135deg, rgba(255, 0, 100, 0.3), rgba(100, 0, 255, 0.3));
+      border: 2px solid transparent;
+      background-clip: padding-box;
+      position: relative;
+      padding: 0.75rem 1rem !important;
+      font-size: 0.9rem;
+    }
+    
+    .upgrade-button .upgrade-title {
+      font-size: 1rem;
+      margin-bottom: 0.25rem;
+    }
+    
+    .upgrade-button .upgrade-cost {
+      font-size: 0.8rem;
+    }
+    
+    .upgrade-button::after {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, var(--neon-pink), var(--neon-cyan), var(--neon-purple));
+      border-radius: inherit;
+      z-index: -1;
+      background-size: 300% 300%;
+      animation: gradientShift 4s ease infinite;
+    }
+    
+    .hp-bar {
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      background: linear-gradient(90deg, var(--neon-green), var(--neon-yellow), #ff4444);
+      box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .hp-bar::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.3) 50%, transparent 70%);
+      animation: flow 2s linear infinite;
+    }
+    
+    @keyframes flow {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    
+    .modal {  
+      display: none;  
+      position: fixed;  
+      inset: 0;  
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(10px);
+      align-items: center;  
+      justify-content: center;  
+      z-index: 1000;
+      padding: 1rem;
+    }
+    
+    .modal.show { 
+      display: flex; 
+      animation: modalFadeIn 0.3s ease-out;
+    }
+    
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    
+    .particle {
+      position: absolute;
+      pointer-events: none;
+      font-weight: 900;
+      z-index: 100;
+      animation: particleFloat 2.5s ease-out forwards;
+      text-shadow: 0 0 10px currentColor;
+      font-size: 18px;
+    }
+    
+    @keyframes particleFloat {
+      0% { 
+        transform: translateY(0) scale(1) rotate(0deg); 
+        opacity: 1; 
+      }
+      50% {
+        transform: translateY(-60px) scale(1.3) rotate(180deg);
+        opacity: 1;
+      }
+      100% { 
+        transform: translateY(-120px) scale(1.5) rotate(360deg); 
+        opacity: 0; 
+      }
+    }
+    
+    .shake {
+      animation: shakeIntense 0.6s ease-in-out;
+    }
+    
+    @keyframes shakeIntense {
+      0%, 100% { transform: translateX(0); }
+      10% { transform: translateX(-10px) rotate(-1deg); }
+      20% { transform: translateX(10px) rotate(1deg); }
+      30% { transform: translateX(-8px) rotate(-1deg); }
+      40% { transform: translateX(8px) rotate(1deg); }
+      50% { transform: translateX(-6px) rotate(-0.5deg); }
+      60% { transform: translateX(6px) rotate(0.5deg); }
+      70% { transform: translateX(-4px) rotate(-0.5deg); }
+      80% { transform: translateX(4px) rotate(0.5deg); }
+      90% { transform: translateX(-2px); }
+    }
+    
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, rgba(0, 255, 65, 0.9), rgba(0, 200, 50, 0.9));
+      color: white;
+      padding: 15px 20px;
+      border-radius: 15px;
+      border: 1px solid var(--neon-green);
+      transform: translateX(400px);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1001;
+      box-shadow: 0 10px 30px rgba(0, 255, 65, 0.3);
+      backdrop-filter: blur(10px);
+    }
+    
+    .notification.show {
+      transform: translateX(0);
+      animation: notificationPulse 0.6s ease-in-out;
+    }
+    
+    @keyframes notificationPulse {
+      0%, 100% { transform: translateX(0) scale(1); }
+      50% { transform: translateX(0) scale(1.05); }
+    }
+    
+    .subject-btn {
+      background: var(--glass-bg);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      color: white;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+  padding: 0.5rem 0.3rem;   /* パディングを縮小 */
+  min-height: 60px;         /* 高さを縮小 */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .subject-btn:hover {
+      border-color: var(--neon-cyan);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 255, 255, 0.3);
+    }
+    
+    .subject-btn.active {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(124, 58, 237, 0.3));
+      border-color: var(--neon-purple);
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 12px 30px rgba(139, 92, 246, 0.4);
+      color: white;
+    }
+    
+    .subject-btn.active::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      animation: activePulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes activePulse {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 1; }
+    }
+    
+    .floating-button {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+      border: 2px solid var(--neon-cyan);
+      border-radius: 50%;
+      color: white;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    .floating-button:hover {
+      transform: translateY(-5px) scale(1.1);
+      box-shadow: 0 20px 40px rgba(139, 92, 246, 0.6);
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .glow-text {
+      color: var(--neon-cyan);
+      text-shadow: 0 0 10px currentColor;
+      font-weight: 700;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    
+    .stat-item {
+      background: var(--glass-bg);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      border-radius: 10px;
+      padding: 0.75rem;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+    
+    .stat-item:hover {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 5px 20px rgba(0, 255, 255, 0.2);
+    }
+    
+    .quiz-option {
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
+      border: 1px solid var(--neon-cyan);
+      color: white;
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-weight: 600;
+      font-size: 0.9rem;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .quiz-option:hover {
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2));
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0, 255, 255, 0.3);
+    }
+    
+    .quiz-option::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.6s;
+    }
+    
+    .quiz-option:hover::before {
+      left: 100%;
+    }
+
+    .auto-quest-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+
+    .toggle-button {
+      background: linear-gradient(135deg, rgba(255, 0, 100, 0.3), rgba(100, 0, 255, 0.3));
+      border: 1px solid #ff0066;
+      color: white;
+      padding: 0.4rem 1rem;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .toggle-button.active {
+      background: linear-gradient(135deg, rgba(0, 255, 100, 0.3), rgba(0, 200, 255, 0.3));
+      border-color: #00ff66;
+      box-shadow: 0 0 15px rgba(0, 255, 100, 0.5);
+    }
+
+    .time-selector {
+      background: var(--glass-bg);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      border-radius: 20px;
+      padding: 0.4rem;
+      backdrop-filter: blur(10px);
+      display: flex;
+      gap: 0.25rem;
+    }
+
+    .time-option {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: rgba(255, 255, 255, 0.7);
+      padding: 0.25rem 0.75rem;
+      border-radius: 15px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .time-option.active {
+      background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+      border-color: var(--neon-cyan);
+      color: white;
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    }
+
+    .time-option:hover {
+      border-color: var(--neon-cyan);
+      color: white;
+    }
+
+    .manual-quiz-button {
+      background: linear-gradient(135deg, rgba(255, 165, 0, 0.3), rgba(255, 100, 0, 0.3));
+      border: 2px solid #ff6600;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 15px;
+      font-size: 1rem;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(255, 165, 0, 0.3);
+      margin-top: 1rem;
+    }
+
+    .manual-quiz-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(255, 165, 0, 0.5);
+      border-color: #ff8800;
+    }
+
+    .manual-quiz-button.hidden {
+      display: none;
+    }
+
+    .quiz-explanation {
+      height: 100px;
+      background: rgba(0, 20, 40, 0.5);
+      border-radius: 10px;
+      padding: 0.5rem;
+      margin-top: 1rem;
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      display: flex;
+      align-items: flex-start; 
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+      box-sizing: border-box;
+      transition: none;
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+
+    .quiz-explanation p {
+      margin: 0;
+      padding: 0;
+      word-wrap: break-word;
+      max-height: 100%;
+      overflow: hidden;
+      font-size: 1rem;
+    }
+
+    .quiz-explanation.has-content {
+      border-color: var(--neon-green);
+      background: rgba(0, 40, 20, 0.5);
+      box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+    }
+
+    .subject-modal-content {
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    .subject-grid {
+      grid-template-columns: repeat(6, 1fr);
+      gap: 0.5rem;
+    }
+    
+    @media (max-width: 640px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .container-spacing {
+        max-width: 95%;
+        margin-bottom: 2rem;
+      }
+      
+      .neon-card {
+        margin: 0.5rem;
+        padding: 1rem;
+      }
+      
+      .neon-card:last-of-type {
+        margin-bottom: 4rem;
+      }
+  
+      body {
+        padding-bottom: 5rem;
+      }
+
+      .game-title {
+        font-size: clamp(1.5rem, 8vw, 2.5rem);
+      }
+      
+      .subject-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.3rem;
+      }
+      
+  .subject-btn {
+    padding: 0.3rem 0.15rem;  /* さらに縮小 */
+    min-height: 45px;         /* さらに高さを縮小 */
+  }
+      
+  .subject-icon {
+    font-size: 1rem;         /* アイコンサイズ縮小 */
+  }
+      
+  .subject-name {
+    font-size: 0.6rem;       /* 文字サイズ縮小 */
+  }
+
+      .auto-quest-controls {
+        gap: 0.5rem;
+        flex-direction: column;
+      }
+
+      .time-selector {
+        flex-wrap: wrap;
+      }
+
+      .time-option {
+        padding: 0.2rem 0.6rem;
+        font-size: 0.75rem;
+      }
+
+      .upgrade-button {
+        padding: 0.5rem 0.75rem !important;
+        font-size: 0.8rem;
+      }
+
+      .upgrade-button .upgrade-title {
+        font-size: 0.9rem;
+      }
+
+      .upgrade-button .upgrade-cost {
+        font-size: 0.7rem;
+      }
+
+      .quiz-explanation {
+        min-height: 100px;
+        padding: 0.9rem;
+      }
+
+  /* クイズモーダル専用の調整を追加 */
+  .quiz-option {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    min-height: auto;
+  }
+  
+  #quizQ {
+    font-size: 0.9rem;
+    line-height: 1.3;
+  }
+  
+  .quiz-explanation {
+    height: 80px;
+    padding: 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  .neon-card .space-y-4 > * + * {
+    margin-top: 0.75rem;
+  }
+  
+  .quiz-explanation p {
+    font-size: 0.9rem;
+  }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center pt-6 pb-12 gap-6 relative">
+
+<!-- 教科選択モーダル -->
+<div id="subjectModal" class="modal show">
+  <div class="neon-card p-4 container-spacing subject-modal-content">
+    <div class="text-center mb-4">
+      <h2 class="text-2xl font-black mb-3 glow-text">
+        🎯 教科選択
+      </h2>
+      <p class="text-gray-300 text-sm">学習したい分野を選んでクエストを開始！</p>
+    </div>
+    
+    <div id="subjectContainer" class="grid subject-grid mb-4">
+    </div>
+    
+    <div class="text-center">
+      <button id="startGame" class="neon-button px-8 py-3 text-lg font-bold disabled:opacity-40 disabled:cursor-not-allowed">
+        🚀 クエスト開始
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- メインタイトル -->
+<div class="neon-card p-6 text-center container-spacing">
+  <h1 class="game-title">
+    JUKEN★QUEST 
+  </h1>
+  <div id="currentSubject" class="mt-3 text-xl font-bold glow-text"></div>
+  
+  <!-- オートクエスト設定エリア -->
+  <div class="auto-quest-controls">
+    <button id="autoQuestToggle" class="toggle-button">
+      🚀 オートクエスト: OFF
+    </button>
+    
+    <div class="time-selector">
+      <button class="time-option" data-time="60">1分</button>
+      <button class="time-option active" data-time="180">3分</button>
+      <button class="time-option" data-time="300">5分</button>
+      <button class="time-option" data-time="600">10分</button>
+      <button class="time-option" data-time="0">∞</button>
+    </div>
+  </div>
+
+  <!-- 手動クイズボタン -->
+  <button id="manualQuizButton" class="manual-quiz-button">
+    🧠 問題にチャレンジ！
+  </button>
+</div>
+
+<!-- ゲーム情報 -->
+<div class="neon-card p-6 container-spacing">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- プレイヤー情報 -->
+    <div class="space-y-4">
+      <h3 class="font-bold text-xl glow-text flex items-center gap-2">
+        👤 プレイヤー情報
+      </h3>
+      <div id="stats" class="stats-grid text-sm"></div>
+    </div>
+    
+    <!-- 敵情報 -->
+    <div class="space-y-4">
+      <h3 class="font-bold text-xl glow-text flex items-center gap-2">
+        🎯 ターゲット情報
+      </h3>
+      <div id="enemyInfo" class="space-y-3">
+        <div id="enemyName" class="font-bold text-lg text-white"></div>
+        <div class="bg-gray-800 rounded-full h-6 p-1 border border-gray-600">
+          <div id="hpBar" class="hp-bar h-4 rounded-full"></div>
+        </div>
+        <div id="enemyStats" class="text-sm text-gray-300"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 強化メニュー -->
+<div class="neon-card p-6 container-spacing">
+  <h3 class="font-bold text-xl glow-text mb-6 flex items-center gap-2">
+    ⚡ パワーアップセンター
+  </h3>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <button id="upgradeAttack" class="upgrade-button neon-button rounded-xl">
+      <div class="upgrade-title font-bold">⚔️ 攻撃力強化</div>
+      <div class="upgrade-cost opacity-90">コスト: ¥<span id="attackCost">100</span></div>
+    </button>
+    
+    <button id="upgradeCrit" class="upgrade-button neon-button rounded-xl">
+      <div class="upgrade-title font-bold">💥 クリティカル強化</div>
+      <div class="upgrade-cost opacity-90">コスト: ¥<span id="critCost">200</span></div>
+    </button>
+    
+    <button id="upgradeDefense" class="upgrade-button neon-button rounded-xl">
+      <div class="upgrade-title font-bold">🛡️ 防御力強化</div>
+      <div class="upgrade-cost opacity-90">コスト: ¥<span id="defenseCost">150</span></div>
+    </button>
+  </div>
+</div>
+
+<!-- 教科変更ボタン -->
+<button id="changeSubject" class="floating-button">
+  📚
+</button>
+
+<!-- クイズモーダル -->
+<div id="quizModal" class="modal">
+  <div class="neon-card p-4 w-full max-w-lg mx-4">
+    <div class="text-center mb-4">
+      <h2 class="font-black text-xl glow-text">
+        🧠 ナレッジバトル！
+      </h2>
+    </div>
+    
+    <div class="space-y-4">
+      <p id="quizQ" class="text-base font-medium text-center text-white leading-relaxed"></p>
+      <div id="quizOptions" class="space-y-2"></div>
+      
+      <!-- 固定の解説エリア -->
+      <div id="quizExplanation" class="quiz-explanation">
+        <p id="quizMsg" class="font-bold text-center text-base"></p>
+      </div>
+      
+      <div class="flex gap-2">
+        <button id="quizNext" class="flex-1 neon-button py-2 text-sm">
+          🔥 次の問題
+        </button>
+        <button id="quizBack" class="flex-1 neon-button py-2 text-sm">
+          🏠 戻る
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 通知 -->
+<div id="notification" class="notification">
+  <div class="flex items-center gap-3">
+    <span class="text-2xl">🎉</span>
+    <div>
+      <div class="font-bold">システム通知</div>
+      <div id="notificationText" class="text-sm opacity-90"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ----------------- 効果音システム ----------------- */
+class SoundSystem {
+  constructor() {
+    this.audioContext = null;
+    this.sounds = {};
+    this.initAudio();
+  }
+
+  initAudio() {
+    try {
+      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (e) {
+      console.log('音声システムを初期化できませんでした');
+    }
+  }
+
+  playClick() {
+    this.createTone(800, 0.1, 0.05, 'square');
+  }
+
+  playCorrect() {
+    this.createTone(523, 0.1, 0.3);
+    setTimeout(() => this.createTone(659, 0.1, 0.3), 150);
+    setTimeout(() => this.createTone(784, 0.2, 0.3), 300);
+  }
+
+  playWrong() {
+    this.createTone(200, 0.3, 0.3, 'sawtooth');
+  }
+
+  playCritical() {
+    this.createTone(1000, 0.1, 0.4, 'square');
+    setTimeout(() => this.createTone(1200, 0.1, 0.4, 'square'), 80);
+    setTimeout(() => this.createTone(1500, 0.2, 0.4, 'square'), 160);
+  }
+
+  playCoin() {
+    this.createTone(988, 0.1, 0.3);
+    setTimeout(() => this.createTone(1319, 0.2, 0.3), 100);
+  }
+
+  playLevelUp() {
+    const notes = [523, 587, 659, 698, 784, 880, 988, 1047];
+    notes.forEach((freq, i) => {
+      setTimeout(() => this.createTone(freq, 0.15, 0.3), i * 100);
+    });
+  }
+
+  playAttack() {
+    this.createTone(300 + Math.random() * 200, 0.1, 0.2, 'square');
+  }
+
+  playBoss() {
+    this.createTone(100, 0.5, 0.5, 'triangle');
+    setTimeout(() => this.createTone(120, 0.5, 0.5, 'triangle'), 200);
+    setTimeout(() => this.createTone(80, 0.8, 0.5, 'triangle'), 400);
+  }
+
+  createTone(frequency, duration, volume = 0.3, type = 'sine') {
+    if (!this.audioContext) return;
+
+    const oscillator = this.audioContext.createOscillator();
+    const gainNode = this.audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(this.audioContext.destination);
+
+    oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+    oscillator.type = type;
+
+    gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+    gainNode.gain.linearRampToValueAtTime(volume, this.audioContext.currentTime + 0.01);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + duration);
+
+    oscillator.start(this.audioContext.currentTime);
+    oscillator.stop(this.audioContext.currentTime + duration);
+  }
+}
+
+const soundSystem = new SoundSystem();
+
+/* ----------------- ゲーム変数 ----------------- */
+let coins = 0;
+let dps = 10;
+let critRate = 5;
+let defense = 0;
+let enemyHPMax = 100;
+let enemyHP = enemyHPMax;
+let killCount = 0;
+let currentSubject = '';
+
+let attackCost = 100;
+let critCost = 200;
+let defenseCost = 150;
+
+// オートクエスト設定
+let autoQuestEnabled = false;
+let autoQuestInterval = 180;
+let autoQuestTimer = null;
+let autoQuestCountdown = 0;
+
+// 問題重複防止用
+let usedQuestions = {};
+let particleOffset = 0;
+
+/* ----------------- DOM要素 ----------------- */
+const enemyName = document.getElementById('enemyName');
+const hpBar = document.getElementById('hpBar');
+const statsDiv = document.getElementById('stats');
+const currentSubjectDiv = document.getElementById('currentSubject');
+const manualQuizButton = document.getElementById('manualQuizButton');
+
+/* ----------------- エフェクト関数 ----------------- */
+function createParticle(text, color, x, y) {
+  const particle = document.createElement('div');
+  particle.className = 'particle';
+  particle.textContent = text;
+  particle.style.color = color;
+  particle.style.left = (x + particleOffset) + 'px';
+  particle.style.top = (y + particleOffset) + 'px';
+  particle.style.fontSize = Math.random() > 0.5 ? '20px' : '18px';
+  document.body.appendChild(particle);
+  
+  particleOffset += 40;
+  if (particleOffset > 160) particleOffset = 0;
+  
+  setTimeout(() => {
+    if (particle.parentNode) {
+      particle.parentNode.removeChild(particle);
+    }
+  }, 2500);
+}
+
+function showNotification(text) {
+  const notification = document.getElementById('notification');
+  const notificationText = document.getElementById('notificationText');
+  
+  notificationText.textContent = text;
+  notification.classList.add('show');
+  
+  setTimeout(() => {
+    notification.classList.remove('show');
+  }, 4000);
+}
+
+/* ----------------- オートクエスト関連 ----------------- */
+function initAutoQuestControls() {
+  const toggleButton = document.getElementById('autoQuestToggle');
+  const timeOptions = document.querySelectorAll('.time-option');
+
+  toggleButton.addEventListener('click', () => {
+    soundSystem.playClick();
+    autoQuestEnabled = !autoQuestEnabled;
+    updateAutoQuestUI();
+    
+    if (autoQuestEnabled) {
+      startAutoQuest();
+      showNotification('🚀 オートクエスト開始！連続学習モード！');
+    } else {
+      stopAutoQuest();
+      showNotification('⏸️ オートクエスト停止 - 手動モードに切替');
+    }
+  });
+
+  timeOptions.forEach(option => {
+    option.addEventListener('click', () => {
+      soundSystem.playClick();
+      timeOptions.forEach(opt => opt.classList.remove('active'));
+      option.classList.add('active');
+      
+      autoQuestInterval = parseInt(option.dataset.time);
+      
+      if (autoQuestEnabled) {
+        stopAutoQuest();
+        startAutoQuest();
+      }
+      
+      const timeText = option.textContent;
+      showNotification(`⏰ 間隔を${timeText}に設定しました`);
+    });
+  });
+
+  // 手動クイズボタン
+  manualQuizButton.addEventListener('click', () => {
+    soundSystem.playClick();
+    openQuiz();
+  });
+}
+
+function updateAutoQuestUI() {
+  const toggleButton = document.getElementById('autoQuestToggle');
+  
+  if (autoQuestEnabled) {
+    toggleButton.textContent = '🚀 オートクエスト: ON';
+    toggleButton.classList.add('active');
+    manualQuizButton.classList.add('hidden');
+  } else {
+    toggleButton.textContent = '🚀 オートクエスト: OFF';
+    toggleButton.classList.remove('active');
+    manualQuizButton.classList.remove('hidden');
+  }
+}
+
+function startAutoQuest() {
+  if (autoQuestInterval === 0) {
+    // 無制限モード：クイズを閉じたら即座に次を開く
+    openQuiz();
+    return;
+  }
+  
+  // 最初のクイズをすぐに開く
+  openQuiz();
+  
+  autoQuestCountdown = autoQuestInterval;
+  
+  autoQuestTimer = setInterval(() => {
+    autoQuestCountdown--;
+    
+    if (autoQuestCountdown <= 0) {
+      // クイズモーダルが開いていない場合のみ新しいクイズを開く
+      if (!document.getElementById('quizModal').classList.contains('show')) {
+        openQuiz();
+      }
+      autoQuestCountdown = autoQuestInterval;
+    }
+  }, 1000);
+}
+
+function stopAutoQuest() {
+  if (autoQuestTimer) {
+    clearInterval(autoQuestTimer);
+    autoQuestTimer = null;
+  }
+  autoQuestCountdown = 0;
+}
+
+/* ----------------- 画面更新 ----------------- */
+function renderStats() {
+  const autoQuestStatus = autoQuestEnabled && autoQuestInterval > 0 
+    ? `(次回: ${autoQuestCountdown}秒後)` 
+    : autoQuestEnabled && autoQuestInterval === 0 
+    ? '(無制限モード)' 
+    : '';
+
+  statsDiv.innerHTML = `
+    <div class="stat-item">
+      <div class="flex justify-between items-center">
+        <span class="font-medium text-gray-300">💰 コイン</span>
+        <span class="font-bold text-yellow-400">${coins.toLocaleString()}</span>
+      </div>
+    </div>
+    <div class="stat-item">
+      <div class="flex justify-between items-center">
+        <span class="font-medium text-gray-300">⚔️ 攻撃力</span>
+        <span class="font-bold text-red-400">${dps}/秒</span>
+      </div>
+    </div>
+    <div class="stat-item">
+      <div class="flex justify-between items-center">
+        <span class="font-medium text-gray-300">💥 クリティカル率</span>
+        <span class="font-bold text-yellow-400">${critRate}%</span>
+      </div>
+    </div>
+    <div class="stat-item">
+      <div class="flex justify-between items-center">
+        <span class="font-medium text-gray-300">🛡️ 防御力</span>
+        <span class="font-bold text-blue-400">${defense}</span>
+      </div>
+    </div>
+    <div class="stat-item">
+      <div class="flex justify-between items-center">
+        <span class="font-medium text-gray-300">🏆 撃破数</span>
+        <span class="font-bold text-purple-400">${killCount}</span>
+      </div>
+    </div>
+    ${autoQuestEnabled ? `
+    <div class="stat-item border-cyan-400">
+      <div class="text-center">
+        <span class="font-medium text-cyan-300">🚀 オートクエスト</span>
+        <div class="text-xs text-cyan-400 mt-1">${autoQuestStatus}</div>
+      </div>
+    </div>
+    ` : ''}
+  `;
+  
+  document.getElementById('attackCost').textContent = attackCost;
+  document.getElementById('critCost').textContent = critCost;
+  document.getElementById('defenseCost').textContent = defenseCost;
+  
+  document.getElementById('upgradeAttack').disabled = coins < attackCost;
+  document.getElementById('upgradeCrit').disabled = coins < critCost;
+  document.getElementById('upgradeDefense').disabled = coins < defenseCost;
+}
+
+function renderEnemy() {
+  const subjectNames = {
+'geography_1': '🗺️ 中１地理モンスター',
+'geography_2': '🗾 中２地理モンスター',
+'history_1': '⛩️ 中１歴史モンスター',   // 古代文明なのでそのまま
+'history_2': '🏯 中２歴史モンスター',    // 大航海時代・幕府政治の時代
+'history_3': '🏭 中３歴史モンスター',    // 近現代・産業革命以降の発展
+'civics': '⚖️ 公民モンスター',
+'chemistry_1': '🧪 中１化学モンスター', // 物質の実験なのでそのまま
+'chemistry_2': '⚛️ 中２化学モンスター', // 原子・分子の学習内容
+'chemistry_3': '⚡ 中３化学モンスター', // イオンの電気的性質
+'biology_1': '🌱 中１生物モンスター',   // 植物の構造と機能
+'biology_2': '🐾 中２生物モンスター',   // 動物の生活と進化
+'biology_3': '🧬 中３生物モンスター',   // 遺伝・生殖なのでそのまま
+'physics_1': '💡 中１物理モンスター',   // 光・音・力（光を代表として）
+'physics_2': '⚡ 中２物理モンスター',   // 電気の学習内容
+'physics_3': '🚀 中３物理モンスター',   // 運動とエネルギー
+'earth_1': '🏔️ 中１地学モンスター',    // 大地の成り立ち・地層
+'earth_2': '🌤️ 中２地学モンスター',    // 気象と天気の変化
+'earth_3': '🌌 中３地学モンスター',    // 地球と宇宙
+  };
+  
+  const currentEnemyType = subjectNames[currentSubject] || 'テストモンスター';
+  enemyName.textContent = `${currentEnemyType} Lv.${Math.floor(killCount / 5) + 1}`;
+  
+  const hpPercent = (enemyHP / enemyHPMax) * 100;
+  hpBar.style.width = hpPercent + '%';
+  
+  document.getElementById('enemyStats').textContent = `HP: ${enemyHP}/${enemyHPMax}`;
+}
+
+/* ----------------- 教科選択（最適化版） ----------------- */
+function initSubjectSelection() {
+  const container = document.getElementById('subjectContainer');
+  const startButton = document.getElementById('startGame');
+  let selectedSubject = '';
+  let activeButton = null;
+  
+  // subjectNameMapを関数外で定義（1回のみ）
+  const subjectNameMap = {
+    'geography_1': '🗺️ 中１地理クエスト',
+    'geography_2': '🗾 中２地理クエスト',
+    'history_1': '⛩️ 中１歴史クエスト',
+    'history_2': '🏯 中２歴史クエスト',
+    'history_3': '🏭 中３歴史クエスト',
+    'civics': '⚖️ 公民クエスト',
+    'chemistry_1': '🧪 中１化学クエスト',
+    'chemistry_2': '⚛️ 中２化学クエスト',
+    'chemistry_3': '⚡ 中３化学クエスト',
+    'biology_1': '🌱 中１生物クエスト',
+    'biology_2': '🐾 中２生物クエスト',
+    'biology_3': '🧬 中３生物クエスト',
+    'physics_1': '💡 中１物理クエスト',
+    'physics_2': '⚡ 中２物理クエスト',
+    'physics_3': '🚀 中３物理クエスト',
+    'earth_1': '🏔️ 中１地学クエスト',
+    'earth_2': '🌤️ 中２地学クエスト',
+    'earth_3': '🌌 中３地学クエスト'
+  };
+  
+  const subjects = [
+    {id: 'geography_1', icon: '🗺️', name: '中１地理'},
+    {id: 'geography_2', icon: '🗾', name: '中２地理'},
+    {id: 'history_1', icon: '⛩️', name: '中１歴史'},
+    {id: 'history_2', icon: '🏯', name: '中２歴史'},
+    {id: 'history_3', icon: '🏭', name: '中３歴史'},
+    {id: 'civics', icon: '⚖️', name: '公民'},
+    {id: 'chemistry_1', icon: '🧪', name: '中１化学'},
+    {id: 'chemistry_2', icon: '⚛️', name: '中２化学'},
+    {id: 'chemistry_3', icon: '⚡', name: '中３化学'},
+    {id: 'biology_1', icon: '🌱', name: '中１生物'},
+    {id: 'biology_2', icon: '🐾', name: '中２生物'},
+    {id: 'biology_3', icon: '🧬', name: '中３生物'},
+    {id: 'physics_1', icon: '💡', name: '中１物理'},
+    {id: 'physics_2', icon: '⚡', name: '中２物理'},
+    {id: 'physics_3', icon: '🚀', name: '中３物理'},
+    {id: 'earth_1', icon: '🏔️', name: '中１地学'},
+    {id: 'earth_2', icon: '🌤️', name: '中２地学'},
+    {id: 'earth_3', icon: '🌌', name: '中３地学'}
+  ];
+  
+  if (!container) return;
+  
+  container.innerHTML = "";
+  
+  subjects.forEach(subject => {
+    const btn = document.createElement('button');
+    btn.className = 'subject-btn';
+    btn.innerHTML = `
+      <div class="subject-icon text-2xl mb-1">${subject.icon}</div>
+      <div class="subject-name font-bold text-xs">${subject.name}</div>
+    `;
+    
+    // 軽量化されたクリックハンドラー
+    btn.onclick = function() {
+      soundSystem.playClick();
+      
+      if (activeButton && activeButton !== this) {
+        activeButton.classList.remove('active');
+      }
+      
+      this.classList.add('active');
+      activeButton = this;
+      selectedSubject = subject.id;
+      startButton.disabled = false;
+    };
+    
+    container.appendChild(btn);
+  });
+  
+  startButton.disabled = true;
+  startButton.onclick = function() {
+    if (selectedSubject) {
+      soundSystem.playLevelUp();
+      currentSubject = selectedSubject;
+      document.getElementById('subjectModal').classList.remove('show');
+      currentSubjectDiv.textContent = subjectNameMap[currentSubject];
+      startGameLoop();
+    }
+  };
+}
+
+/* ----------------- バトルループ ----------------- */
+function startBattleLoop() {
+  setInterval(() => {
+    const isCrit = Math.random() * 100 < critRate;
+    const damage = isCrit ? dps * 2 : dps;
+    
+    enemyHP -= damage;
+    
+    const enemyElement = document.getElementById('enemyInfo');
+    const rect = enemyElement.getBoundingClientRect();
+    
+    const offsetX = (Math.random() - 0.5) * 150;
+    const offsetY = (Math.random() - 0.5) * 80;
+    
+    createParticle(
+      isCrit ? `💥 CRIT! -${damage}` : `⚔️ -${damage}`,
+      isCrit ? '#ffff00' : '#ff4444',
+      rect.left + rect.width / 2 + offsetX,
+      rect.top + offsetY
+    );
+    
+    if (isCrit) {
+      soundSystem.playCritical();
+      enemyElement.classList.add('shake');
+      setTimeout(() => enemyElement.classList.remove('shake'), 600);
+    }
+    
+    if (enemyHP <= 0) {
+      const coinReward = 50 + Math.floor(killCount / 10) * 25;
+      coins += coinReward;
+      killCount++;
+      
+      enemyHPMax = Math.round(enemyHPMax * 1.15);
+      enemyHP = enemyHPMax;
+      
+      soundSystem.playCoin();
+      
+      createParticle(`💰 +${coinReward} コイン`, '#00ffff', 
+        window.innerWidth / 2 + (Math.random() - 0.5) * 200, 
+        window.innerHeight / 2 + (Math.random() - 0.5) * 100
+      );
+      
+      if (killCount % 50 === 0) {
+        enemyHPMax *= 2;
+        enemyHP = enemyHPMax;
+        soundSystem.playBoss();
+        showNotification('🔥 ボス級モンスター出現！');
+      }
+    }
+    
+    renderStats();
+    renderEnemy();
+  }, 1000);
+}
+
+/* ----------------- 強化ボタン ----------------- */
+function initUpgradeButtons() {
+  document.getElementById('upgradeAttack').onclick = () => {
+    if (coins >= attackCost) {
+      soundSystem.playLevelUp();
+      coins -= attackCost;
+      dps += 10;
+      attackCost = Math.floor(attackCost * 1.5);
+      createParticle('⚔️ 攻撃力UP!', '#ff4444', window.innerWidth / 2, window.innerHeight / 3);
+      showNotification('攻撃力が強化されました！');
+      renderStats();
+    }
+  };
+
+  document.getElementById('upgradeCrit').onclick = () => {
+    if (coins >= critCost) {
+      soundSystem.playLevelUp();
+      coins -= critCost;
+      critRate += 5;
+      critCost = Math.floor(critCost * 1.8);
+      createParticle('💥 クリティカルUP!', '#ffff00', window.innerWidth / 2, window.innerHeight / 3);
+      showNotification('クリティカル率が向上しました！');
+      renderStats();
+    }
+  };
+
+  document.getElementById('upgradeDefense').onclick = () => {
+    if (coins >= defenseCost) {
+      soundSystem.playLevelUp();
+      coins -= defenseCost;
+      defense += 10;
+      defenseCost = Math.floor(defenseCost * 1.6);
+      createParticle('🛡️ 防御力UP!', '#00ffff', window.innerWidth / 2, window.innerHeight / 3);
+      showNotification('防御力が向上しました！');
+      renderStats();
+    }
+  };
+}
+
+/* ----------------- クイズ（重複防止機能付き） ----------------- */
+function openQuiz() {
+  const problems = problemDatabase[currentSubject];
+  if (!problems || problems.length === 0) return;
+  
+  if (!usedQuestions[currentSubject]) {
+    usedQuestions[currentSubject] = [];
+  }
+  
+  if (usedQuestions[currentSubject].length >= problems.length) {
+    usedQuestions[currentSubject] = [];
+    showNotification('🎉 全問クリア！問題をリセットしました');
+  }
+  
+  const availableQuestions = problems.filter((_, index) => 
+    !usedQuestions[currentSubject].includes(index)
+  );
+  
+  if (availableQuestions.length === 0) return;
+  
+  const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+  const quiz = availableQuestions[randomIndex];
+  
+  const originalIndex = problems.indexOf(quiz);
+  usedQuestions[currentSubject].push(originalIndex);
+  
+  const modal = document.getElementById('quizModal');
+  const qEl = document.getElementById('quizQ');
+  const optDiv = document.getElementById('quizOptions');
+  const msgEl = document.getElementById('quizMsg');
+  const explanationEl = document.getElementById('quizExplanation');
+  const nextBtn = document.getElementById('quizNext');
+  const backBtn = document.getElementById('quizBack');
+  
+  const remaining = problems.length - usedQuestions[currentSubject].length;
+  qEl.textContent = `${quiz.q} (残り${remaining}問)`;
+  optDiv.innerHTML = '';
+  msgEl.textContent = '';
+  explanationEl.classList.remove('has-content');
+  
+  // 初期状態：ボタンを無効化
+  nextBtn.disabled = true;
+  nextBtn.style.opacity = '0.3';
+  backBtn.disabled = true;
+  backBtn.style.opacity = '0.3';
+  
+  quiz.opts.forEach((txt, i) => {
+    const btn = document.createElement('button');
+    btn.textContent = txt;
+    btn.className = 'quiz-option w-full';
+    btn.onclick = () => {
+      if (i === quiz.ans) {
+        soundSystem.playCorrect();
+        msgEl.innerHTML = `🎉 正解！${quiz.exp || ''}`;
+        msgEl.style.color = '#00ff41';
+        coins += 100;
+        createParticle('💰 +100 コイン', '#00ffff', window.innerWidth / 2, window.innerHeight / 2);
+        showNotification('正解！ボーナスコインを獲得しました！');
+      } else {
+        soundSystem.playWrong();
+        msgEl.innerHTML = `❌ 残念...不正解。正解は「${quiz.opts[quiz.ans]}」です。${quiz.exp || ''}`;
+        msgEl.style.color = '#ff8800';
+      }
+      explanationEl.classList.add('has-content');
+      renderStats();
+      [...optDiv.children].forEach(b => b.disabled = true);
+      
+      // 答えた後：ボタンを有効化
+      nextBtn.disabled = false;
+      nextBtn.style.opacity = '1';
+      backBtn.disabled = false;
+      backBtn.style.opacity = '1';
+
+      // オートクエスト無制限モード時のみ自動で次の問題へ
+      if (autoQuestEnabled && autoQuestInterval === 0) {
+        setTimeout(() => {
+          loadNextQuiz();
+        }, 2000);
+      }
+    };
+    optDiv.appendChild(btn);
+  });
+  
+  // 次の問題ボタンの処理
+  nextBtn.onclick = () => {
+    soundSystem.playClick();
+    loadNextQuiz();
+  };
+
+  // 戻るボタンの処理
+  backBtn.onclick = () => {
+    soundSystem.playClick();
+    if (autoQuestEnabled) {
+      autoQuestEnabled = false;
+      stopAutoQuest();
+      updateAutoQuestUI();
+    }
+    modal.classList.remove('show');
+    showNotification('🏠 メイン画面に戻りました');
+  };
+  
+  modal.classList.add('show');
+}
+
+function loadNextQuiz() {
+  const problems = problemDatabase[currentSubject];
+  if (!problems || problems.length === 0) return;
+  
+  if (!usedQuestions[currentSubject]) {
+    usedQuestions[currentSubject] = [];
+  }
+  
+  if (usedQuestions[currentSubject].length >= problems.length) {
+    usedQuestions[currentSubject] = [];
+    showNotification('🎉 全問クリア！問題をリセットしました');
+  }
+  
+  const availableQuestions = problems.filter((_, index) => 
+    !usedQuestions[currentSubject].includes(index)
+  );
+  
+  if (availableQuestions.length === 0) return;
+  
+  const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+  const quiz = availableQuestions[randomIndex];
+  
+  const originalIndex = problems.indexOf(quiz);
+  usedQuestions[currentSubject].push(originalIndex);
+  
+  // モーダル内の要素を直接更新
+  const qEl = document.getElementById('quizQ');
+  const optDiv = document.getElementById('quizOptions');
+  const msgEl = document.getElementById('quizMsg');
+  const explanationEl = document.getElementById('quizExplanation');
+  const nextBtn = document.getElementById('quizNext');
+  const backBtn = document.getElementById('quizBack');
+  
+  const remaining = problems.length - usedQuestions[currentSubject].length;
+  qEl.textContent = `${quiz.q} (残り${remaining}問)`;
+  optDiv.innerHTML = '';
+  msgEl.textContent = '';
+  explanationEl.classList.remove('has-content');
+
+  // ボタンを無効化
+  nextBtn.disabled = true;
+  nextBtn.style.opacity = '0.3';
+  backBtn.disabled = true;
+  backBtn.style.opacity = '0.3';
+  
+  // 選択肢を再生成
+  quiz.opts.forEach((txt, i) => {
+    const btn = document.createElement('button');
+    btn.textContent = txt;
+    btn.className = 'quiz-option w-full';
+    btn.onclick = () => {
+      if (i === quiz.ans) {
+        soundSystem.playCorrect();
+        msgEl.innerHTML = `🎉 正解！${quiz.exp || ''}`;
+        msgEl.style.color = '#00ff41';
+        coins += 100;
+        createParticle('💰 +100 コイン', '#00ffff', window.innerWidth / 2, window.innerHeight / 2);
+        showNotification('正解！ボーナスコインを獲得しました！');
+      } else {
+        soundSystem.playWrong();
+        msgEl.innerHTML = `❌ 残念...不正解。正解は「${quiz.opts[quiz.ans]}」です。${quiz.exp || ''}`;
+        msgEl.style.color = '#ff8800';
+      }
+      explanationEl.classList.add('has-content');
+      renderStats();
+      [...optDiv.children].forEach(b => b.disabled = true);
+      
+      // 答えた後：ボタンを有効化
+      nextBtn.disabled = false;
+      nextBtn.style.opacity = '1';
+      backBtn.disabled = false;
+      backBtn.style.opacity = '1';
+
+      // オートクエスト無制限モード時のみ自動で次の問題へ
+      if (autoQuestEnabled && autoQuestInterval === 0) {
+        setTimeout(() => {
+          loadNextQuiz();
+        }, 2000);
+      }
+    };
+    optDiv.appendChild(btn);
+  });
+}
+
+/* ----------------- ゲーム開始 ----------------- */
+function startGameLoop() {
+  renderStats();
+  renderEnemy();
+  startBattleLoop();
+  updateAutoQuestUI();
+  showNotification('🚀 クエスト開始！知識の力で敵を倒せ！');
+}
+
+/* ----------------- 教科変更 ----------------- */
+document.getElementById('changeSubject').onclick = () => {
+  soundSystem.playClick();
+  // オートクエストが動いている場合は停止
+  if (autoQuestEnabled) {
+    stopAutoQuest();
+    autoQuestEnabled = false;
+    updateAutoQuestUI();
+  }
+  document.getElementById('subjectModal').classList.add('show');
+};
+
+/* ----------------- 全ボタンに効果音を追加 ----------------- */
+function addSoundToButtons() {
+  document.addEventListener('click', (e) => {
+    if (e.target.matches('button, .neon-button, .subject-btn, .quiz-option') && !e.target.disabled) {
+      // 音声要素以外のクリックで音を鳴らす（重複防止）
+      if (!e.target.hasAttribute('data-sound-added')) {
+        soundSystem.playClick();
+      }
+    }
+  });
+}
+
+/* ----------------- 初期化 ----------------- */
+document.addEventListener('DOMContentLoaded', () => {
+  initSubjectSelection();
+  initUpgradeButtons();
+  initAutoQuestControls();
+  addSoundToButtons();
+  
+  // 音声システムの初期化（ユーザーインタラクション後）
+  document.addEventListener('click', () => {
+    if (soundSystem.audioContext && soundSystem.audioContext.state === 'suspended') {
+      soundSystem.audioContext.resume();
+    }
+  }, { once: true });
+});
+</script>
+</body>
+</html>
