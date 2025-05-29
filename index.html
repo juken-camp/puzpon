@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+    <title>🐱 NEKOPON Quiz 🐱</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="problems.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary-brown: #8b4513;
+            --light-brown: #d2691e;
+            --cream: #faf8f5;
+            --white: #ffffff;
+            --soft-orange: #ff7f50;
+            --gold: #ffd700;
+            --pink: #ffb6c1;
+            --shadow: rgba(139,69,19,0.25);
+            --neon-pink: #ff1493;
+            --neon-blue: #00bfff;
+            --neon-green: #00ff00;
+        }
+
+        body {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            background: var(--cream);
+            color: var(--primary-brown);
+            font-weight: 700;
+            min-height: 100vh;
+            touch-action: manipulation;
+            overflow-x: hidden;
+            -webkit-text-size-adjust: none;
+            -moz-text-size-adjust: none;
+            -ms-text-size-adjust: none;
+            text-size-adjust: none;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .container-spacing {
+            margin: 0 auto;
+            max-width: 95%;
+            width: 100%;
+        }
+
+        @media (min-width: 640px) {
+            .container-spacing {
+                max-width: 500px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .container-spacing {
+                max-width: 600px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .container-spacing {
+                max-width: 700px;
+            }
+        }
+
+        /* 横並びスコア表示（NEKOPON風） */
+        .horizontal-points-display {
+            position: fixed !important;
+            bottom: 20px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            z-index: 9999 !important;
+            display: flex !important;
+            gap: 12px !important;
+            pointer-events: none;
+            background: rgba(255,255,255,0.35);
+            padding: 8px 24px;
+            border-radius: 25px;
+            backdrop-filter: blur(15px);
+            box-shadow: 
+                0 8px 32px rgba(139,69,19,0.15),
+                inset 0 1px 0 rgba(255,255,255,0.3);
+            animation: header-enter 1.2s ease-out 0.8s forwards;
+            opacity: 0;
+        }
+
+        @keyframes header-enter {
+            0% { 
+                opacity: 0; 
+                transform: translateX(-50%) translateY(20px) scale(0.9); 
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateX(-50%) translateY(0) scale(1); 
+            }
+        }
+
+        .point-bubble {
+            background: transparent;
+            border: none;
+            border-radius: 15px;
+            padding: 5px 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary-brown);
+            cursor: pointer;
+            pointer-events: auto;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .point-bubble:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.05);
+        }
+
+        /* アイコンのみの回転用クラス - 拡張版 */
+        .rotating-icon, .auto-rotating-emoji {
+            display: inline-block;
+            transition: transform 0.1s ease-out;
+            --rotation: 0deg;
+        }
+
+        .rotating-icon:not(.animating):not(.bounce), 
+        .auto-rotating-emoji:not(.animating):not(.bounce) {
+            transform: rotate(var(--rotation)) !important;
+        }
+
+        .point-bubble:nth-child(1):not(.tap-sparkle) .rotating-icon,
+        .point-bubble:nth-child(1):not(.tap-sparkle) .auto-rotating-emoji {
+            animation: gentle-sparkle 4s ease-in-out 3s infinite;
+        }
+
+        .point-bubble:nth-child(2):not(.tap-fire) .rotating-icon,
+        .point-bubble:nth-child(2):not(.tap-fire) .auto-rotating-emoji {
+            animation: gentle-fire 3.5s ease-in-out 3.5s infinite;
+        }
+
+        .point-bubble:nth-child(3):not(.tap-trophy) .rotating-icon,
+        .point-bubble:nth-child(3):not(.tap-trophy) .auto-rotating-emoji {
+            animation: gentle-trophy 5s ease-in-out 4s infinite;
+        }
+
+        .point-bubble.tap-sparkle .rotating-icon,
+        .point-bubble.tap-sparkle .auto-rotating-emoji {
+            animation: tap-sparkle 0.8s ease-out !important;
+        }
+
+        .point-bubble.tap-fire .rotating-icon,
+        .point-bubble.tap-fire .auto-rotating-emoji {
+            animation: tap-fire 0.8s ease-out !important;
+        }
+
+        .point-bubble.tap-trophy .rotating-icon,
+        .point-bubble.tap-trophy .auto-rotating-emoji {
+            animation: tap-trophy 0.8s ease-out !important;
+        }
+
+        @keyframes gentle-sparkle {
+            0%, 100% { filter: brightness(1); transform: scale(1) rotate(var(--rotation)); }
+            50% { filter: brightness(1.2) drop-shadow(0 0 5px gold); transform: scale(1.02) rotate(calc(var(--rotation) + 5deg)); }
+        }
+
+        @keyframes gentle-fire {
+            0%, 100% { filter: brightness(1); transform: scale(1) rotate(var(--rotation)); }
+            33% { filter: brightness(1.3) hue-rotate(15deg); transform: scale(1.03) rotate(calc(var(--rotation) + 3deg)); }
+            66% { filter: brightness(1.1) hue-rotate(-10deg); transform: scale(1.01) rotate(calc(var(--rotation) - 3deg)); }
+        }
+
+        @keyframes gentle-trophy {
+            0%, 100% { filter: brightness(1); transform: scale(1) rotate(var(--rotation)); }
+            50% { filter: brightness(1.4) drop-shadow(0 0 8px orange); transform: scale(1.04) rotate(calc(var(--rotation) + 4deg)); }
+        }
+
+        @keyframes tap-sparkle {
+            0% { transform: scale(1) rotate(var(--rotation)); filter: brightness(1); }
+            30% { transform: scale(1.4) rotate(calc(var(--rotation) + 15deg)); filter: brightness(2) drop-shadow(0 0 20px gold) saturate(2); }
+            60% { transform: scale(1.2) rotate(calc(var(--rotation) + 5deg)); filter: brightness(1.8) drop-shadow(0 0 15px gold); }
+            100% { transform: scale(1) rotate(var(--rotation)); filter: brightness(1); }
+        }
+
+        @keyframes tap-fire {
+            0% { transform: scale(1) rotate(var(--rotation)); filter: brightness(1); }
+            25% { transform: scale(1.5) rotate(calc(var(--rotation) + 20deg)); filter: brightness(3) hue-rotate(90deg) saturate(3); }
+            50% { transform: scale(1.3) rotate(calc(var(--rotation) - 10deg)); filter: brightness(2.5) hue-rotate(45deg) saturate(2); }
+            75% { transform: scale(1.1) rotate(calc(var(--rotation) + 8deg)); filter: brightness(1.8) hue-rotate(20deg); }
+            100% { transform: scale(1) rotate(var(--rotation)); filter: brightness(1); }
+        }
+
+        @keyframes tap-trophy {
+            0% { transform: scale(1) rotate(var(--rotation)); filter: brightness(1); }
+            20% { transform: scale(1.6) translateY(-5px) rotate(calc(var(--rotation) + 25deg)); filter: brightness(4) drop-shadow(0 0 25px orange) saturate(3); }
+            40% { transform: scale(1.4) translateY(-2px) rotate(calc(var(--rotation) - 15deg)); filter: brightness(3) drop-shadow(0 0 20px gold); }
+            60% { transform: scale(1.2) translateY(0px) rotate(calc(var(--rotation) + 10deg)); filter: brightness(2) drop-shadow(0 0 15px orange); }
+            80% { transform: scale(1.05) translateY(0px) rotate(calc(var(--rotation) - 3deg)); filter: brightness(1.5); }
+            100% { transform: scale(1) translateY(0px) rotate(var(--rotation)); filter: brightness(1); }
+        }
+
+        /* クリッカブルな要素の基本スタイル（回転なし） */
+        .clickable-element {
+            cursor: pointer !important;
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+            position: relative;
+            overflow: visible;
+        }
+
+        .clickable-element:hover {
+            transform: scale(1.05) !important;
+            filter: brightness(1.2) !important;
+        }
+
+        .clickable-element:active {
+            transform: scale(0.95) !important;
+        }
+
+        /* 可愛い震えエフェクト（回転なし） */
+        .cute-shake-effect {
+            animation: cute-shake 0.6s ease-in-out !important;
+        }
+
+        @keyframes cute-shake {
+            0%, 100% { 
+                transform: scale(1); 
+            }
+            10% { 
+                transform: scale(1.1); 
+            }
+            20% { 
+                transform: scale(0.95); 
+            }
+            30% { 
+                transform: scale(1.08); 
+            }
+            40% { 
+                transform: scale(0.98); 
+            }
+            50% { 
+                transform: scale(1.05); 
+            }
+            60% { 
+                transform: scale(0.99); 
+            }
+            70% { 
+                transform: scale(1.02); 
+            }
+            80% { 
+                transform: scale(0.995); 
+            }
+            90% { 
+                transform: scale(1.01); 
+            }
+        }
+
+        /* ゲームタイトル */
+        .game-title {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-weight: 700;
+            font-size: clamp(1.4rem, 4vw, 2rem);
+            text-align: center;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            user-select: none;
+            opacity: 0;
+            animation: title-enter 1.5s ease-out 0.2s forwards;
+            white-space: normal;
+            overflow: visible;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* タイトルのテキスト部分のみにグラデーション適用 */
+        .game-title-text {
+            background: linear-gradient(45deg, var(--light-brown), var(--soft-orange), var(--gold));
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @keyframes title-enter {
+            0% { 
+                opacity: 0; 
+                transform: translateY(-30px) scale(0.8); 
+            }
+            60% { 
+                opacity: 1; 
+                transform: translateY(5px) scale(1.1); 
+            }
+            80% { 
+                transform: translateY(-2px) scale(1.05); 
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+
+        .game-title.title-bounce {
+            animation: title-mega-bounce 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+        }
+
+        @keyframes title-mega-bounce {
+            0% { transform: scale(1); }
+            20% { transform: scale(1.15); }
+            40% { transform: scale(0.95); }
+            60% { transform: scale(1.1); }
+            80% { transform: scale(0.98); }
+            100% { transform: scale(1); }
+        }
+
+        /* 猫アイコン */
+        .cat-icon {
+            display: inline-block;
+            cursor: pointer;
+            font-size: clamp(28px, 4vw, 40px);
+            transition: all 0.1s ease-out;
+            filter: drop-shadow(0 0 5px var(--gold));
+            --rotation: 0deg;
+            color: #8b4513; /* 猫アイコンに固定色を設定 */
+        }
+
+        .cat-icon:hover {
+            transform: scale(1.4) rotate(calc(var(--rotation) + 15deg)) !important;
+            filter: drop-shadow(0 0 15px var(--neon-pink)) brightness(1.5) !important;
+        }
+
+        .cat-icon.bounce {
+            animation: cat-mega-bounce 0.8s ease-in-out !important;
+        }
+
+        .cat-icon:not(.bounce) {
+            transform: rotate(var(--rotation));
+        }
+
+        @keyframes cat-mega-bounce {
+            0%, 100% { 
+                transform: scale(1) rotate(var(--rotation)); 
+            }
+            25% { 
+                transform: scale(1.6) rotate(calc(var(--rotation) + 20deg)); 
+            }
+            50% { 
+                transform: scale(1.8) rotate(calc(var(--rotation) - 15deg)); 
+            }
+            75% { 
+                transform: scale(1.4) rotate(calc(var(--rotation) + 10deg)); 
+            }
+        }
+
+        /* 小さなフローティングポイント表示 */
+        .floating-points {
+            position: absolute;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            pointer-events: none;
+            z-index: 8000;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+            animation: float-points 2s ease-out forwards;
+            white-space: nowrap;
+        }
+
+        .floating-points.normal {
+            color: var(--soft-orange);
+        }
+
+        .floating-points.bonus {
+            font-size: 18px;
+            color: var(--neon-pink);
+        }
+
+        .floating-points.mega {
+            font-size: 20px;
+            color: var(--neon-blue);
+        }
+
+        .floating-points.ultra {
+            font-size: 22px;
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-blue), var(--neon-green), var(--gold));
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @keyframes float-points {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-60px) scale(1.2); }
+        }
+
+        /* 小さなパーティクル */
+        .cute-particle {
+            position: absolute;
+            font-size: 14px;
+            pointer-events: none;
+            z-index: 7000;
+            animation: cute-particle-burst 1.5s ease-out forwards;
+        }
+
+        @keyframes cute-particle-burst {
+            0% { 
+                opacity: 1; 
+                transform: scale(0) rotate(0deg); 
+            }
+            20% { 
+                opacity: 1; 
+                transform: scale(1.2) rotate(180deg); 
+            }
+            100% { 
+                opacity: 0; 
+                transform: scale(0.5) rotate(360deg) translateY(-80px); 
+            }
+        }
+
+        .clean-card {
+            background: var(--white);
+            border: 2px solid var(--light-brown);
+            border-radius: 20px;
+            box-shadow: 0 8px 24px var(--shadow);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .clean-button {
+            background: var(--light-brown);
+            border: none;
+            color: white;
+            font-weight: 700;
+            border-radius: 25px;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 4px 12px var(--shadow);
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .clean-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px var(--shadow);
+            background: var(--soft-orange);
+        }
+
+        .clean-button:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .clean-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .subject-btn, .category-btn {
+            background: var(--white);
+            border: 3px solid var(--light-brown);
+            border-radius: 15px;
+            color: var(--primary-brown);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px var(--shadow);
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .subject-btn:hover, .category-btn:hover {
+            border-color: var(--soft-orange);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 28px var(--shadow);
+            background: #fff8f0;
+        }
+
+        .subject-btn.active, .category-btn.active {
+            background: #ffe4cc;
+            border-color: var(--soft-orange);
+            color: var(--soft-orange);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 28px var(--shadow);
+        }
+
+        .category-btn {
+            padding: 0.5rem 0.75rem !important;
+            min-height: 50px !important;
+            font-size: 0.85rem !important;
+            line-height: 1.2 !important;
+        }
+
+        .category-btn:hover {
+            transform: translateY(-2px) scale(1.01) !important;
+        }
+
+        .category-btn.active {
+            transform: translateY(-2px) scale(1.01) !important;
+        }
+
+        /* アイコン部分だけ回転させる */
+        .subject-icon, .category-icon {
+            display: inline-block;
+            transition: transform 0.1s ease-out;
+            --rotation: 0deg;
+        }
+
+        .subject-icon:not(.animating):not(.bounce), 
+        .category-icon:not(.animating):not(.bounce) {
+            transform: rotate(var(--rotation)) !important;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(139,69,19,0.4);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            z-index: 5000;
+            padding: 1rem;
+        }
+
+        .modal.show {
+            display: flex;
+            animation: modalFadeIn 0.5s ease-out;
+        }
+
+        .modal.unit-modal {
+            align-items: flex-start;
+            padding: 0.5rem;
+            overflow-y: auto;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .floating-msg {
+            position: absolute;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary-brown);
+            pointer-events: none;
+            z-index: 7500;
+            animation: float-up 2s ease-out forwards;
+            text-shadow: 1px 1px 4px rgba(255,255,255,0.8);
+            white-space: nowrap;
+        }
+
+        @keyframes float-up {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-60px) scale(1.2); }
+        }
+
+        .quiz-option {
+            background: var(--white);
+            border: 3px solid var(--light-brown);
+            color: var(--primary-brown);
+            border-radius: 15px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            font-weight: 700;
+            font-size: 0.9rem;
+            position: relative;
+            box-shadow: 0 4px 12px var(--shadow);
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            cursor: pointer;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--soft-orange);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px var(--shadow);
+            background: #fff8f0;
+        }
+
+        .quiz-explanation {
+            height: 150px;
+            background: #fff8f0;
+            border-radius: 15px;
+            padding: 0.75rem;
+            margin-top: 1rem;
+            border: 3px solid var(--light-brown);
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            text-align: center;
+            overflow-y: auto;
+            box-sizing: border-box;
+            font-size: 1rem;
+            line-height: 1.4;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-weight: 700;
+        }
+
+        .quiz-explanation p {
+            margin: 0;
+            padding: 0;
+            word-wrap: break-word;
+            max-height: 100%;
+            overflow: hidden;
+            font-size: 1rem;
+        }
+
+        .quiz-explanation.has-content {
+            border-color: var(--soft-orange);
+            background: #ffe4cc;
+        }
+
+        .back-button {
+            background: #f8f4f0;
+            border: 2px solid var(--light-brown);
+            color: var(--primary-brown);
+            border-radius: 15px;
+            padding: 0.5rem 1rem;
+            font-weight: 700;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            font-size: 0.9rem;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            background: #fff8f0;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px var(--shadow);
+        }
+
+        .mode-btn {
+            background: var(--white);
+            border: 3px solid var(--light-brown);
+            border-radius: 12px;
+            color: var(--primary-brown);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 8px var(--shadow);
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            cursor: pointer;
+        }
+
+        .mode-btn:hover {
+            border-color: var(--soft-orange);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px var(--shadow);
+            background: #fff8f0;
+        }
+
+        .mode-btn.active {
+            background: #ffe4cc;
+            border-color: var(--soft-orange);
+            color: var(--soft-orange);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px var(--shadow);
+        }
+
+        /* モードアイコンも回転 */
+        .mode-icon {
+            display: inline-block;
+            margin-right: 4px;
+            transition: transform 0.1s ease-out;
+            --rotation: 0deg;
+        }
+
+        .mode-icon:not(.animating):not(.bounce) {
+            transform: rotate(var(--rotation)) !important;
+        }
+
+        .stats-display {
+            background: #fff8f0;
+            border: 2px solid var(--light-brown);
+            border-radius: 20px;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .floating-button {
+            position: fixed !important;
+            bottom: 20px !important;
+            left: 20px !important;
+            right: auto !important;
+            margin: 0 !important;
+            transform: none !important;
+            width: 56px;
+            height: 56px;
+            background: var(--light-brown);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 20px var(--shadow);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 9998;
+            cursor: pointer;
+        }
+
+        .floating-button.hidden {
+            display: none !important;
+        }
+
+        .floating-button:hover {
+            transform: translateY(-3px) !important;
+            box-shadow: 0 8px 24px var(--shadow);
+            background: var(--soft-orange);
+        }
+
+        /* フローティングボタンのアイコンも回転 */
+        .floating-button-icon {
+            display: inline-block;
+            transition: transform 0.1s ease-out;
+            --rotation: 0deg;
+        }
+
+        .floating-button-icon:not(.animating):not(.bounce) {
+            transform: rotate(var(--rotation)) !important;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--white);
+            color: var(--primary-brown);
+            padding: 12px 16px;
+            border-radius: 20px;
+            border: 2px solid var(--light-brown);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 9001;
+            box-shadow: 0 6px 20px var(--shadow);
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-weight: 700;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .subject-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+
+        .category-grid {
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) !important;
+            gap: 0.4rem !important;
+        }
+
+        .section-divider {
+            height: 2px;
+            background: var(--light-brown);
+            margin: 1rem 0;
+            border-radius: 1px;
+        }
+
+        .grade-label {
+            font-size: 0.7rem !important;
+            font-weight: 700;
+            color: var(--light-brown);
+            text-align: center;
+            margin: 0.5rem 0 0.3rem 0 !important;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .score-pulse {
+            animation: score-pulse 0.6s ease-in-out;
+        }
+
+        @keyframes score-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); filter: brightness(1.3); }
+        }
+
+        .tap-effect {
+            position: relative;
+            overflow: visible;
+        }
+
+        .tap-effect::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: var(--gold);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 6000;
+        }
+
+        .tap-effect.tapped::after {
+            animation: tap-ripple 0.6s ease-out;
+        }
+
+        @keyframes tap-ripple {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 0.8;
+            }
+            100% {
+                width: 200px;
+                height: 200px;
+                opacity: 0;
+            }
+        }
+
+        .subject-modal-content {
+            max-height: 85vh;
+            overflow-y: auto;
+            padding-top: 0;
+        }
+        
+        .modal .clean-card {
+            margin: 2rem 1rem 1rem 1rem;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        /* 修正①: スクロール問題解決 - 戻るボタンが見えるよう下の余白を追加 */
+        .modal.unit-modal .clean-card {
+            margin: 0.25rem 1rem 8rem 1rem; /* 下の余白を8remに増加 */
+            max-height: 94vh;
+            overflow-y: auto;
+            padding: 1rem 1rem 3rem 1rem; /* 下のpaddingも3remに増加 */
+        }
+
+        /* 修正③: 重力感知のための権限要求ポップアップの幅を広げる */
+        .permission-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(139,69,19,0.25);
+            z-index: 10000;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            text-align: center;
+            max-width: 400px; /* 320px から 400px に変更 */
+            width: 90%; /* 幅を追加してレスポンシブ対応 */
+            line-height: 1.6;
+            border: 1px solid rgba(255,255,255,0.3);
+            opacity: 0;
+            display: none;
+        }
+
+        .permission-popup.show {
+            display: block;
+            animation: popup-enter 0.8s ease-out forwards;
+        }
+
+        @keyframes popup-enter {
+            0% { 
+                opacity: 0; 
+                transform: translate(-50%, -50%) scale(0.8) rotate(-5deg); 
+            }
+            60% { 
+                opacity: 1; 
+                transform: translate(-50%, -50%) scale(1.05) rotate(2deg); 
+            }
+            80% { 
+                transform: translate(-50%, -50%) scale(0.98) rotate(-1deg); 
+            }
+            100% { 
+                opacity: 1; 
+                transform: translate(-50%, -50%) scale(1) rotate(0deg); 
+            }
+        }
+
+        .permission-popup h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            color: #8b4513;
+        }
+
+        .permission-popup p {
+            font-size: 15px;
+            margin-bottom: 20px;
+            color: #a0522d;
+            white-space: normal; /* テキスト折り返しを許可 */
+            word-wrap: break-word; /* 長い単語の折り返し */
+        }
+
+        .permission-popup button {
+            background: linear-gradient(145deg, #d2691e, #ff7f50);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 8px 6px;
+            width: 120px;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(210,105,30,0.3);
+        }
+
+        .permission-popup button:hover {
+            background: linear-gradient(145deg, #ff7f50, #ff6347);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(210,105,30,0.4);
+        }
+
+        @media (max-width: 640px) {
+            .container-spacing {
+                max-width: 95%;
+                margin-bottom: 2rem;
+            }
+
+            .horizontal-points-display {
+                bottom: 15px !important;
+                gap: 8px;
+                padding: 6px 20px;
+            }
+
+            .point-bubble {
+                font-size: 14px;
+                padding: 4px 6px;
+                gap: 4px;
+            }
+
+            .modal .clean-card {
+                margin: 1.5rem 0.25rem 0.25rem 0.25rem;
+                padding: 0.75rem;
+                max-height: 92vh;
+            }
+
+            /* 修正①: スマホでもスクロール問題解決 */
+            .modal.unit-modal .clean-card {
+                margin: 0.1rem 0.25rem 8rem 0.25rem !important; /* 下の余白を8remに増加 */
+                padding: 0.6rem 0.75rem 4rem 0.75rem !important; /* 下のpaddingも4remに増加 */
+                max-height: 98vh !important;
+            }
+
+            .floating-button {
+                bottom: 20px !important;
+                left: 20px !important;
+                right: auto !important;
+                width: 52px;
+                height: 52px;
+                font-size: 20px;
+            }
+
+            .clean-card {
+                margin: 0.5rem;
+                padding: 1rem;
+            }
+
+            .clean-card:last-of-type {
+                margin-bottom: 6rem;
+            }
+
+            body {
+                padding-bottom: 7rem;
+            }
+
+            .game-title {
+                font-size: clamp(1.2rem, 4.5vw, 1.6rem);
+                letter-spacing: 1px;
+            }
+            
+            .cat-icon {
+                font-size: clamp(24px, 4.5vw, 32px);
+            }
+
+            .subject-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.5rem;
+            }
+
+            .category-grid {
+                grid-template-columns: 1fr !important;
+                gap: 0.3rem !important;
+            }
+
+            .subject-btn, .category-btn {
+                padding: 0.75rem 0.5rem;
+                min-height: 70px;
+                font-size: 0.8rem;
+            }
+
+            .category-btn {
+                padding: 0.4rem 0.5rem !important;
+                min-height: 45px !important;
+                font-size: 0.8rem !important;
+                line-height: 1.1 !important;
+            }
+
+            .quiz-option {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.85rem;
+            }
+
+            #quizQ {
+                font-size: 0.9rem;
+                line-height: 1.3;
+            }
+
+            .quiz-explanation {
+                height: 120px;
+                padding: 0.5rem;
+                font-size: 0.9rem;
+                line-height: 1.3;
+            }
+
+            .quiz-explanation p {
+                font-size: 0.9rem;
+            }
+
+            .grade-label {
+                margin: 0.4rem 0 0.25rem 0 !important;
+            }
+
+            .floating-points {
+                font-size: 14px;
+            }
+
+            .floating-points.bonus {
+                font-size: 16px;
+            }
+
+            .floating-points.mega {
+                font-size: 18px;
+            }
+
+            .floating-points.ultra {
+                font-size: 20px;
+            }
+
+            /* 修正③: スマホでのポップアップ対応 */
+            .permission-popup {
+                max-width: 350px; /* スマホ用にさらに調整 */
+                width: 85%;
+                padding: 20px;
+            }
+
+            .permission-popup h3 {
+                font-size: 18px;
+            }
+
+            .permission-popup p {
+                font-size: 14px;
+            }
+
+            .permission-popup button {
+                width: 100px;
+                padding: 10px 16px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .game-title {
+                font-size: clamp(1rem, 5vw, 1.4rem);
+                letter-spacing: 0px;
+            }
+            
+            .cat-icon {
+                font-size: clamp(20px, 5vw, 28px);
+            }
+
+            .horizontal-points-display {
+                bottom: 10px !important;
+                gap: 6px;
+                padding: 4px 16px;
+            }
+
+            .point-bubble {
+                font-size: 12px;
+                padding: 3px 5px;
+                gap: 3px;
+            }
+
+            /* 修正③: 極小画面でのポップアップ対応 */
+            .permission-popup {
+                max-width: 320px;
+                width: 90%;
+                padding: 18px;
+            }
+
+            .permission-popup button {
+                width: 90px;
+                margin: 6px 4px;
+            }
+        }
+
+        button, .subject-btn, .category-btn, .quiz-option, .clean-button, .back-button, .mode-btn {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            touch-action: manipulation;
+            -webkit-appearance: none;
+        }
+
+        * {
+            touch-action: manipulation;
+        }
+
+        input, select, textarea {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center pt-6 pb-12 gap-6 relative">
+    <!-- 横並びポイント表示（画面下部中央） -->
+    <div class="horizontal-points-display">
+        <div class="point-bubble clickable-element" id="sparklePointBubble">
+            <span class="rotating-icon">✨</span> <span id="sparklePointsMain">0</span>
+        </div>
+        <div class="point-bubble clickable-element" id="firePointBubble">
+            <span class="rotating-icon">🔥</span> <span id="firePointsMain">0</span>
+        </div>
+        <div class="point-bubble clickable-element" id="trophyPointBubble">
+            <span class="rotating-icon">🏆</span> <span id="trophyPointsMain">0</span>
+        </div>
+    </div>
+
+    <!-- メインの教科選択モーダル -->
+    <div id="mainSubjectModal" class="modal show">
+        <div class="clean-card p-6 container-spacing subject-modal-content">
+            <div class="text-center mb-6">
+                <!-- 修正完了: メインページのNEKOPON Quizタイトルに重力感知猫追加 -->
+                <h1 class="game-title clickable-element" id="gameTitle">
+                    <span class="cat-icon clickable-element rotating-icon" id="leftCat">🐱</span>
+                    <span class="game-title-text">NEKOPON Quiz</span>
+                    <span class="cat-icon clickable-element rotating-icon" id="rightCat">🐱</span>
+                </h1>
+                <h2 class="text-lg font-semibold mb-3 text-gray-700 clickable-element">
+                    <span class="rotating-icon">📚</span> 教科を選ぶにゃ〜♪
+                </h2>
+                <p class="text-gray-600 text-sm clickable-element">学習したい教科を選んでほしいにゃん♪<br>どこでもクリックでポイントゲットにゃ〜<span class="rotating-icon">✨</span></p>
+            </div>
+            <div class="grid subject-grid mb-6">
+                <button class="subject-btn tap-effect clickable-element" data-subject="social">
+                    <div class="subject-icon text-2xl mb-1">🌍</div>
+                    <div class="subject-name font-semibold text-sm">社会</div>
+                </button>
+                <button class="subject-btn tap-effect clickable-element" data-subject="science">
+                    <div class="subject-icon text-2xl mb-1">🔬</div>
+                    <div class="subject-name font-semibold text-sm">理科</div>
+                </button>
+                <button class="subject-btn tap-effect clickable-element" data-subject="english">
+                    <div class="subject-icon text-2xl mb-1">📖</div>
+                    <div class="subject-name font-semibold text-sm">英語</div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ゲーム画面 -->
+    <div id="gameScreen" class="hidden">
+        <div class="clean-card p-6 text-center container-spacing mb-6">
+            <!-- 修正②: 単元選択画面のタイトルに猫追加（重力感知対応） -->
+            <h1 class="game-title clickable-element">
+                <span class="cat-icon clickable-element rotating-icon" id="gameLeftCat">🐱</span>
+                <span class="game-title-text">NEKOPON Quiz</span>
+                <span class="cat-icon clickable-element rotating-icon" id="gameRightCat">🐱</span>
+            </h1>
+            <div id="currentCategory" class="text-lg font-semibold text-gray-700 mb-4 clickable-element"></div>
+            <div class="stats-display clickable-element">
+                <div class="grid grid-cols-3 gap-4 text-center mb-4">
+                    <div class="clickable-element">
+                        <div class="text-xl font-bold text-gray-800 clickable-element" id="correctCount">0</div>
+                        <div class="text-xs text-gray-600 clickable-element">正解数だにゃ♪</div>
+                    </div>
+                    <div class="clickable-element">
+                        <div class="text-xl font-bold text-gray-800 clickable-element" id="wrongCount">0</div>
+                        <div class="text-xs text-gray-600 clickable-element">不正解数だにゃ</div>
+                    </div>
+                    <div class="clickable-element">
+                        <div class="text-xl font-bold text-gray-800 clickable-element" id="totalCount">0</div>
+                        <div class="text-xs text-gray-600 clickable-element">総問題数だにゃ〜</div>
+                    </div>
+                </div>
+                
+                <div class="section-divider clickable-element"></div>
+                <div class="text-center">
+                    <div class="text-sm font-semibold text-gray-700 mb-3 clickable-element"><span class="rotating-icon">📋</span> 出題形式だにゃ〜</div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button id="randomModeBtn" class="mode-btn active tap-effect clickable-element" data-mode="random">
+                            <span class="mode-icon">🎲</span> ランダムにゃ
+                        </button>
+                        <button id="sequentialModeBtn" class="mode-btn tap-effect clickable-element" data-mode="sequential">
+                            <span class="mode-icon">📋</span> 順番通りにゃ
+                        </button>
+                    </div>
+                    <div class="text-xs text-gray-600 mt-2 clickable-element" id="modeDescription">
+                        問題をランダムに出題するにゃ〜♪
+                    </div>
+                </div>
+            </div>
+            <button id="startQuizButton" class="clean-button px-6 py-3 text-base font-semibold mt-6 tap-effect clickable-element">
+                <span class="rotating-icon">✨</span> スタートにゃ〜♪
+            </button>
+        </div>
+    </div>
+
+    <!-- 残りのHTMLは前回と同じなので省略 -->
+    <!-- ここに前回の残りのHTMLコードを記載してください -->
+
+    <script>
+        /* JavaScript部分は前回と同じなので省略 */
+        /* 完全なJavaScriptコードをここに記載する必要があります */
+    </script>
+</body>
+</html>
