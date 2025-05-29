@@ -1,0 +1,3129 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+    <title>🐱 NEKOPON Quiz 🐱</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="problems.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary-brown: #8b4513;
+            --light-brown: #d2691e;
+            --cream: #faf8f5;
+            --white: #ffffff;
+            --soft-orange: #ff7f50;
+            --gold: #ffd700;
+            --pink: #ffb6c1;
+            --shadow: rgba(139,69,19,0.25);
+            --neon-pink: #ff1493;
+            --neon-blue: #00bfff;
+            --neon-green: #00ff00;
+        }
+
+        body {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            background: var(--cream);
+            color: var(--primary-brown);
+            font-weight: 700;
+            min-height: 100vh;
+            touch-action: manipulation;
+            overflow-x: hidden;
+            -webkit-text-size-adjust: none;
+            -moz-text-size-adjust: none;
+            -ms-text-size-adjust: none;
+            text-size-adjust: none;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .container-spacing {
+            margin: 0 auto;
+            max-width: 95%;
+            width: 100%;
+        }
+
+        @media (min-width: 640px) {
+            .container-spacing {
+                max-width: 500px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .container-spacing {
+                max-width: 600px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .container-spacing {
+                max-width: 700px;
+            }
+        }
+
+        /* 横並びスコア表示（NEKOPON風） */
+        .horizontal-points-display {
+            position: fixed !important;
+            bottom: 20px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            z-index: 9999 !important;
+            display: flex !important;
+            gap: 12px !important;
+            pointer-events: none;
+            background: rgba(255,255,255,0.35);
+            padding: 8px 24px;
+            border-radius: 25px;
+            backdrop-filter: blur(15px);
+            box-shadow: 
+                0 8px 32px rgba(139,69,19,0.15),
+                inset 0 1px 0 rgba(255,255,255,0.3);
+            animation: header-enter 1.2s ease-out 0.8s forwards;
+            opacity: 0;
+        }
+
+        @keyframes header-enter {
+            0% { 
+                opacity: 0; 
+                transform: translateX(-50%) translateY(20px) scale(0.9); 
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateX(-50%) translateY(0) scale(1); 
+            }
+        }
+
+        .point-bubble {
+            background: transparent;
+            border: none;
+            border-radius: 15px;
+            padding: 5px 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary-brown);
+            cursor: pointer;
+            pointer-events: auto;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .point-bubble:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.05);
+        }
+
+        /* アイコンのみの回転用クラス */
+        .rotating-icon {
+            display: inline-block;
+            transition: transform 0.1s ease-out;
+            --rotation: 0deg;
+        }
+
+        .rotating-icon:not(.animating) {
+            transform: rotate(var(--rotation)) !important;
+        }
+
+        .point-bubble:nth-child(1):not(.tap-sparkle) .rotating-icon {
+            animation: gentle-sparkle 4s ease-in-out 3s infinite;
+        }
+
+        .point-bubble:nth-child(2):not(.tap-fire) .rotating-icon {
+            animation: gentle-fire 3.5s ease-in-out 3.5s infinite;
+        }
+
+        .point-bubble:nth-child(3):not(.tap-trophy) .rotating-icon {
+            animation: gentle-trophy 5s ease-in-out 4s infinite;
+        }
+
+        .point-bubble.tap-sparkle .rotating-icon {
+            animation: tap-sparkle 0.8s ease-out !important;
+        }
+
+        .point-bubble.tap-fire .rotating-icon {
+            animation: tap-fire 0.8s ease-out !important;
+        }
+
+        .point-bubble.tap-trophy .rotating-icon {
+            animation: tap-trophy 0.8s ease-out !important;
+        }
+
+        @keyframes gentle-sparkle {
+            0%, 100% { filter: brightness(1); transform: scale(1) rotate(var(--rotation)); }
+            50% { filter: brightness(1.2) drop-shadow(0 0 5px gold); transform: scale(1.02) rotate(calc(var(--rotation) + 5deg)); }
+        }
+
+        @keyframes gentle-fire {
+            0%, 100% { filter: brightness(1); transform: scale(1) rotate(var(--rotation)); }
+            33% { filter: brightness(1.3) hue-rotate(15deg); transform: scale(1.03) rotate(calc(var(--rotation) + 3deg)); }
+            66% { filter: brightness(1.1) hue-rotate(-10deg); transform: scale(1.01) rotate(calc(var(--rotation) - 3deg)); }
+        }
+
+        @keyframes gentle-trophy {
+            0%, 100% { filter: brightness(1); transform: scale(1) rotate(var(--rotation)); }
+            50% { filter: brightness(1.4) drop-shadow(0 0 8px orange); transform: scale(1.04) rotate(calc(var(--rotation) + 4deg)); }
+        }
+
+        @keyframes tap-sparkle {
+            0% { transform: scale(1) rotate(var(--rotation)); filter: brightness(1); }
+            30% { transform: scale(1.4) rotate(calc(var(--rotation) + 15deg)); filter: brightness(2) drop-shadow(0 0 20px gold) saturate(2); }
+            60% { transform: scale(1.2) rotate(calc(var(--rotation) + 5deg)); filter: brightness(1.8) drop-shadow(0 0 15px gold); }
+            100% { transform: scale(1) rotate(var(--rotation)); filter: brightness(1); }
+        }
+
+        @keyframes tap-fire {
+            0% { transform: scale(1) rotate(var(--rotation)); filter: brightness(1); }
+            25% { transform: scale(1.5) rotate(calc(var(--rotation) + 20deg)); filter: brightness(3) hue-rotate(90deg) saturate(3); }
+            50% { transform: scale(1.3) rotate(calc(var(--rotation) - 10deg)); filter: brightness(2.5) hue-rotate(45deg) saturate(2); }
+            75% { transform: scale(1.1) rotate(calc(var(--rotation) + 8deg)); filter: brightness(1.8) hue-rotate(20deg); }
+            100% { transform: scale(1) rotate(var(--rotation)); filter: brightness(1); }
+        }
+
+        @keyframes tap-trophy {
+            0% { transform: scale(1) rotate(var(--rotation)); filter: brightness(1); }
+            20% { transform: scale(1.6) translateY(-5px) rotate(calc(var(--rotation) + 25deg)); filter: brightness(4) drop-shadow(0 0 25px orange) saturate(3); }
+            40% { transform: scale(1.4) translateY(-2px) rotate(calc(var(--rotation) - 15deg)); filter: brightness(3) drop-shadow(0 0 20px gold); }
+            60% { transform: scale(1.2) translateY(0px) rotate(calc(var(--rotation) + 10deg)); filter: brightness(2) drop-shadow(0 0 15px orange); }
+            80% { transform: scale(1.05) translateY(0px) rotate(calc(var(--rotation) - 3deg)); filter: brightness(1.5); }
+            100% { transform: scale(1) translateY(0px) rotate(var(--rotation)); filter: brightness(1); }
+        }
+
+        /* クリッカブルな要素の基本スタイル（回転なし） */
+        .clickable-element {
+            cursor: pointer !important;
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+            position: relative;
+            overflow: visible;
+        }
+
+        .clickable-element:hover {
+            transform: scale(1.05) !important;
+            filter: brightness(1.2) !important;
+        }
+
+        .clickable-element:active {
+            transform: scale(0.95) !important;
+        }
+
+        /* 可愛い震えエフェクト（回転なし） */
+        .cute-shake-effect {
+            animation: cute-shake 0.6s ease-in-out !important;
+        }
+
+        @keyframes cute-shake {
+            0%, 100% { 
+                transform: scale(1); 
+            }
+            10% { 
+                transform: scale(1.1); 
+            }
+            20% { 
+                transform: scale(0.95); 
+            }
+            30% { 
+                transform: scale(1.08); 
+            }
+            40% { 
+                transform: scale(0.98); 
+            }
+            50% { 
+                transform: scale(1.05); 
+            }
+            60% { 
+                transform: scale(0.99); 
+            }
+            70% { 
+                transform: scale(1.02); 
+            }
+            80% { 
+                transform: scale(0.995); 
+            }
+            90% { 
+                transform: scale(1.01); 
+            }
+        }
+
+        /* ゲームタイトル */
+        .game-title {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-weight: 700;
+            font-size: clamp(1.4rem, 4vw, 2rem);
+            background: linear-gradient(45deg, var(--light-brown), var(--soft-orange), var(--gold));
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            user-select: none;
+            opacity: 0;
+            animation: title-enter 1.5s ease-out 0.2s forwards;
+            white-space: nowrap;
+            overflow: visible;
+        }
+
+        @keyframes title-enter {
+            0% { 
+                opacity: 0; 
+                transform: translateY(-30px) scale(0.8); 
+            }
+            60% { 
+                opacity: 1; 
+                transform: translateY(5px) scale(1.1); 
+            }
+            80% { 
+                transform: translateY(-2px) scale(1.05); 
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+
+        .game-title.title-bounce {
+            animation: title-mega-bounce 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+        }
+
+        @keyframes title-mega-bounce {
+            0% { transform: scale(1); }
+            20% { transform: scale(1.15); }
+            40% { transform: scale(0.95); }
+            60% { transform: scale(1.1); }
+            80% { transform: scale(0.98); }
+            100% { transform: scale(1); }
+        }
+
+        /* 猫アイコン */
+        .cat-icon {
+            display: inline-block;
+            cursor: pointer;
+            font-size: clamp(28px, 4vw, 40px);
+            margin: 0 8px;
+            transition: all 0.1s ease-out;
+            filter: drop-shadow(0 0 5px var(--gold));
+            --rotation: 0deg;
+        }
+
+        .cat-icon:hover {
+            transform: scale(1.4) rotate(calc(var(--rotation) + 15deg)) !important;
+            filter: drop-shadow(0 0 15px var(--neon-pink)) brightness(1.5) !important;
+        }
+
+        .cat-icon.bounce {
+            animation: cat-mega-bounce 0.8s ease-in-out !important;
+        }
+
+        .cat-icon:not(.bounce) {
+            transform: rotate(var(--rotation));
+        }
+
+        @keyframes cat-mega-bounce {
+            0%, 100% { 
+                transform: scale(1) rotate(var(--rotation)); 
+            }
+            25% { 
+                transform: scale(1.6) rotate(calc(var(--rotation) + 20deg)); 
+            }
+            50% { 
+                transform: scale(1.8) rotate(calc(var(--rotation) - 15deg)); 
+            }
+            75% { 
+                transform: scale(1.4) rotate(calc(var(--rotation) + 10deg)); 
+            }
+        }
+
+        /* 小さなフローティングポイント表示 */
+        .floating-points {
+            position: absolute;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            pointer-events: none;
+            z-index: 8000;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+            animation: float-points 2s ease-out forwards;
+            white-space: nowrap;
+        }
+
+        .floating-points.normal {
+            color: var(--soft-orange);
+        }
+
+        .floating-points.bonus {
+            font-size: 18px;
+            color: var(--neon-pink);
+        }
+
+        .floating-points.mega {
+            font-size: 20px;
+            color: var(--neon-blue);
+        }
+
+        .floating-points.ultra {
+            font-size: 22px;
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-blue), var(--neon-green), var(--gold));
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @keyframes float-points {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-60px) scale(1.2); }
+        }
+
+        /* 小さなパーティクル */
+        .cute-particle {
+            position: absolute;
+            font-size: 14px;
+            pointer-events: none;
+            z-index: 7000;
+            animation: cute-particle-burst 1.5s ease-out forwards;
+        }
+
+        @keyframes cute-particle-burst {
+            0% { 
+                opacity: 1; 
+                transform: scale(0) rotate(0deg); 
+            }
+            20% { 
+                opacity: 1; 
+                transform: scale(1.2) rotate(180deg); 
+            }
+            100% { 
+                opacity: 0; 
+                transform: scale(0.5) rotate(360deg) translateY(-80px); 
+            }
+        }
+
+        .clean-card {
+            background: var(--white);
+            border: 2px solid var(--light-brown);
+            border-radius: 20px;
+            box-shadow: 0 8px 24px var(--shadow);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .clean-button {
+            background: var(--light-brown);
+            border: none;
+            color: white;
+            font-weight: 700;
+            border-radius: 25px;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 4px 12px var(--shadow);
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .clean-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px var(--shadow);
+            background: var(--soft-orange);
+        }
+
+        .clean-button:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .clean-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .subject-btn, .category-btn {
+            background: var(--white);
+            border: 3px solid var(--light-brown);
+            border-radius: 15px;
+            color: var(--primary-brown);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px var(--shadow);
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .subject-btn:hover, .category-btn:hover {
+            border-color: var(--soft-orange);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 28px var(--shadow);
+            background: #fff8f0;
+        }
+
+        .subject-btn.active, .category-btn.active {
+            background: #ffe4cc;
+            border-color: var(--soft-orange);
+            color: var(--soft-orange);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 28px var(--shadow);
+        }
+
+        .category-btn {
+            padding: 0.5rem 0.75rem !important;
+            min-height: 50px !important;
+            font-size: 0.85rem !important;
+            line-height: 1.2 !important;
+        }
+
+        .category-btn:hover {
+            transform: translateY(-2px) scale(1.01) !important;
+        }
+
+        .category-btn.active {
+            transform: translateY(-2px) scale(1.01) !important;
+        }
+
+        /* アイコン部分だけ回転させる */
+        .subject-icon, .category-icon {
+            display: inline-block;
+            transition: transform 0.1s ease-out;
+            --rotation: 0deg;
+        }
+
+        .subject-icon:not(.animating), .category-icon:not(.animating) {
+            transform: rotate(var(--rotation)) !important;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(139,69,19,0.4);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            z-index: 5000;
+            padding: 1rem;
+        }
+
+        .modal.show {
+            display: flex;
+            animation: modalFadeIn 0.5s ease-out;
+        }
+
+        .modal.unit-modal {
+            align-items: flex-start;
+            padding: 0.5rem;
+            overflow-y: auto;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .floating-msg {
+            position: absolute;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary-brown);
+            pointer-events: none;
+            z-index: 7500;
+            animation: float-up 2s ease-out forwards;
+            text-shadow: 1px 1px 4px rgba(255,255,255,0.8);
+            white-space: nowrap;
+        }
+
+        @keyframes float-up {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-60px) scale(1.2); }
+        }
+
+        .quiz-option {
+            background: var(--white);
+            border: 3px solid var(--light-brown);
+            color: var(--primary-brown);
+            border-radius: 15px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            font-weight: 700;
+            font-size: 0.9rem;
+            position: relative;
+            box-shadow: 0 4px 12px var(--shadow);
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            cursor: pointer;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--soft-orange);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px var(--shadow);
+            background: #fff8f0;
+        }
+
+        .quiz-explanation {
+            height: 150px;
+            background: #fff8f0;
+            border-radius: 15px;
+            padding: 0.75rem;
+            margin-top: 1rem;
+            border: 3px solid var(--light-brown);
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            text-align: center;
+            overflow-y: auto;
+            box-sizing: border-box;
+            font-size: 1rem;
+            line-height: 1.4;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-weight: 700;
+        }
+
+        .quiz-explanation p {
+            margin: 0;
+            padding: 0;
+            word-wrap: break-word;
+            max-height: 100%;
+            overflow: hidden;
+            font-size: 1rem;
+        }
+
+        .quiz-explanation.has-content {
+            border-color: var(--soft-orange);
+            background: #ffe4cc;
+        }
+
+        .back-button {
+            background: #f8f4f0;
+            border: 2px solid var(--light-brown);
+            color: var(--primary-brown);
+            border-radius: 15px;
+            padding: 0.5rem 1rem;
+            font-weight: 700;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            font-size: 0.9rem;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            background: #fff8f0;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px var(--shadow);
+        }
+
+        .mode-btn {
+            background: var(--white);
+            border: 3px solid var(--light-brown);
+            border-radius: 12px;
+            color: var(--primary-brown);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 8px var(--shadow);
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            cursor: pointer;
+        }
+
+        .mode-btn:hover {
+            border-color: var(--soft-orange);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px var(--shadow);
+            background: #fff8f0;
+        }
+
+        .mode-btn.active {
+            background: #ffe4cc;
+            border-color: var(--soft-orange);
+            color: var(--soft-orange);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px var(--shadow);
+        }
+
+        /* モードアイコンも回転 */
+        .mode-icon {
+            display: inline-block;
+            margin-right: 4px;
+            transition: transform 0.1s ease-out;
+            --rotation: 0deg;
+        }
+
+        .mode-icon:not(.animating) {
+            transform: rotate(var(--rotation)) !important;
+        }
+
+        .stats-display {
+            background: #fff8f0;
+            border: 2px solid var(--light-brown);
+            border-radius: 20px;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .floating-button {
+            position: fixed !important;
+            bottom: 24px !important;
+            left: 24px !important;
+            right: auto !important;
+            margin: 0 !important;
+            transform: none !important;
+            width: 56px;
+            height: 56px;
+            background: var(--light-brown);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 20px var(--shadow);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 9998;
+            cursor: pointer;
+        }
+
+        .floating-button.hidden {
+            display: none !important;
+        }
+
+        .floating-button:hover {
+            transform: translateY(-3px) !important;
+            box-shadow: 0 8px 24px var(--shadow);
+            background: var(--soft-orange);
+        }
+
+        /* フローティングボタンのアイコンも回転 */
+        .floating-button-icon {
+            display: inline-block;
+            transition: transform 0.1s ease-out;
+            --rotation: 0deg;
+        }
+
+        .floating-button-icon:not(.animating) {
+            transform: rotate(var(--rotation)) !important;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--white);
+            color: var(--primary-brown);
+            padding: 12px 16px;
+            border-radius: 20px;
+            border: 2px solid var(--light-brown);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 9001;
+            box-shadow: 0 6px 20px var(--shadow);
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-weight: 700;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .subject-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+
+        .category-grid {
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) !important;
+            gap: 0.4rem !important;
+        }
+
+        .section-divider {
+            height: 2px;
+            background: var(--light-brown);
+            margin: 1rem 0;
+            border-radius: 1px;
+        }
+
+        .grade-label {
+            font-size: 0.7rem !important;
+            font-weight: 700;
+            color: var(--light-brown);
+            text-align: center;
+            margin: 0.5rem 0 0.3rem 0 !important;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .score-pulse {
+            animation: score-pulse 0.6s ease-in-out;
+        }
+
+        @keyframes score-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); filter: brightness(1.3); }
+        }
+
+        .tap-effect {
+            position: relative;
+            overflow: visible;
+        }
+
+        .tap-effect::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: var(--gold);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 6000;
+        }
+
+        .tap-effect.tapped::after {
+            animation: tap-ripple 0.6s ease-out;
+        }
+
+        @keyframes tap-ripple {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 0.8;
+            }
+            100% {
+                width: 200px;
+                height: 200px;
+                opacity: 0;
+            }
+        }
+
+        .subject-modal-content {
+            max-height: 85vh;
+            overflow-y: auto;
+            padding-top: 0;
+        }
+        
+        .modal .clean-card {
+            margin: 2rem 1rem 1rem 1rem;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal.unit-modal .clean-card {
+            margin: 0.25rem 1rem 1rem 1rem;
+            max-height: 94vh;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        /* 重力感知のための権限要求ポップアップ */
+        .permission-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(139,69,19,0.25);
+            z-index: 2000;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            text-align: center;
+            max-width: 320px;
+            line-height: 1.6;
+            border: 1px solid rgba(255,255,255,0.3);
+            opacity: 0;
+            animation: popup-enter 0.8s ease-out 2s forwards;
+        }
+
+        @keyframes popup-enter {
+            0% { 
+                opacity: 0; 
+                transform: translate(-50%, -50%) scale(0.8) rotate(-5deg); 
+            }
+            60% { 
+                opacity: 1; 
+                transform: translate(-50%, -50%) scale(1.05) rotate(2deg); 
+            }
+            80% { 
+                transform: translate(-50%, -50%) scale(0.98) rotate(-1deg); 
+            }
+            100% { 
+                opacity: 1; 
+                transform: translate(-50%, -50%) scale(1) rotate(0deg); 
+            }
+        }
+
+        .permission-popup h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            color: #8b4513;
+        }
+
+        .permission-popup p {
+            font-size: 15px;
+            margin-bottom: 20px;
+            color: #a0522d;
+        }
+
+        .permission-popup button {
+            background: linear-gradient(145deg, #d2691e, #ff7f50);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 8px 6px;
+            width: 120px;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(210,105,30,0.3);
+        }
+
+        .permission-popup button:hover {
+            background: linear-gradient(145deg, #ff7f50, #ff6347);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(210,105,30,0.4);
+        }
+
+        @media (max-width: 640px) {
+            .container-spacing {
+                max-width: 95%;
+                margin-bottom: 2rem;
+            }
+
+            .horizontal-points-display {
+                bottom: 15px !important;
+                gap: 8px;
+                padding: 6px 20px;
+            }
+
+            .point-bubble {
+                font-size: 14px;
+                padding: 4px 6px;
+                gap: 4px;
+            }
+
+            .modal .clean-card {
+                margin: 1.5rem 0.25rem 0.25rem 0.25rem;
+                padding: 0.75rem;
+                max-height: 92vh;
+            }
+
+            .modal.unit-modal .clean-card {
+                margin: 0.1rem 0.25rem 0.25rem 0.25rem !important;
+                padding: 0.6rem 0.75rem 0.8rem 0.75rem !important;
+                max-height: 98vh !important;
+            }
+
+            .floating-button {
+                bottom: 90px !important;
+                left: 20px !important;
+                right: auto !important;
+                width: 52px;
+                height: 52px;
+                font-size: 20px;
+            }
+
+            .clean-card {
+                margin: 0.5rem;
+                padding: 1rem;
+            }
+
+            .clean-card:last-of-type {
+                margin-bottom: 6rem;
+            }
+
+            body {
+                padding-bottom: 7rem;
+            }
+
+            .game-title {
+                font-size: clamp(1.2rem, 4.5vw, 1.6rem);
+                letter-spacing: 1px;
+            }
+            
+            .cat-icon {
+                font-size: clamp(24px, 4.5vw, 32px);
+                margin: 0 4px;
+            }
+
+            .subject-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.5rem;
+            }
+
+            .category-grid {
+                grid-template-columns: 1fr !important;
+                gap: 0.3rem !important;
+            }
+
+            .subject-btn, .category-btn {
+                padding: 0.75rem 0.5rem;
+                min-height: 70px;
+                font-size: 0.8rem;
+            }
+
+            .category-btn {
+                padding: 0.4rem 0.5rem !important;
+                min-height: 45px !important;
+                font-size: 0.8rem !important;
+                line-height: 1.1 !important;
+            }
+
+            .quiz-option {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.85rem;
+            }
+
+            #quizQ {
+                font-size: 0.9rem;
+                line-height: 1.3;
+            }
+
+            .quiz-explanation {
+                height: 120px;
+                padding: 0.5rem;
+                font-size: 0.9rem;
+                line-height: 1.3;
+            }
+
+            .quiz-explanation p {
+                font-size: 0.9rem;
+            }
+
+            .grade-label {
+                margin: 0.4rem 0 0.25rem 0 !important;
+            }
+
+            .floating-points {
+                font-size: 14px;
+            }
+
+            .floating-points.bonus {
+                font-size: 16px;
+            }
+
+            .floating-points.mega {
+                font-size: 18px;
+            }
+
+            .floating-points.ultra {
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .game-title {
+                font-size: clamp(1rem, 5vw, 1.4rem);
+                letter-spacing: 0px;
+            }
+            
+            .cat-icon {
+                font-size: clamp(20px, 5vw, 28px);
+                margin: 0 2px;
+            }
+
+            .horizontal-points-display {
+                bottom: 10px !important;
+                gap: 6px;
+                padding: 4px 16px;
+            }
+
+            .point-bubble {
+                font-size: 12px;
+                padding: 3px 5px;
+                gap: 3px;
+            }
+        }
+
+        button, .subject-btn, .category-btn, .quiz-option, .clean-button, .back-button, .mode-btn {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            touch-action: manipulation;
+            -webkit-appearance: none;
+        }
+
+        * {
+            touch-action: manipulation;
+        }
+
+        input, select, textarea {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center pt-6 pb-12 gap-6 relative">
+    <!-- 横並びポイント表示（画面下部中央） -->
+    <div class="horizontal-points-display">
+        <div class="point-bubble clickable-element" id="sparklePointBubble">
+            <span class="rotating-icon">✨</span> <span id="sparklePointsMain">0</span>
+        </div>
+        <div class="point-bubble clickable-element" id="firePointBubble">
+            <span class="rotating-icon">🔥</span> <span id="firePointsMain">0</span>
+        </div>
+        <div class="point-bubble clickable-element" id="trophyPointBubble">
+            <span class="rotating-icon">🏆</span> <span id="trophyPointsMain">0</span>
+        </div>
+    </div>
+
+    <!-- メインの教科選択モーダル -->
+    <div id="mainSubjectModal" class="modal show">
+        <div class="clean-card p-6 container-spacing subject-modal-content">
+            <div class="text-center mb-6">
+                <h1 class="game-title clickable-element" id="gameTitle">
+                    <span class="cat-icon clickable-element" id="leftCat">🐱</span>NEKOPON Quiz<span class="cat-icon clickable-element" id="rightCat">🐱</span>
+                </h1>
+                <h2 class="text-lg font-semibold mb-3 text-gray-700 clickable-element">
+                    <span class="rotating-icon">📚</span> 教科を選ぶにゃ〜♪
+                </h2>
+                <p class="text-gray-600 text-sm clickable-element">学習したい教科を選んでほしいにゃん♪<br>どこでもクリックでポイントゲットにゃ〜<span class="rotating-icon">✨</span></p>
+            </div>
+            <div class="grid subject-grid mb-6">
+                <button class="subject-btn tap-effect clickable-element" data-subject="social">
+                    <div class="subject-icon text-2xl mb-1">🌍</div>
+                    <div class="subject-name font-semibold text-sm">社会</div>
+                </button>
+                <button class="subject-btn tap-effect clickable-element" data-subject="science">
+                    <div class="subject-icon text-2xl mb-1">🔬</div>
+                    <div class="subject-name font-semibold text-sm">理科</div>
+                </button>
+                <button class="subject-btn tap-effect clickable-element" data-subject="english">
+                    <div class="subject-icon text-2xl mb-1">📖</div>
+                    <div class="subject-name font-semibold text-sm">英語</div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 社会モーダル -->
+    <div id="socialModal" class="modal">
+        <div class="clean-card p-6 container-spacing subject-modal-content">
+            <div class="text-center mb-6">
+                <h2 class="text-lg font-semibold mb-3 text-gray-700 clickable-element">
+                    <span class="rotating-icon">🌍</span> 社会
+                </h2>
+                <p class="text-gray-600 text-sm clickable-element">分野を選んでほしいにゃん♪</p>
+            </div>
+            <div class="grid subject-grid mb-6">
+                <button class="subject-btn tap-effect clickable-element" data-category="geography">
+                    <div class="subject-icon text-2xl mb-1">🗺️</div>
+                    <div class="subject-name font-semibold text-sm">地理</div>
+                </button>
+                <button class="subject-btn tap-effect clickable-element" data-category="history">
+                    <div class="subject-icon text-2xl mb-1">🏛️</div>
+                    <div class="subject-name font-semibold text-sm">歴史</div>
+                </button>
+                <button class="subject-btn tap-effect clickable-element" data-category="civics">
+                    <div class="subject-icon text-2xl mb-1">⚖️</div>
+                    <div class="subject-name font-semibold text-sm">公民</div>
+                </button>
+            </div>
+            <div class="text-center">
+                <button class="back-button tap-effect clickable-element" onclick="goBackToMain()">
+                    ← 教科選択に戻るにゃ〜
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 理科モーダル -->
+    <div id="scienceModal" class="modal">
+        <div class="clean-card p-6 container-spacing subject-modal-content">
+            <div class="text-center mb-6">
+                <h2 class="text-lg font-semibold mb-3 text-gray-700 clickable-element">
+                    <span class="rotating-icon">🔬</span> 理科
+                </h2>
+                <p class="text-gray-600 text-sm clickable-element">分野を選んでほしいにゃん♪</p>
+            </div>
+            <div class="grid subject-grid mb-6">
+                <button class="subject-btn tap-effect clickable-element" data-category="chemistry">
+                    <div class="subject-icon text-2xl mb-1">🧪</div>
+                    <div class="subject-name font-semibold text-sm">化学</div>
+                </button>
+                <button class="subject-btn tap-effect clickable-element" data-category="biology">
+                    <div class="subject-icon text-2xl mb-1">🧬</div>
+                    <div class="subject-name font-semibold text-sm">生物</div>
+                </button>
+                <button class="subject-btn tap-effect clickable-element" data-category="physics">
+                    <div class="subject-icon text-2xl mb-1">⚛️</div>
+                    <div class="subject-name font-semibold text-sm">物理</div>
+                </button>
+                <button class="subject-btn tap-effect clickable-element" data-category="earth">
+                    <div class="subject-icon text-2xl mb-1">🌍</div>
+                    <div class="subject-name font-semibold text-sm">地学</div>
+                </button>
+            </div>
+            <div class="text-center">
+                <button class="back-button tap-effect clickable-element" onclick="goBackToMain()">
+                    ← 教科選択に戻るにゃ〜
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 英語モーダル -->
+    <div id="englishModal" class="modal">
+        <div class="clean-card p-6 container-spacing subject-modal-content">
+            <div class="text-center mb-6">
+                <h2 class="text-lg font-semibold mb-3 text-gray-700 clickable-element">
+                    <span class="rotating-icon">📖</span> 英語
+                </h2>
+                <p class="text-gray-600 text-sm clickable-element">分野を選んでほしいにゃん♪</p>
+            </div>
+            <div class="grid subject-grid mb-6">
+                <button class="subject-btn tap-effect clickable-element" data-category="english_words">
+                    <div class="subject-icon text-2xl mb-1">📝</div>
+                    <div class="subject-name font-semibold text-sm">英単語</div>
+                </button>
+                <button class="subject-btn tap-effect clickable-element" data-category="english_phrases">
+                    <div class="subject-icon text-2xl mb-1">💬</div>
+                    <div class="subject-name font-semibold text-sm">英熟語</div>
+                </button>
+                <button class="subject-btn tap-effect clickable-element" data-category="english_grammar">
+                    <div class="subject-icon text-2xl mb-1">📘</div>
+                    <div class="subject-name font-semibold text-sm">語形変化</div>
+                </button>
+            </div>
+            <div class="text-center">
+                <button class="back-button tap-effect clickable-element" onclick="goBackToMain()">
+                    ← 教科選択に戻るにゃ〜
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 地理の単元選択モーダル -->
+    <div id="geographyModal" class="modal unit-modal">
+        <div class="clean-card p-6 container-spacing subject-modal-content">
+            <div class="text-center mb-4">
+                <h2 class="text-lg font-semibold mb-3 text-gray-700 clickable-element">
+                    <span class="rotating-icon">🗺️</span> 地理
+                </h2>
+                <p class="text-gray-600 text-sm clickable-element">学習する単元を選んでほしいにゃん♪<br>複数選択もできるにゃ〜♪</p>
+            </div>
+            <div class="grid category-grid mb-4" id="geographyCategories"></div>
+            <div class="text-center space-y-2">
+                <button id="startGeographyQuiz" class="clean-button px-6 py-2 text-sm tap-effect clickable-element" disabled>
+                    決定するにゃ〜♪
+                </button>
+                <br>
+                <button class="back-button tap-effect clickable-element" onclick="goBackToSocial()">
+                    ← 社会に戻るにゃ〜
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 歴史の単元選択モーダル -->
+    <div id="historyModal" class="modal unit-modal">
+        <div class="clean-card p-6 container-spacing subject-modal-content">
+            <div class="text-center mb-4">
+                <h2 class="text-lg font-semibold mb-3 text-gray-700 clickable-element">
+                    <span class="rotating-icon">🏛️</span> 歴史
+                </h2>
+                <p class="text-gray-600 text-sm clickable-element">学習する単元を選んでほしいにゃん♪<br>複数選択もできるにゃ〜♪</p>
+            </div>
+            <div class="grid category-grid mb-4" id="historyCategories"></div>
+            <div class="text-center space-y-2">
+                <button id="startHistoryQuiz" class="clean-button px-6 py-2 text-sm tap-effect clickable-element" disabled>
+                    決定するにゃ〜♪
+                </button>
+                <br>
+                <button class="back-button tap-effect clickable-element" onclick="goBackToSocial()">
+                    ← 社会に戻るにゃ〜
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 公民の単元選択モーダル -->
+    <div id="civicsModal" class="modal unit-modal">
+        <div class="clean-card p-6 container-spacing subject-modal-content">
+            <div class="text-center mb-4">
+                <h2 class="text-lg font-semibold mb-3 text-gray-700 clickable-element">
+                    <span class="rotating-icon">⚖️</span> 公民
+                </h2>
+                <p class="text-gray-600 text-sm clickable-element">学習する単元を選んでほしいにゃん♪<br>複数選択もできるにゃ〜♪</p>
+            </div>
+            <div class="grid category-grid mb-4" id="civicsCategories"></div>
+            <div class="text-center space-y-2">
+                <button id="startCivicsQuiz" class="clean-button px-6 py-2 text-sm tap-effect clickable-element" disabled>
+                    決定するにゃ〜♪
+                </button>
+                <br>
+                <button class="back-button tap-effect clickable-element" onclick="goBackToSocial()">
+                    ← 社会に戻るにゃ〜
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 化学の単元選択モーダル -->
+    <div id="chemistryModal" class="modal unit-modal">
+        <div class="clean-card p-6 container-spacing subject-modal-content">
+            <div class="text-center mb-4">
+                <h2 class="text-lg font-semibold mb-3 text-gray-700 clickable-element">
+                    <span class="rotating-icon">🧪</span> 化学
+                </h2>
+                <p class="text-gray-600 text-sm clickable-element">学習する単元を選んでほしいにゃん♪<br>複数選択もできるにゃ〜♪</p>
+            </div>
+            <div class="grid category-grid mb-4" id="chemistryCategories"></div>
+            <div class="text-center space-y-2">
+                <button id="startChemistryQuiz" class="clean-button px-6 py-2 text-sm tap-effect clickable-element" disabled>
+                    決定するにゃ〜♪
+                </button>
+                <br>
+                <button class="back-button tap-effect clickable-element" onclick="goBackToScience()">
+                    ← 理科に戻るにゃ〜
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 生物の単元選択モーダル -->
+    <div id="biologyModal" class="modal unit-modal">
+        <div class="clean-card p-6 container-spacing subject-modal-content">
+            <div class="text-center mb-4">
+                <h2 class="text-lg font-semibold mb-3 text-gray-700 clickable-element">
+                    <span class="rotating-icon">🧬</span> 生物
+                </h2>
+                <p class="text-gray-600 text-sm clickable-element">学習する単元を選んでほしいにゃん♪<br>複数選択もできるにゃ〜♪</p>
+            </div>
+            <div class="grid category-grid mb-4" id="biologyCategories"></div>
+            <div class="text-center space-y-2">
+                <button id="startBiologyQuiz" class="clean-button px-6 py-2 text-sm tap-effect clickable-element" disabled>
+                    決定するにゃ〜♪
+                </button>
+                <br>
+                <button class="back-button tap-effect clickable-element" onclick="goBackToScience()">
+                    ← 理科に戻るにゃ〜
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 物理の単元選択モーダル -->
+    <div id="physicsModal" class="modal unit-modal">
+        <div class="clean-card p-6 container-spacing subject-modal-content">
+            <div class="text-center mb-4">
+                <h2 class="text-lg font-semibold mb-3 text-gray-700 clickable-element">
+                    <span class="rotating-icon">⚛️</span> 物理
+                </h2>
+                <p class="text-gray-600 text-sm clickable-element">学習する単元を選んでほしいにゃん♪<br>複数選択もできるにゃ〜♪</p>
+            </div>
+            <div class="grid category-grid mb-4" id="physicsCategories"></div>
+            <div class="text-center space-y-2">
+                <button id="startPhysicsQuiz" class="clean-button px-6 py-2 text-sm tap-effect clickable-element" disabled>
+                    決定するにゃ〜♪
+                </button>
+                <br>
+                <button class="back-button tap-effect clickable-element" onclick="goBackToScience()">
+                    ← 理科に戻るにゃ〜
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 地学の単元選択モーダル -->
+    <div id="earthModal" class="modal unit-modal">
+        <div class="clean-card p-6 container-spacing subject-modal-content">
+            <div class="text-center mb-4">
+                <h2 class="text-lg font-semibold mb-3 text-gray-700 clickable-element">
+                    <span class="rotating-icon">🌍</span> 地学
+                </h2>
+                <p class="text-gray-600 text-sm clickable-element">学習する単元を選んでほしいにゃん♪<br>複数選択もできるにゃ〜♪</p>
+            </div>
+            <div class="grid category-grid mb-4" id="earthCategories"></div>
+            <div class="text-center space-y-2">
+                <button id="startEarthQuiz" class="clean-button px-6 py-2 text-sm tap-effect clickable-element" disabled>
+                    決定するにゃ〜♪
+                </button>
+                <br>
+                <button class="back-button tap-effect clickable-element" onclick="goBackToScience()">
+                    ← 理科に戻るにゃ〜
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 英単語の単元選択モーダル -->
+    <div id="englishWordsModal" class="modal unit-modal">
+        <div class="clean-card p-6 container-spacing subject-modal-content">
+            <div class="text-center mb-4">
+                <h2 class="text-lg font-semibold mb-3 text-gray-700 clickable-element">
+                    <span class="rotating-icon">📝</span> 英単語
+                </h2>
+                <p class="text-gray-600 text-sm clickable-element">学習する単元を選んでほしいにゃん♪<br>複数選択もできるにゃ〜♪</p>
+            </div>
+            <div class="grid category-grid mb-4" id="englishWordsCategories"></div>
+            <div class="text-center space-y-2">
+                <button id="startEnglishWordsQuiz" class="clean-button px-6 py-2 text-sm tap-effect clickable-element" disabled>
+                    決定するにゃ〜♪
+                </button>
+                <br>
+                <button class="back-button tap-effect clickable-element" onclick="goBackToEnglish()">
+                    ← 英語に戻るにゃ〜
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 英熟語の単元選択モーダル -->
+    <div id="englishPhrasesModal" class="modal unit-modal">
+        <div class="clean-card p-6 container-spacing subject-modal-content">
+            <div class="text-center mb-4">
+                <h2 class="text-lg font-semibold mb-3 text-gray-700 clickable-element">
+                    <span class="rotating-icon">💬</span> 英熟語
+                </h2>
+                <p class="text-gray-600 text-sm clickable-element">学習する単元を選んでほしいにゃん♪<br>複数選択もできるにゃ〜♪</p>
+            </div>
+            <div class="grid category-grid mb-4" id="englishPhrasesCategories"></div>
+            <div class="text-center space-y-2">
+                <button id="startEnglishPhrasesQuiz" class="clean-button px-6 py-2 text-sm tap-effect clickable-element" disabled>
+                    決定するにゃ〜♪
+                </button>
+                <br>
+                <button class="back-button tap-effect clickable-element" onclick="goBackToEnglish()">
+                    ← 英語に戻るにゃ〜
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 語形変化の単元選択モーダル -->
+    <div id="englishGrammarModal" class="modal unit-modal">
+        <div class="clean-card p-6 container-spacing subject-modal-content">
+            <div class="text-center mb-4">
+                <h2 class="text-lg font-semibold mb-3 text-gray-700 clickable-element">
+                    <span class="rotating-icon">📘</span> 語形変化
+                </h2>
+                <p class="text-gray-600 text-sm clickable-element">学習する単元を選んでほしいにゃん♪<br>複数選択もできるにゃ〜♪</p>
+            </div>
+            <div class="grid category-grid mb-4" id="englishGrammarCategories"></div>
+            <div class="text-center space-y-2">
+                <button id="startEnglishGrammarQuiz" class="clean-button px-6 py-2 text-sm tap-effect clickable-element" disabled>
+                    決定するにゃ〜♪
+                </button>
+                <br>
+                <button class="back-button tap-effect clickable-element" onclick="goBackToEnglish()">
+                    ← 英語に戻るにゃ〜
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ゲーム画面 -->
+    <div id="gameScreen" class="hidden">
+        <div class="clean-card p-6 text-center container-spacing mb-6">
+            <h1 class="game-title clickable-element">
+                <span class="cat-icon clickable-element">🐱</span>NEKOPON Quiz<span class="cat-icon clickable-element">🐱</span>
+            </h1>
+            <div id="currentCategory" class="text-lg font-semibold text-gray-700 mb-4 clickable-element"></div>
+            <div class="stats-display clickable-element">
+                <div class="grid grid-cols-3 gap-4 text-center mb-4">
+                    <div class="clickable-element">
+                        <div class="text-xl font-bold text-gray-800 clickable-element" id="correctCount">0</div>
+                        <div class="text-xs text-gray-600 clickable-element">正解数だにゃ♪</div>
+                    </div>
+                    <div class="clickable-element">
+                        <div class="text-xl font-bold text-gray-800 clickable-element" id="wrongCount">0</div>
+                        <div class="text-xs text-gray-600 clickable-element">不正解数だにゃ</div>
+                    </div>
+                    <div class="clickable-element">
+                        <div class="text-xl font-bold text-gray-800 clickable-element" id="totalCount">0</div>
+                        <div class="text-xs text-gray-600 clickable-element">総問題数だにゃ〜</div>
+                    </div>
+                </div>
+                
+                <div class="section-divider clickable-element"></div>
+                <div class="text-center">
+                    <div class="text-sm font-semibold text-gray-700 mb-3 clickable-element"><span class="rotating-icon">📋</span> 出題形式だにゃ〜</div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button id="randomModeBtn" class="mode-btn active tap-effect clickable-element" data-mode="random">
+                            <span class="mode-icon">🎲</span> ランダムにゃ
+                        </button>
+                        <button id="sequentialModeBtn" class="mode-btn tap-effect clickable-element" data-mode="sequential">
+                            <span class="mode-icon">📋</span> 順番通りにゃ
+                        </button>
+                    </div>
+                    <div class="text-xs text-gray-600 mt-2 clickable-element" id="modeDescription">
+                        問題をランダムに出題するにゃ〜♪
+                    </div>
+                </div>
+            </div>
+            <button id="startQuizButton" class="clean-button px-6 py-3 text-base font-semibold mt-6 tap-effect clickable-element">
+                <span class="rotating-icon">✨</span> スタートにゃ〜♪
+            </button>
+        </div>
+    </div>
+
+    <!-- クイズモーダル -->
+    <div id="quizModal" class="modal">
+        <div class="clean-card p-4 w-full max-w-lg mx-4">
+            <div class="text-center mb-4">
+                <h2 class="font-semibold text-lg text-gray-700 clickable-element">
+                    <span class="rotating-icon">✨</span> NEKOPON Quiz <span class="rotating-icon">✨</span>
+                </h2>
+            </div>
+            <div class="space-y-4">
+                <p id="quizQ" class="text-base font-medium text-center text-gray-800 leading-relaxed clickable-element"></p>
+                <div id="quizOptions" class="space-y-2"></div>
+                <div id="quizExplanation" class="quiz-explanation clickable-element">
+                    <p id="quizMsg" class="font-semibold text-center text-base clickable-element"></p>
+                </div>
+                <div class="flex gap-2">
+                    <button id="quizNext" class="flex-1 clean-button py-2 text-sm tap-effect clickable-element">
+                        <span class="rotating-icon">🌟</span> 次の問題にゃ〜
+                    </button>
+                    <button id="quizBack" class="flex-1 back-button py-2 text-sm tap-effect clickable-element">
+                        <span class="rotating-icon">🏠</span> 戻るにゃ〜
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- フローティングボタン -->
+    <button id="changeSubject" class="floating-button hidden tap-effect clickable-element">
+        <span class="floating-button-icon">📚</span>
+    </button>
+
+    <!-- 通知 -->
+    <div id="notification" class="notification">
+        <div class="flex items-center gap-3">
+            <span class="text-xl rotating-icon">✨</span>
+            <div>
+                <div class="font-semibold text-sm">NEKOPON Quiz</div>
+                <div id="notificationText" class="text-xs text-gray-600"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 重力感知の権限要求ポップアップ -->
+    <div id="tiltPermissionPopup" class="permission-popup" style="display: none;">
+        <h3><span class="rotating-icon">🐱</span> 猫反応機能 <span class="rotating-icon">🐱</span></h3>
+        <p>スマホを傾けると猫がクルクル回転します♪<br>勉強がもっと楽しくなるにゃ〜</p>
+        <button onclick="requestTiltPermission()">有効にする</button>
+        <button onclick="skipTiltPermission()">スキップ</button>
+    </div>
+
+    <script>
+        /* ----------------- 重力感知システム（アイコンのみ回転対応） ----------------- */
+        class TiltSystem {
+            constructor() {
+                this.tiltEnabled = false;
+                this.currentTilt = { gamma: 0, beta: 0 };
+                this.lastTiltTime = 0;
+                this.permissionPopup = null;
+            }
+
+            init() {
+                // iOS 13以降の許可要求
+                if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    this.showTiltPermissionPopup();
+                } else {
+                    this.enableTiltSensor();
+                }
+            }
+
+            showTiltPermissionPopup() {
+                const popup = document.getElementById('tiltPermissionPopup');
+                popup.style.display = 'block';
+                this.permissionPopup = popup;
+            }
+
+            async requestTiltPermission() {
+                try {
+                    const permission = await DeviceOrientationEvent.requestPermission();
+                    if (permission === 'granted') {
+                        this.enableTiltSensor();
+                        showNekoMsg('猫がクルクル回転！', window.innerWidth/2, window.innerHeight/2);
+                    }
+                } catch (error) {
+                    console.log('Permission denied');
+                }
+                this.closeTiltPermissionPopup();
+            }
+
+            skipTiltPermission() {
+                this.closeTiltPermissionPopup();
+            }
+
+            closeTiltPermissionPopup() {
+                if (this.permissionPopup) {
+                    this.permissionPopup.style.display = 'none';
+                    this.permissionPopup = null;
+                }
+            }
+
+            enableTiltSensor() {
+                this.tiltEnabled = true;
+
+                window.addEventListener('deviceorientation', (event) => {
+                    if (!this.tiltEnabled) return;
+
+                    this.currentTilt.gamma = event.gamma || 0; // 左右の傾き (-90 to 90)
+                    this.currentTilt.beta = event.beta || 0;   // 前後の傾き (-180 to 180)
+                    this.updateIconOrientations();
+                });
+
+                // PC環境でもテストできるように自動回転機能を追加
+                if (!window.DeviceOrientationEvent || navigator.userAgent.includes('Chrome')) {
+                    this.startTestRotation();
+                }
+            }
+
+            // PC環境用の自動回転テスト
+            startTestRotation() {
+                setInterval(() => {
+                    if (!this.tiltEnabled) return;
+                    
+                    // 疑似的な傾きデータを生成
+                    const time = Date.now() * 0.001;
+                    this.currentTilt.gamma = Math.sin(time) * 60; // -60度〜+60度
+                    this.currentTilt.beta = Math.cos(time * 0.7) * 45; // -45度〜+45度
+                    this.updateIconOrientations();
+                }, 50); // 20FPS
+            }
+
+            updateIconOrientations() {
+                const now = Date.now();
+                if (now - this.lastTiltTime < 30) return; // 30FPSに制限
+                this.lastTiltTime = now;
+
+                const gamma = this.currentTilt.gamma;
+                const beta = this.currentTilt.beta;
+
+                // 基本回転角度を計算
+                let baseRotation = gamma * 2;
+                if (Math.abs(beta) > 90) {
+                    baseRotation += 180;
+                }
+                if (Math.abs(gamma) > 30) {
+                    baseRotation = gamma * 2.5;
+                }
+
+                // アイコンのみ回転させる
+                document.querySelectorAll('.rotating-icon, .cat-icon, .subject-icon, .category-icon, .mode-icon, .floating-button-icon').forEach((element, index) => {
+                    // アニメーション中の要素はスキップ
+                    if (element.classList.contains('bounce') ||
+                        element.classList.contains('animating') ||
+                        element.closest('.tap-sparkle') ||
+                        element.closest('.tap-fire') ||
+                        element.closest('.tap-trophy')) {
+                        return;
+                    }
+
+                    // 各アイコンに個別の回転を適用
+                    const individualRotation = baseRotation + (index % 7 - 3) * 15;
+                    element.style.setProperty('--rotation', `${individualRotation}deg`);
+                    
+                    // cat-iconは特別処理（bounceアニメーション中でなければ）
+                    if (element.classList.contains('cat-icon') && !element.classList.contains('bounce')) {
+                        element.style.transform = `rotate(${individualRotation}deg)`;
+                    } else if (!element.classList.contains('cat-icon')) {
+                        element.style.transform = `rotate(${individualRotation}deg)`;
+                    }
+                });
+            }
+        }
+
+        // グローバル関数として定義（HTMLから呼び出されるため）
+        function requestTiltPermission() {
+            tiltSystem.requestTiltPermission();
+        }
+
+        function skipTiltPermission() {
+            tiltSystem.skipTiltPermission();
+        }
+
+        /* ----------------- ポイントシステム（横並び対応・小さなポイント表示） ----------------- */
+        class UltimateMegaPointSystem {
+            constructor() {
+                this.sparklePoints = 0;
+                this.firePoints = 0;
+                this.trophyPoints = 0;
+                this.totalClicks = 0;
+                this.comboCount = 0;
+                this.lastClickTime = 0;
+                this.multiplier = 1;
+                this.isComboMode = false;
+                
+                this.sparkleMessages = [
+                    'きゃー♪', 'きらきら〜', 'まぶしい！', 'すてき♪', 'ぴかぴか〜',
+                    'ひかってる〜', 'まほう♪', 'だいすき！', 'きれい〜', 'わーい♪',
+                    'すごいにゃ〜', 'びっくり！', 'やったー！', 'さいこう♪', 'てんし〜'
+                ];
+
+                this.fireMessages = [
+                    'あつあつ〜', 'めらめら！', 'もえもえ〜', 'ぽかぽか♪', 'はーと♪',
+                    'だいすき〜', 'らぶらぶ♪', 'あったか〜', 'もふもふ〜', 'きゅーん♪',
+                    'ばーにんぐ♪', 'ほっと〜', 'れんあい♪', 'どきどき〜', 'きもちいい〜'
+                ];
+
+                this.trophyMessages = [
+                    'すごいね！', 'えらいえらい♪', 'やったー！', 'がんばった！', '最高だね♪',
+                    'さいこう〜', 'でんせつ！', 'きょうりょく！', 'すばらしい♪', 'かんどう〜',
+                    'ちゃんぴおん♪', 'すたー！', 'ひーろー♪', 'おうさま〜', 'かみさま♪'
+                ];
+
+                this.initializeSystem();
+            }
+
+            initializeSystem() {
+                // すべてのクリッカブル要素にイベントリスナーを追加
+                this.addGlobalClickListeners();
+                
+                // 横並びポイントバブルのクリックイベント
+                this.initPointBubbles();
+                
+                // 定期的なボーナス処理
+                setInterval(() => this.checkComboTimeout(), 100);
+                setInterval(() => this.autoBonus(), 5000); // 5秒ごとにオートボーナス
+            }
+
+            addGlobalClickListeners() {
+                // 全てのクリッカブル要素を取得してイベント追加
+                document.addEventListener('click', (e) => {
+                    const element = e.target;
+                    if (element.classList.contains('clickable-element') || 
+                        element.closest('.clickable-element')) {
+                        this.handleElementClick(e);
+                    }
+                });
+            }
+
+            initPointBubbles() {
+                // 横並びポイントバブルのクリック
+                document.getElementById('sparklePointBubble').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.megaTapPointBubble('sparkle', e);
+                });
+
+                document.getElementById('firePointBubble').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.megaTapPointBubble('fire', e);
+                });
+
+                document.getElementById('trophyPointBubble').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.megaTapPointBubble('trophy', e);
+                });
+            }
+
+            handleElementClick(e) {
+                const element = e.target.closest('.clickable-element') || e.target;
+                
+                // コンボ判定
+                const now = Date.now();
+                if (now - this.lastClickTime < 500) { // 0.5秒以内なら連続クリック
+                    this.comboCount++;
+                    this.multiplier = Math.min(5, 1 + (this.comboCount * 0.1)); // 最大5倍
+                    this.isComboMode = true;
+                } else {
+                    this.comboCount = 0;
+                    this.multiplier = 1;
+                    this.isComboMode = false;
+                }
+                this.lastClickTime = now;
+
+                // 基本ポイント
+                let basePoints = 5;
+                let particleType = 'normal';
+                let messages = ['ぽちっ♪', 'たっち〜', 'ぺちぺち♪'];
+
+                // 要素タイプ別ボーナス
+                if (element.classList.contains('game-title') || element.id === 'gameTitle') {
+                    basePoints = 50;
+                    particleType = 'mega';
+                    messages = ['たいとる〜♪', 'NEKOPON♪', 'ろご〜！'];
+                } else if (element.classList.contains('cat-icon')) {
+                    basePoints = 25;
+                    particleType = 'bonus';
+                    messages = ['にゃーん♪', 'ねこちゃん♪', 'かわいい〜'];
+                } else if (element.classList.contains('subject-btn') || element.classList.contains('category-btn')) {
+                    basePoints = 15;
+                    particleType = 'bonus';
+                    messages = ['ぼたん♪', 'せんたく〜', 'くりっく！'];
+                } else if (element.classList.contains('clean-button') || element.classList.contains('quiz-option')) {
+                    basePoints = 12;
+                    particleType = 'bonus';
+                    messages = ['たっぷ♪', 'ぽちっと〜', 'ぐっど！'];
+                }
+
+                // コンボボーナス適用
+                const finalPoints = Math.floor(basePoints * this.multiplier);
+                
+                // ポイント振り分け（ランダム）
+                const distribution = Math.random();
+                if (distribution < 0.4) {
+                    this.sparklePoints += finalPoints;
+                } else if (distribution < 0.7) {
+                    this.firePoints += Math.floor(finalPoints * 0.7);
+                } else {
+                    this.trophyPoints += Math.floor(finalPoints * 1.5);
+                }
+
+                this.totalClicks++;
+
+                // 可愛い震えエフェクト追加（正確な座標取得）
+                const rect = element.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+
+                // 要素に可愛い震えエフェクト追加
+                element.classList.add('cute-shake-effect');
+                setTimeout(() => element.classList.remove('cute-shake-effect'), 600);
+
+                // パーティクル生成（正確な座標）
+                this.createCuteParticles(centerX, centerY, 
+                    ['✨', '💫', '🌟', '💖', '🎊', '⭐', '💎'], 
+                    this.isComboMode ? 8 : 4);
+
+                // 小さなフローティングポイント表示
+                this.showFloatingPoints(finalPoints, centerX, centerY, 
+                    this.isComboMode ? 'ultra' : particleType);
+
+                // メッセージ表示
+                const message = this.isComboMode ? 
+                    `コンボ×${this.multiplier.toFixed(1)}` :
+                    messages[Math.floor(Math.random() * messages.length)];
+                showNekoMsg(message, centerX, centerY);
+
+                // サウンド
+                soundSystem.playSound(this.isComboMode ? 'mega' : 'sparkle');
+                soundSystem.vibrate(this.isComboMode ? [80, 40, 80, 40, 120] : [50]);
+
+                this.updateAllPointDisplays();
+            }
+
+            megaTapPointBubble(type, event) {
+                let bonusPoints, messages, particles, soundType;
+
+                switch(type) {
+                    case 'sparkle':
+                        bonusPoints = 200;
+                        messages = this.sparkleMessages;
+                        particles = ['✨', '💫', '🌟', '💎', '⭐', '🔮'];
+                        soundType = 'sparkle';
+                        this.sparklePoints += bonusPoints;
+                        break;
+                    
+                    case 'fire':
+                        bonusPoints = 150;
+                        messages = this.fireMessages;
+                        particles = ['🔥', '💕', '❤️', '💖', '💝', '💘'];
+                        soundType = 'fire';
+                        this.firePoints += bonusPoints;
+                        break;
+                    
+                    case 'trophy':
+                        bonusPoints = 300;
+                        messages = this.trophyMessages;
+                        particles = ['🏆', '👑', '🎊', '🎉', '🌟', '💫', '🎆', '🎖️'];
+                        soundType = 'trophy';
+                        this.trophyPoints += bonusPoints;
+                        break;
+                }
+
+                this.totalClicks++;
+
+                // サウンド再生
+                soundSystem.playSound(soundType);
+                soundSystem.vibrate([200, 100, 200, 100, 300]);
+
+                // エフェクト表示（イベント座標使用）
+                const element = event.target;
+                const rect = element.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+
+                // バブルに適切なアニメーションクラス追加
+                element.classList.add(`tap-${type}`);
+                setTimeout(() => element.classList.remove(`tap-${type}`), 800);
+
+                // パーティクル生成
+                this.createCuteParticles(centerX, centerY, particles, 10);
+
+                // 小さなフローティングポイント
+                this.showFloatingPoints(bonusPoints, centerX, centerY, 'ultra');
+
+                // メッセージ表示
+                const message = messages[Math.floor(Math.random() * messages.length)];
+                showNekoMsg(message, centerX, centerY);
+
+                this.updateAllPointDisplays();
+            }
+
+            checkComboTimeout() {
+                const now = Date.now();
+                if (this.isComboMode && now - this.lastClickTime > 1000) {
+                    this.comboCount = 0;
+                    this.multiplier = 1;
+                    this.isComboMode = false;
+                }
+            }
+
+            autoBonus() {
+                if (this.totalClicks > 0) {
+                    const bonus = Math.floor(this.totalClicks * 0.05);
+                    this.sparklePoints += bonus;
+                    this.firePoints += bonus;
+                    this.trophyPoints += bonus;
+                    
+                    // 小さな通知
+                    const messages = ['おまけにゃ〜', 'ぼーなす♪', 'さーびす〜'];
+                    showNekoMsg(messages[Math.floor(Math.random() * messages.length)], 
+                              window.innerWidth - 100, 100);
+                    
+                    this.updateAllPointDisplays();
+                }
+            }
+
+            createCuteParticles(x, y, emojis, count) {
+                for (let i = 0; i < count; i++) {
+                    setTimeout(() => {
+                        const particle = document.createElement('div');
+                        particle.className = 'cute-particle';
+                        particle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                        particle.style.left = (x + (Math.random() - 0.5) * 60) + 'px';
+                        particle.style.top = (y + (Math.random() - 0.5) * 60) + 'px';
+                        particle.style.color = `hsl(${Math.random() * 360}, 70%, 60%)`;
+                        document.body.appendChild(particle);
+                        setTimeout(() => particle.remove(), 1500);
+                    }, i * 40);
+                }
+            }
+
+            showFloatingPoints(points, x, y, type = 'normal') {
+                const element = document.createElement('div');
+                element.className = `floating-points ${type}`;
+                element.textContent = `+${this.formatNum(points)}`;
+                element.style.left = Math.min(x, window.innerWidth - 80) + 'px';
+                element.style.top = Math.min(y, window.innerHeight - 40) + 'px';
+                document.body.appendChild(element);
+                
+                setTimeout(() => element.remove(), 2000);
+            }
+
+            updateAllPointDisplays() {
+                document.getElementById('sparklePointsMain').textContent = this.formatNum(this.sparklePoints);
+                document.getElementById('firePointsMain').textContent = this.formatNum(this.firePoints);
+                document.getElementById('trophyPointsMain').textContent = this.formatNum(this.trophyPoints);
+            }
+
+            formatNum(n) {
+                if (n >= 1e12) return Math.floor(n / 1e12) + 'T';
+                if (n >= 1e9) return Math.floor(n / 1e9) + 'B';
+                if (n >= 1e6) return Math.floor(n / 1e6) + 'M';
+                if (n >= 1e3) return Math.floor(n / 1e3) + 'K';
+                return Math.floor(n).toString();
+            }
+
+            getTotalPoints() {
+                return this.sparklePoints + this.firePoints + this.trophyPoints;
+            }
+        }
+
+        /* ----------------- 音響システム ----------------- */
+        class UltimateSoundSystem {
+            constructor() {
+                this.audioContext = null;
+                this.sounds = {};
+                this.initAudio();
+            }
+
+            initAudio() {
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.log('音声システムを初期化できませんでしたにゃ〜');
+                }
+            }
+
+            playClick() {
+                this.createNekoTone(600, 0.2, 0.15, 'sine');
+            }
+
+            playCorrect() {
+                this.createNekoTone(523, 0.15, 0.2);
+                setTimeout(() => this.createNekoTone(659, 0.15, 0.2), 100);
+                setTimeout(() => this.createNekoTone(784, 0.25, 0.25), 200);
+                setTimeout(() => this.createNekoTone(1047, 0.3, 0.2), 350);
+            }
+
+            playWrong() {
+                this.createNekoTone(400, 0.2, 0.15, 'sine');
+                setTimeout(() => this.createNekoTone(300, 0.3, 0.2, 'sine'), 150);
+            }
+
+            playSuccess() {
+                const notes = [523, 587, 659, 698, 784, 880, 988, 1047, 1175];
+                notes.forEach((freq, i) => {
+                    setTimeout(() => this.createNekoTone(freq, 0.15, 0.2, 'sine'), i * 80);
+                });
+            }
+
+            playSound(type) {
+                if (!this.audioContext) return;
+
+                try {
+                    if (this.audioContext.state === 'suspended') {
+                        this.audioContext.resume();
+                    }
+
+                    const oscillator = this.audioContext.createOscillator();
+                    const gainNode = this.audioContext.createGain();
+                    const filterNode = this.audioContext.createBiquadFilter();
+
+                    oscillator.connect(filterNode);
+                    filterNode.connect(gainNode);
+                    gainNode.connect(this.audioContext.destination);
+
+                    let frequency, duration, filterFreq;
+
+                    switch(type) {
+                        case 'sparkle':
+                            frequency = 1200 + Math.random() * 500;
+                            duration = 0.8;
+                            filterFreq = 2500;
+                            oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+                            oscillator.frequency.exponentialRampToValueAtTime(frequency * 0.4, this.audioContext.currentTime + duration);
+                            break;
+                        case 'fire':
+                            frequency = 600 + Math.random() * 300;
+                            duration = 1.0;
+                            filterFreq = 1800;
+                            oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+                            oscillator.frequency.exponentialRampToValueAtTime(frequency * 1.3, this.audioContext.currentTime + duration * 0.5);
+                            oscillator.frequency.exponentialRampToValueAtTime(frequency * 0.7, this.audioContext.currentTime + duration);
+                            break;
+                        case 'trophy':
+                            frequency = 1500;
+                            duration = 1.5;
+                            filterFreq = 3500;
+                            oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+                            oscillator.frequency.exponentialRampToValueAtTime(frequency * 2, this.audioContext.currentTime + duration);
+                            break;
+                        case 'mega':
+                            frequency = 1200;
+                            duration = 1.2;
+                            filterFreq = 3000;
+                            oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+                            oscillator.frequency.exponentialRampToValueAtTime(frequency * 2.5, this.audioContext.currentTime + duration * 0.3);
+                            oscillator.frequency.exponentialRampToValueAtTime(frequency * 0.3, this.audioContext.currentTime + duration);
+                            break;
+                        default:
+                            frequency = 440;
+                            duration = 0.3;
+                            filterFreq = 1000;
+                            oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+                            oscillator.frequency.exponentialRampToValueAtTime(frequency * 0.6, this.audioContext.currentTime + duration);
+                    }
+
+                    filterNode.frequency.setValueAtTime(filterFreq, this.audioContext.currentTime);
+                    filterNode.Q.setValueAtTime(2, this.audioContext.currentTime);
+
+                    gainNode.gain.setValueAtTime(0.12, this.audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
+
+                    oscillator.start(this.audioContext.currentTime);
+                    oscillator.stop(this.audioContext.currentTime + duration);
+                } catch (e) {
+                    // エラーは無視
+                }
+            }
+
+            createNekoTone(frequency, duration, volume = 0.15, type = 'sine') {
+                if (!this.audioContext) return;
+
+                try {
+                    if (this.audioContext.state === 'suspended') {
+                        this.audioContext.resume();
+                    }
+
+                    const oscillator = this.audioContext.createOscillator();
+                    const gainNode = this.audioContext.createGain();
+                    const filterNode = this.audioContext.createBiquadFilter();
+
+                    oscillator.connect(filterNode);
+                    filterNode.connect(gainNode);
+                    gainNode.connect(this.audioContext.destination);
+
+                    oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+                    oscillator.type = type;
+
+                    filterNode.frequency.setValueAtTime(frequency * 2, this.audioContext.currentTime);
+                    filterNode.Q.setValueAtTime(1, this.audioContext.currentTime);
+
+                    gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+                    gainNode.gain.linearRampToValueAtTime(volume, this.audioContext.currentTime + 0.01);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + duration);
+
+                    oscillator.start(this.audioContext.currentTime);
+                    oscillator.stop(this.audioContext.currentTime + duration);
+                } catch (e) {
+                    // エラーは無視
+                }
+            }
+
+            vibrate(pattern) {
+                if ('vibrate' in navigator) {
+                    navigator.vibrate(pattern);
+                }
+            }
+        }
+
+        // グローバルインスタンス
+        const tiltSystem = new TiltSystem();
+        const soundSystem = new UltimateSoundSystem();
+        const pointSystem = new UltimateMegaPointSystem();
+
+        /* ----------------- 猫語メッセージ ----------------- */
+        const nekoMessages = {
+            correct: [
+                'すごいにゃ〜♪', '正解だにゃ！', 'やったにゃ〜！', '天才にゃ♪', 'かしこいにゃ〜',
+                'ばっちりにゃ！', 'すばらしいにゃ♪', 'さすがにゃ〜', 'えらいにゃ！', 'ぱーふぇくとにゃ♪'
+            ],
+            wrong: [
+                'ざんねんにゃ〜', 'おしいにゃ！', 'つぎがんばるにゃ〜', 'どんまいにゃ♪', 'おしかったにゃ〜',
+                'もう少しにゃ！', 'ファイトにゃ〜♪', 'つぎはできるにゃ！', 'がんばるにゃ〜', 'あきらめないにゃ♪'
+            ],
+            tap: [
+                'にゃ〜ん♪', 'ぽんぽん♪', 'きゃわいい〜', 'もふもふ♪', 'ふわふわ〜',
+                'ぺろぺろ♪', 'ぽよぽよ〜', 'きらきら♪', 'ぴかぴか〜', 'わくわく♪'
+            ],
+            notification: [
+                'お知らせにゃ〜♪', 'だいじなことにゃ！', 'きいてほしいにゃ〜', 'チェックにゃ♪', 'みてにゃ〜'
+            ],
+            start: [
+                'はじまるにゃ〜♪', 'がんばるにゃ！', 'よろしくにゃ〜', 'たのしもうにゃ♪', 'すたーとにゃ〜！'
+            ]
+        };
+
+        /* ----------------- カテゴリー定義（完全実装） ----------------- */
+        const categories = {
+            geography: [
+                {id: 'geo_world_overview', name: '1.世界の姿'},
+                {id: 'geo_japan_overview', name: '2.日本の姿'},
+                {id: 'geo_world_life', name: '3.世界各地の人々の生活と環境'},
+                {id: 'geo_asia', name: '4.世界の諸地域　アジア州'},
+                {id: 'geo_europe', name: '5.世界の諸地域　ヨーロッパ州'},
+                {id: 'geo_africa', name: '6.世界の諸地域　アフリカ州'},
+                {id: 'geo_north_america', name: '7.世界の諸地域　北アメリカ州'},
+                {id: 'geo_south_america', name: '8.世界の諸地域　南アメリカ州'},
+                {id: 'geo_oceania', name: '9.世界の諸地域　オセアニア'},
+                {id: 'geo_japan_features', name: '10.日本の地域的特色'},
+                {id: 'geo_japan_kyushu', name: '11.日本の諸地域　九州地方'},
+                {id: 'geo_japan_chugoku', name: '12.日本の諸地域　中国・四国地方'},
+                {id: 'geo_japan_kinki', name: '13.日本の諸地域　近畿地方'},
+                {id: 'geo_japan_chubu', name: '14.日本の諸地域　中部地方'},
+                {id: 'geo_japan_kanto', name: '15.日本の諸地域　関東地方'},
+                {id: 'geo_japan_tohoku', name: '16.日本の諸地域　東北地方'},
+                {id: 'geo_japan_hokkaido', name: '17.日本の諸地域　北海道地方'}
+            ],
+            history: [
+                {id: 'hist_ancient', name: '1.文明のおこりと日本の成り立ち'},
+                {id: 'hist_ancient_state', name: '2.古代国家の歩みと東アジア'},
+                {id: 'hist_kamakura', name: '3.武士のおこりと鎌倉幕府'},
+                {id: 'hist_muromachi', name: '4.モンゴルの襲来と室町幕府'},
+                {id: 'hist_unification', name: '5.ヨーロッパ人との出会いと全国統一'},
+                {id: 'hist_edo_early', name: '6.江戸幕府の成立と鎖国'},
+                {id: 'hist_edo_develop', name: '7.産業の発達と幕府政治の展開'},
+                {id: 'hist_opening', name: '8.欧米の進出と日本の開国'},
+                {id: 'hist_meiji', name: '9.明治維新'},
+                {id: 'hist_wars', name: '10.日清・日露戦争と日本の産業革命'},
+                {id: 'hist_wwi', name: '11.第一次世界大戦と日本'},
+                {id: 'hist_wwii', name: '12.世界恐慌と第二次世界大戦'},
+                {id: 'hist_postwar', name: '13.戦後の日本の発展と国際社会'}
+            ],
+            civics: [
+                {id: 'civics_modern', name: '1.現代社会と私たち'},
+                {id: 'civics_constitution', name: '2.人間の尊重と日本国憲法'},
+                {id: 'civics_democracy', name: '3.現代の民主政治'},
+                {id: 'civics_economy', name: '4.暮らしと経済'}
+            ],
+            chemistry: [
+                {id: 'chemistry_basic', name: '1.物質とその性質'},
+                {id: 'chemistry_gas', name: '2.気体の性質'},
+                {id: 'chemistry_solution', name: '3.水溶液の性質'},
+                {id: 'chemistry_state', name: '4.状態変化'},
+                {id: 'chemistry_change', name: '5.物質の変化'},
+                {id: 'chemistry_structure', name: '6.物質の成り立ち'},
+                {id: 'chemistry_reaction', name: '7.物質どうしの化学変化'},
+                {id: 'chemistry_mass', name: '8.化学変化と質量'},
+                {id: 'chemistry_ion', name: '9.イオンと電池'},
+                {id: 'chemistry_acid', name: '10.酸、アルカリ、塩'}
+            ],
+            biology: [
+                {id: 'biology_flower', name: '1.花のつくり'},
+                {id: 'biology_plant', name: '2.根・葉のつくり、植物の特徴と分類'},
+                {id: 'biology_animal', name: '3.動物の特徴と分類'},
+                {id: 'biology_microscope', name: '4.顕微鏡の使い方'},
+                {id: 'biology_cell', name: '5.生物と細胞'},
+                {id: 'biology_plant_body', name: '6.植物のからだのつくり、植物と日光'},
+                {id: 'biology_digestion', name: '7.消化と吸収'},
+                {id: 'biology_breathing', name: '8.呼吸'},
+                {id: 'biology_circulation', name: '9.血液の循環、排出のしくみ'},
+                {id: 'biology_response', name: '10.刺激と反応、動物のからだ'},
+                {id: 'biology_growth', name: '11.生物の成長と細胞の変化'},
+                {id: 'biology_reproduction', name: '12.生物の生殖'},
+                {id: 'biology_heredity', name: '13.遺伝の規則性と遺伝子'},
+                {id: 'biology_evolution', name: '14.生物の進化、生態系と食物連鎖'},
+                {id: 'biology_environment', name: '15.自然と環境、人間と自然環境'}
+            ],
+            physics: [
+                {id: 'physics_light', name: '1.光による現象'},
+                {id: 'physics_sound', name: '2.音による現象'},
+                {id: 'physics_force', name: '3.力による現象'},
+                {id: 'physics_current', name: '4.電流と電圧'},
+                {id: 'physics_energy', name: '5.電気エネルギー'},
+                {id: 'physics_magnetic', name: '6.電流と磁界'},
+                {id: 'physics_balance', name: '7.力のつり合いと合成・分解'},
+                {id: 'physics_motion', name: '8.物体の運動'},
+                {id: 'physics_pressure', name: '9.水圧と浮力'},
+                {id: 'physics_work', name: '10.エネルギーと仕事'},
+                {id: 'physics_energy_change', name: '11.エネルギーの移り変わり'},
+                {id: 'physics_resources', name: '12.エネルギー資源の利用'}
+            ],
+            earth: [
+                {id: 'earth_volcano', name: '1.火山'},
+                {id: 'earth_earthquake', name: '2.地震'},
+                {id: 'earth_strata', name: '3.地層のでき方'},
+                {id: 'earth_weather', name: '4.気象の観測、大気圧と圧力'},
+                {id: 'earth_front', name: '5.気団と前線、日本の天気'},
+                {id: 'earth_cloud', name: '6.雲のでき方と水蒸気'},
+                {id: 'earth_celestial', name: '7.地球の動きと天体の動き'},
+                {id: 'earth_solar', name: '8.太陽系の天体'},
+                {id: 'earth_moon', name: '9.月と惑星の見え方、自然の恵みと災害'}
+            ],
+            english_words: [
+                {id: 'words_time', name: '月・序数'},
+                {id: 'words_week', name: '曜日'},
+                {id: 'words_timeday', name: '時・時間帯など'},
+                {id: 'words_season', name: '季節・家族'},
+                {id: 'words_sports', name: 'スポーツ・教科'},
+                {id: 'words_job', name: '職業・人・建物・施設'},
+                {id: 'words_uncountable', name: '数えられない名詞'},
+                {id: 'words_verb_important', name: '入試必出重要動詞'},
+                {id: 'words_verb_various', name: 'いろいろな意味をもつ動詞'},
+                {id: 'words_verb_set', name: 'セットで覚えておきたい動詞'},
+                {id: 'words_verb_other', name: 'その他の重要動詞'},
+                {id: 'words_adj_quantity', name: '数・量を表す形容詞'},
+                {id: 'words_adj_various', name: 'いろいろな形容詞'},
+                {id: 'words_adj_adv', name: 'その他の重要形容詞・副詞'},
+                {id: 'words_adv_manner', name: '様子を表す副詞'}
+            ],
+            english_phrases: [
+                {id: 'phrases_verb', name: 'よく出る動詞の熟語'},
+                {id: 'phrases_set', name: 'セットで覚えておきたい熟語'},
+                {id: 'phrases_similar', name: '意味の似ている熟語'},
+                {id: 'phrases_verb_other', name: 'その他の動詞の熟語'},
+                {id: 'phrases_be', name: 'be 動詞を使った熟語'},
+                {id: 'phrases_quantity', name: '数や量を表す熟語'},
+                {id: 'phrases_time_place', name: '時・場所を表す熟語'},
+                {id: 'phrases_important', name: 'その他の重要熟語'}
+            ],
+            english_grammar: [
+                {id: 'grammar_irregular_past', name: '不規則動詞 - 過去形・過去分詞'},
+                {id: 'grammar_irregular_same', name: '不規則動詞 - 過去形と過去分詞が同じ'},
+                {id: 'grammar_irregular_special', name: '不規則動詞 - 特殊なケース'},
+                {id: 'grammar_be_past', name: 'be 動詞 - 過去形・過去分詞'},
+                {id: 'grammar_regular', name: '規則動詞 - 過去形・過去分詞'},
+                {id: 'grammar_third_person', name: '三人称単数現在形'},
+                {id: 'grammar_ing', name: '動詞の -ing 形'},
+                {id: 'grammar_comparative', name: '形容詞 - 比較級・最上級'},
+                {id: 'grammar_more_most', name: 'more、most をつける形容詞'},
+                {id: 'grammar_noun_plural', name: '名詞の複数形'},
+                {id: 'grammar_irregular_plural', name: '不規則な複数形'},
+                {id: 'grammar_pronoun', name: '人称代名詞'}
+            ]
+        };
+
+        /* ----------------- ゲーム変数 ----------------- */
+        let selectedCategories = [];
+        let currentQuestionIndex = 0;
+        let correctCount = 0;
+        let wrongCount = 0;
+        let totalCount = 0;
+        let usedQuestions = [];
+        let currentSubject = '';
+        let questionMode = 'random';
+        let sequentialIndex = 0;
+
+        /* ----------------- エフェクト関数 ----------------- */
+        function createNekoParticle(text, color, x, y) {
+            const particle = document.createElement('div');
+            particle.className = 'cute-particle';
+            particle.textContent = text;
+            particle.style.color = color;
+            particle.style.left = x + 'px';
+            particle.style.top = y + 'px';
+            particle.style.fontSize = '16px';
+            document.body.appendChild(particle);
+
+            setTimeout(() => {
+                if (particle.parentNode) {
+                    particle.parentNode.removeChild(particle);
+                }
+            }, 1500);
+        }
+
+        function createNekoParticles(x, y, emojis, count) {
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+                    const offsetX = (Math.random() - 0.5) * 50;
+                    const offsetY = (Math.random() - 0.5) * 50;
+                    createNekoParticle(emoji, '#d2691e', x + offsetX, y + offsetY);
+                }, i * 40);
+            }
+        }
+
+        function showNekoMsg(text, x, y) {
+            const el = document.createElement('div');
+            el.className = 'floating-msg';
+            el.textContent = text;
+            el.style.left = Math.min(x, window.innerWidth - 80) + 'px';
+            el.style.top = Math.min(y, window.innerHeight - 40) + 'px';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 2000);
+        }
+
+        function showNotification(text) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            const nekoText = text + 'にゃ〜♪';
+            notificationText.textContent = nekoText;
+            notification.classList.add('show');
+            
+            soundSystem.playClick();
+            soundSystem.vibrate([50, 30, 50]);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function addTapEffect(element) {
+            element.addEventListener('click', function(e) {
+                this.classList.add('tapped');
+                setTimeout(() => this.classList.remove('tapped'), 600);
+                
+                const rect = this.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                createNekoParticles(centerX, centerY, ['✨', '🌟', '💫', '💖'], 3);
+                
+                const message = nekoMessages.tap[Math.floor(Math.random() * nekoMessages.tap.length)];
+                showNekoMsg(message, centerX, centerY);
+                
+                soundSystem.playClick();
+                soundSystem.vibrate([30]);
+            });
+        }
+
+        /* ----------------- タイトル猫のアニメーション ----------------- */
+        function bounceCat(side) {
+            const catId = side === 'left' ? 'leftCat' : 'rightCat';
+            const catElement = document.getElementById(catId);
+
+            catElement.classList.add('bounce');
+            soundSystem.playSuccess();
+            soundSystem.vibrate([50]);
+
+            const rect = catElement.getBoundingClientRect();
+            createNekoParticles(rect.left + rect.width/2, rect.top + rect.height/2, ['💫', '✨', '🌟'], 3);
+
+            const message = 'にゃ〜ん♪';
+            showNekoMsg(message, rect.left + rect.width/2, rect.top + rect.height/2);
+
+            setTimeout(() => {
+                catElement.classList.remove('bounce');
+            }, 800);
+        }
+
+        function bounceTitle() {
+            const titleElement = document.getElementById('gameTitle');
+            titleElement.classList.add('title-bounce');
+
+            soundSystem.playSuccess();
+            soundSystem.vibrate([120, 60, 120, 60, 180]);
+
+            const rect = titleElement.getBoundingClientRect();
+            createNekoParticles(rect.left + rect.width/2, rect.top + rect.height/2, 
+                              ['💫', '✨', '🌟', '💖', '🎊', '🎆', '🌈'], 8);
+
+            const message = 'NEKOPON Quiz だにゃ〜♪';
+            showNekoMsg(message, rect.left + rect.width/2, rect.top + rect.height/2);
+
+            setTimeout(() => {
+                titleElement.classList.remove('title-bounce');
+            }, 800);
+        }
+
+        /* ----------------- 英語発音システム ----------------- */
+        function speakWord(wordToSpeak) {
+            if (!('speechSynthesis' in window) || !wordToSpeak) return;
+            
+            const utterance = new SpeechSynthesisUtterance(wordToSpeak);
+            const voices = speechSynthesis.getVoices();
+            let preferredVoice = voices.find(v => /en-(US|GB)/.test(v.lang) && (v.name.includes('Google') || v.localService || v.default));
+            if (!preferredVoice) preferredVoice = voices.find(v => /en-(US|GB)/.test(v.lang));
+           
+            utterance.voice = preferredVoice || voices.find(v => v.lang && v.lang.startsWith('en-')); 
+            utterance.lang = utterance.voice ? utterance.voice.lang : 'en-US';
+            utterance.rate = 0.9; 
+            utterance.pitch = 1;
+            speechSynthesis.cancel(); 
+            speechSynthesis.speak(utterance);
+        }
+
+        function isEnglishCategory() {
+            return selectedCategories.some(categoryId => 
+                categoryId.startsWith('words_') || categoryId.startsWith('phrases_') || categoryId.startsWith('grammar_')
+            );
+        }
+
+        /* ----------------- 画面遷移関数 ----------------- */
+        function hideAllModals() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.classList.remove('show');
+            });
+        }
+
+        function goBackToMain() {
+            hideAllModals();
+            document.getElementById('mainSubjectModal').classList.add('show');
+            soundSystem.playClick();
+        }
+
+        function goBackToSocial() {
+            hideAllModals();
+            document.getElementById('socialModal').classList.add('show');
+            soundSystem.playClick();
+        }
+
+        function goBackToScience() {
+            hideAllModals();
+            document.getElementById('scienceModal').classList.add('show');
+            soundSystem.playClick();
+        }
+
+        function goBackToEnglish() {
+            hideAllModals();
+            document.getElementById('englishModal').classList.add('show');
+            soundSystem.playClick();
+        }
+
+        /* ----------------- カテゴリー選択の初期化（完全実装） ----------------- */
+        function initCategorySelection() {
+            // 地理カテゴリー
+            const geographyContainer = document.getElementById('geographyCategories');
+            categories.geography.forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn tap-effect clickable-element';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('geography', category.id, btn);
+                addTapEffect(btn);
+                geographyContainer.appendChild(btn);
+            });
+
+            // 歴史カテゴリー
+            const historyContainer = document.getElementById('historyCategories');
+            categories.history.forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn tap-effect clickable-element';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('history', category.id, btn);
+                addTapEffect(btn);
+                historyContainer.appendChild(btn);
+            });
+
+            // 公民カテゴリー
+            const civicsContainer = document.getElementById('civicsCategories');
+            categories.civics.forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn tap-effect clickable-element';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('civics', category.id, btn);
+                addTapEffect(btn);
+                civicsContainer.appendChild(btn);
+            });
+
+            // 化学カテゴリー（学年ごとに分けて表示）
+            const chemistryContainer = document.getElementById('chemistryCategories');
+            // 中1
+            const grade1Label = document.createElement('div');
+            grade1Label.className = 'grade-label clickable-element';
+            grade1Label.textContent = '中学1年生';
+            chemistryContainer.appendChild(grade1Label);
+            categories.chemistry.slice(0, 4).forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn tap-effect clickable-element';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('chemistry', category.id, btn);
+                addTapEffect(btn);
+                chemistryContainer.appendChild(btn);
+            });
+            // 中2
+            const grade2Label = document.createElement('div');
+            grade2Label.className = 'grade-label clickable-element';
+            grade2Label.textContent = '中学2年生';
+            chemistryContainer.appendChild(grade2Label);
+            categories.chemistry.slice(4, 8).forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn tap-effect clickable-element';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('chemistry', category.id, btn);
+                addTapEffect(btn);
+                chemistryContainer.appendChild(btn);
+            });
+            // 中3
+            const grade3Label = document.createElement('div');
+            grade3Label.className = 'grade-label clickable-element';
+            grade3Label.textContent = '中学3年生';
+            chemistryContainer.appendChild(grade3Label);
+            categories.chemistry.slice(8).forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn tap-effect clickable-element';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('chemistry', category.id, btn);
+                addTapEffect(btn);
+                chemistryContainer.appendChild(btn);
+            });
+
+            // 生物カテゴリー（学年ごとに分けて表示）
+            const biologyContainer = document.getElementById('biologyCategories');
+            // 中1
+            const bioGrade1Label = document.createElement('div');
+            bioGrade1Label.className = 'grade-label clickable-element';
+            bioGrade1Label.textContent = '中学1年生';
+            biologyContainer.appendChild(bioGrade1Label);
+            categories.biology.slice(0, 3).forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn tap-effect clickable-element';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('biology', category.id, btn);
+                addTapEffect(btn);
+                biologyContainer.appendChild(btn);
+            });
+            // 中2
+            const bioGrade2Label = document.createElement('div');
+            bioGrade2Label.className = 'grade-label clickable-element';
+            bioGrade2Label.textContent = '中学2年生';
+            biologyContainer.appendChild(bioGrade2Label);
+            categories.biology.slice(3, 10).forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn tap-effect clickable-element';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('biology', category.id, btn);
+                addTapEffect(btn);
+                biologyContainer.appendChild(btn);
+            });
+            // 中3
+            const bioGrade3Label = document.createElement('div');
+            bioGrade3Label.className = 'grade-label clickable-element';
+            bioGrade3Label.textContent = '中学3年生';
+            biologyContainer.appendChild(bioGrade3Label);
+            categories.biology.slice(10).forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn tap-effect clickable-element';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('biology', category.id, btn);
+                addTapEffect(btn);
+                biologyContainer.appendChild(btn);
+            });
+
+            // 物理カテゴリー（学年ごとに分けて表示）
+            const physicsContainer = document.getElementById('physicsCategories');
+            // 中1
+            const phyGrade1Label = document.createElement('div');
+            phyGrade1Label.className = 'grade-label clickable-element';
+            phyGrade1Label.textContent = '中学1年生';
+            physicsContainer.appendChild(phyGrade1Label);
+            categories.physics.slice(0, 3).forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn tap-effect clickable-element';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('physics', category.id, btn);
+                addTapEffect(btn);
+                physicsContainer.appendChild(btn);
+            });
+            // 中2
+            const phyGrade2Label = document.createElement('div');
+            phyGrade2Label.className = 'grade-label clickable-element';
+            phyGrade2Label.textContent = '中学2年生';
+            physicsContainer.appendChild(phyGrade2Label);
+            categories.physics.slice(3, 6).forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn tap-effect clickable-element';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('physics', category.id, btn);
+                addTapEffect(btn);
+                physicsContainer.appendChild(btn);
+            });
+            // 中3
+            const phyGrade3Label = document.createElement('div');
+            phyGrade3Label.className = 'grade-label clickable-element';
+            phyGrade3Label.textContent = '中学3年生';
+            physicsContainer.appendChild(phyGrade3Label);
+            categories.physics.slice(6).forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn tap-effect clickable-element';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('physics', category.id, btn);
+                addTapEffect(btn);
+                physicsContainer.appendChild(btn);
+            });
+
+            // 地学カテゴリー（学年ごとに分けて表示）
+            const earthContainer = document.getElementById('earthCategories');
+            // 中1
+            const earthGrade1Label = document.createElement('div');
+            earthGrade1Label.className = 'grade-label clickable-element';
+            earthGrade1Label.textContent = '中学1年生';
+            earthContainer.appendChild(earthGrade1Label);
+            categories.earth.slice(0, 3).forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn tap-effect clickable-element';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('earth', category.id, btn);
+                addTapEffect(btn);
+                earthContainer.appendChild(btn);
+            });
+            // 中2
+            const earthGrade2Label = document.createElement('div');
+            earthGrade2Label.className = 'grade-label clickable-element';
+            earthGrade2Label.textContent = '中学2年生';
+            earthContainer.appendChild(earthGrade2Label);
+            categories.earth.slice(3, 6).forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn tap-effect clickable-element';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('earth', category.id, btn);
+                addTapEffect(btn);
+                earthContainer.appendChild(btn);
+            });
+            // 中3
+            const earthGrade3Label = document.createElement('div');
+            earthGrade3Label.className = 'grade-label clickable-element';
+            earthGrade3Label.textContent = '中学3年生';
+            earthContainer.appendChild(earthGrade3Label);
+            categories.earth.slice(6).forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn tap-effect clickable-element';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('earth', category.id, btn);
+                addTapEffect(btn);
+                earthContainer.appendChild(btn);
+            });
+
+            // 英単語カテゴリー
+            const englishWordsContainer = document.getElementById('englishWordsCategories');
+            categories.english_words.forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn tap-effect clickable-element';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('english_words', category.id, btn);
+                addTapEffect(btn);
+                englishWordsContainer.appendChild(btn);
+            });
+
+            // 英熟語カテゴリー
+            const englishPhrasesContainer = document.getElementById('englishPhrasesCategories');
+            categories.english_phrases.forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn tap-effect clickable-element';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('english_phrases', category.id, btn);
+                addTapEffect(btn);
+                englishPhrasesContainer.appendChild(btn);
+            });
+
+            // 語形変化カテゴリー
+            const englishGrammarContainer = document.getElementById('englishGrammarCategories');
+            categories.english_grammar.forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn tap-effect clickable-element';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('english_grammar', category.id, btn);
+                addTapEffect(btn);
+                englishGrammarContainer.appendChild(btn);
+            });
+        }
+
+        function toggleCategorySelection(subject, categoryId, buttonElement) {
+            soundSystem.playClick();
+            if (selectedCategories.includes(categoryId)) {
+                selectedCategories = selectedCategories.filter(id => id !== categoryId);
+                buttonElement.classList.remove('active');
+            } else {
+                selectedCategories.push(categoryId);
+                buttonElement.classList.add('active');
+            }
+
+            // クイズ開始ボタンの状態を更新
+            const camelCase = subject.split('_')
+                .map((word, index) => index === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word.charAt(0).toUpperCase() + word.slice(1))
+                .join('');
+            const startButton = document.getElementById(`start${camelCase}Quiz`);
+
+            if (startButton) {
+                startButton.disabled = selectedCategories.length === 0;
+                startButton.style.opacity = selectedCategories.length === 0 ? '0.5' : '1';
+            }
+        }
+
+        function startSelectedQuiz(subject, subjectName) {
+            currentSubject = subject;
+            hideAllModals();
+            document.getElementById('currentCategory').textContent = `${subjectName} - ${selectedCategories.length}単元選択中だにゃ〜♪`;
+            document.getElementById('gameScreen').classList.remove('hidden');
+            
+            const floatingBtn = document.getElementById('changeSubject');
+            floatingBtn.classList.remove('hidden');
+            floatingBtn.style.display = 'flex';
+
+            correctCount = 0;
+            wrongCount = 0;
+            totalCount = 0;
+            usedQuestions = [];
+            sequentialIndex = 0;
+            updateStats();
+            showNotification(`${subjectName}の${selectedCategories.length}単元を選択したにゃ〜♪`);
+        }
+
+        function updateStats() {
+            document.getElementById('correctCount').textContent = correctCount;
+            document.getElementById('wrongCount').textContent = wrongCount;
+            document.getElementById('totalCount').textContent = totalCount;
+            
+            document.querySelector('.stats-display').classList.add('score-pulse');
+            setTimeout(() => {
+                document.querySelector('.stats-display').classList.remove('score-pulse');
+            }, 600);
+        }
+
+        function setQuestionMode(mode) {
+            questionMode = mode;
+            
+            document.getElementById('randomModeBtn').classList.remove('active');
+            document.getElementById('sequentialModeBtn').classList.remove('active');
+            
+            if (mode === 'random') {
+                document.getElementById('randomModeBtn').classList.add('active');
+                document.getElementById('modeDescription').textContent = '問題をランダムに出題するにゃ〜♪';
+                usedQuestions = [];
+                showNotification('ランダム出題に切り替えたにゃ〜');
+            } else {
+                document.getElementById('sequentialModeBtn').classList.add('active');
+                document.getElementById('modeDescription').textContent = '問題を順番通りに出題するにゃ〜♪';
+                sequentialIndex = 0;
+                showNotification('順番通り出題に切り替えたにゃ〜');
+            }
+        }
+
+        /* ----------------- クイズ機能 ----------------- */
+        function openQuiz() {
+            if (selectedCategories.length === 0) {
+                showNotification('単元を選択してほしいにゃ〜');
+                return;
+            }
+
+            let allProblems = [];
+            selectedCategories.forEach(categoryId => {
+                if (problemDatabase[categoryId]) {
+                    allProblems = allProblems.concat(problemDatabase[categoryId]);
+                }
+            });
+
+            if (allProblems.length === 0) {
+                showNotification('問題がまだ準備中だにゃ〜');
+                return;
+            }
+
+            if (usedQuestions.length >= allProblems.length) {
+                usedQuestions = [];
+                showNotification('全問クリアだにゃ〜♪ リセットしたにゃ！');
+            }
+
+            let quiz;
+            let remainingCount;
+            
+            if (questionMode === 'random') {
+                const availableQuestions = allProblems.filter((_, index) => !usedQuestions.includes(index));
+                if (availableQuestions.length === 0) return;
+                
+                const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+                quiz = availableQuestions[randomIndex];
+                const originalIndex = allProblems.indexOf(quiz);
+                usedQuestions.push(originalIndex);
+                remainingCount = allProblems.length - usedQuestions.length;
+            } else {
+                if (sequentialIndex >= allProblems.length) {
+                    sequentialIndex = 0;
+                    showNotification('全問題を一周したにゃ〜♪ 最初から再開にゃ！');
+                }
+                quiz = allProblems[sequentialIndex];
+                sequentialIndex++;
+                remainingCount = allProblems.length - sequentialIndex;
+                if (remainingCount < 0) remainingCount = 0;
+            }
+
+            const modal = document.getElementById('quizModal');
+            const qEl = document.getElementById('quizQ');
+            const optDiv = document.getElementById('quizOptions');
+            const msgEl = document.getElementById('quizMsg');
+            const explanationEl = document.getElementById('quizExplanation');
+            const nextBtn = document.getElementById('quizNext');
+            const backBtn = document.getElementById('quizBack');
+
+            qEl.textContent = `${quiz.q} (残り${remainingCount}問だにゃ〜)`;
+            optDiv.innerHTML = '';
+            msgEl.textContent = '';
+            explanationEl.classList.remove('has-content');
+
+            if (isEnglishCategory()) {
+                speakWord(quiz.q);
+            }
+
+            nextBtn.disabled = false;
+            nextBtn.style.opacity = '1';
+            backBtn.disabled = false;
+            backBtn.style.opacity = '1';
+
+            let firstAnswer = false;
+
+            quiz.opts.forEach((txt, i) => {
+                const btn = document.createElement('button');
+                btn.textContent = txt;
+                btn.className = 'quiz-option w-full tap-effect clickable-element';
+                
+                addTapEffect(btn);
+                
+                btn.onclick = () => {
+                    if (isEnglishCategory()) {
+                        speakWord(txt);
+                    }
+                    
+                    if (!firstAnswer) {
+                        firstAnswer = true;
+                        totalCount++;
+                        if (i === quiz.ans) {
+                            correctCount++;
+                            soundSystem.playCorrect();
+                            soundSystem.vibrate([100, 50, 100, 50, 150]);
+                            
+                            const correctMsg = nekoMessages.correct[Math.floor(Math.random() * nekoMessages.correct.length)];
+                            showNotification(correctMsg);
+                            
+                            const rect = btn.getBoundingClientRect();
+                            createNekoParticles(rect.left + rect.width/2, rect.top + rect.height/2, 
+                                              ['✨', '🌟', '💫', '🎉', '🎊'], 5);
+
+                            // 正解でボーナス
+                            pointSystem.sparklePoints += 500;
+                            pointSystem.firePoints += 250;
+                            pointSystem.trophyPoints += 1000;
+                            pointSystem.updateAllPointDisplays();
+                            pointSystem.showFloatingPoints(1750, rect.left + rect.width/2, rect.top + rect.height/2, 'ultra');
+                        } else {
+                            wrongCount++;
+                            soundSystem.playWrong();
+                            soundSystem.vibrate([80, 40, 80]);
+                            
+                            const wrongMsg = nekoMessages.wrong[Math.floor(Math.random() * nekoMessages.wrong.length)];
+                            showNotification(wrongMsg);
+
+                            // 不正解でも励ましボーナス
+                            pointSystem.sparklePoints += 50;
+                            pointSystem.firePoints += 25;
+                            pointSystem.trophyPoints += 100;
+                            pointSystem.updateAllPointDisplays();
+                            pointSystem.showFloatingPoints(175, rect.left + rect.width/2, rect.top + rect.height/2, 'bonus');
+                        }
+                        updateStats();
+                    }
+                    
+                    if (i === quiz.ans) {
+                        msgEl.innerHTML = `🎉 正解だにゃ〜♪ ${quiz.exp || ''}`;
+                        msgEl.style.color = 'var(--light-brown)';
+                    } else {
+                        msgEl.innerHTML = `❌ 残念にゃ〜...正解は「${quiz.opts[quiz.ans]}」だにゃ♪ ${quiz.exp || ''}`;
+                        msgEl.style.color = '#cd5c5c';
+                    }
+                    explanationEl.classList.add('has-content');
+                };
+                optDiv.appendChild(btn);
+            });
+
+            nextBtn.onclick = () => {
+                soundSystem.playSuccess();
+                modal.classList.remove('show');
+                loadNextQuiz();
+            };
+
+            backBtn.onclick = () => {
+                soundSystem.playClick();
+                modal.classList.remove('show');
+                showNotification('お疲れ様だったにゃ〜♪');
+            };
+
+            modal.classList.add('show');
+        }
+
+        function loadNextQuiz() {
+            openQuiz();
+        }
+
+        /* ----------------- イベントリスナー設定（完全版） ----------------- */
+        function initEventListeners() {
+            // タイトルタップイベント
+            document.getElementById('gameTitle').addEventListener('click', (e) => {
+                e.stopPropagation();
+                bounceTitle();
+            });
+
+            // タイトル猫のタップ
+            document.getElementById('leftCat').addEventListener('click', (e) => {
+                e.stopPropagation();
+                bounceCat('left');
+            });
+
+            document.getElementById('rightCat').addEventListener('click', (e) => {
+                e.stopPropagation();
+                bounceCat('right');
+            });
+
+            // メイン教科選択
+            document.querySelectorAll('[data-subject]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    soundSystem.playSuccess();
+                    const subject = e.currentTarget.dataset.subject;
+                    hideAllModals();
+                    document.getElementById(subject + 'Modal').classList.add('show');
+                });
+            });
+
+            // 詳細カテゴリ選択
+            document.querySelectorAll('[data-category]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    soundSystem.playClick();
+                    const category = e.currentTarget.dataset.category;
+                    selectedCategories = [];
+                    hideAllModals();
+                    
+                    const modalId = category.split('_')
+                        .map((word, index) => index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1))
+                        .join('');
+                    
+                    const modal = document.getElementById(modalId + 'Modal');
+                    modal.classList.add('show');
+                    
+                    // モーダル表示後、スクロール位置を最上部にリセット
+                    setTimeout(() => {
+                        const modalCard = modal.querySelector('.clean-card');
+                        if (modalCard) {
+                            modalCard.scrollTop = 0;
+                        }
+                    }, 50);
+                });
+            });
+
+            // クイズ開始ボタン群
+            document.getElementById('startGeographyQuiz').addEventListener('click', () => {
+                soundSystem.playSuccess();
+                startSelectedQuiz('geography', '🗺️ 地理');
+            });
+            document.getElementById('startHistoryQuiz').addEventListener('click', () => {
+                soundSystem.playSuccess();
+                startSelectedQuiz('history', '🏛️ 歴史');
+            });
+            document.getElementById('startCivicsQuiz').addEventListener('click', () => {
+                soundSystem.playSuccess();
+                startSelectedQuiz('civics', '⚖️ 公民');
+            });
+            document.getElementById('startChemistryQuiz').addEventListener('click', () => {
+                soundSystem.playSuccess();
+                startSelectedQuiz('chemistry', '🧪 化学');
+            });
+            document.getElementById('startBiologyQuiz').addEventListener('click', () => {
+                soundSystem.playSuccess();
+                startSelectedQuiz('biology', '🧬 生物');
+            });
+            document.getElementById('startPhysicsQuiz').addEventListener('click', () => {
+                soundSystem.playSuccess();
+                startSelectedQuiz('physics', '⚛️ 物理');
+            });
+            document.getElementById('startEarthQuiz').addEventListener('click', () => {
+                soundSystem.playSuccess();
+                startSelectedQuiz('earth', '🌍 地学');
+            });
+            document.getElementById('startEnglishWordsQuiz').addEventListener('click', () => {
+                soundSystem.playSuccess();
+                startSelectedQuiz('english_words', '📝 英単語');
+            });
+            document.getElementById('startEnglishPhrasesQuiz').addEventListener('click', () => {
+                soundSystem.playSuccess();
+                startSelectedQuiz('english_phrases', '💬 英熟語');
+            });
+            document.getElementById('startEnglishGrammarQuiz').addEventListener('click', () => {
+                soundSystem.playSuccess();
+                startSelectedQuiz('english_grammar', '📘 語形変化');
+            });
+
+            // 出題形式切り替えボタン
+            document.getElementById('randomModeBtn').addEventListener('click', () => {
+                soundSystem.playClick();
+                setQuestionMode('random');
+            });
+            
+            document.getElementById('sequentialModeBtn').addEventListener('click', () => {
+                soundSystem.playClick();
+                setQuestionMode('sequential');
+            });
+
+            // メインクイズスタートボタン
+            document.getElementById('startQuizButton').addEventListener('click', () => {
+                soundSystem.playSuccess();
+                const startMsg = nekoMessages.start[Math.floor(Math.random() * nekoMessages.start.length)];
+                showNotification(startMsg);
+                openQuiz();
+            });
+
+            // 教科変更ボタン
+            document.getElementById('changeSubject').addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                soundSystem.playClick();
+                selectedCategories = [];
+                sequentialIndex = 0;
+                usedQuestions = [];
+                document.getElementById('gameScreen').classList.add('hidden');
+                document.getElementById('changeSubject').classList.add('hidden');
+                goBackToMain();
+                showNotification('教科選択に戻ったにゃ〜♪');
+            });
+        }
+
+        /* ----------------- 初期化 ----------------- */
+        document.addEventListener('DOMContentLoaded', () => {
+            initCategorySelection();
+            initEventListeners();
+            
+            document.getElementById('changeSubject').classList.add('hidden');
+            
+            document.querySelectorAll('.tap-effect').forEach(addTapEffect);
+
+            // 重力感知システムの初期化
+            tiltSystem.init();
+
+            // 音声システムの初期化
+            document.addEventListener('click', () => {
+                if (soundSystem.audioContext && soundSystem.audioContext.state === 'suspended') {
+                    soundSystem.audioContext.resume();
+                }
+            }, { once: true });
+
+            // 音声合成の初期化
+            if ('speechSynthesis' in window && typeof speechSynthesis.getVoices === 'function') {
+                const voicePolling = setInterval(() => {
+                    if (speechSynthesis.getVoices().length) {
+                        clearInterval(voicePolling);
+                    } else {
+                        speechSynthesis.getVoices(); 
+                    }
+                }, 200);
+            }
+
+            // 初回メッセージ
+            setTimeout(() => {
+                showNotification('NEKOPON Quizへようこそにゃ〜♪');
+                
+                // 画面全体にウェルカムパーティクル
+                for (let i = 0; i < 15; i++) {
+                    setTimeout(() => {
+                        const x = Math.random() * window.innerWidth;
+                        const y = Math.random() * window.innerHeight;
+                        pointSystem.createCuteParticles(x, y, 
+                            ['🎉', '🎊', '✨', '🌟', '💫', '🐱', '📚', '🎓'], 3);
+                    }, i * 200);
+                }
+            }, 1000);
+            
+            // クリッカー説明
+            setTimeout(() => {
+                showNotification('どこでもタップでポイントゲットにゃ〜♪');
+            }, 4000);
+            
+            // 重力感知説明
+            setTimeout(() => {
+                showNotification('スマホを傾けるとアイコンがクルクル回るにゃ〜♪');
+            }, 7000);
+        });
+    </script>
+</body>
+</html>
