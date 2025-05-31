@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🧪 Chemi Quiz - 軽快な化学式ゲーム 🧪</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        :root {
+            --primary-purple: #6b46c1;
+            --light-purple: #a78bfa;
+            --cream: #fef7ff;
+            --white: #ffffff;
+            --soft-pink: #fce7f3;
+            --gold: #fbbf24;
+            --green: #10b981;
+            --blue: #3b82f6;
+            --shadow: rgba(107,70,193,0.25);
+            --neon-pink: #ff1493;
+            --neon-blue: #00bfff;
+            --neon-green: #00ff00;
+        }
+        
+        body {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            background: linear-gradient(135deg, #fef7ff 0%, #fce7f3 50%, #e0e7ff 100%);
+            color: var(--primary-purple);
+            font-weight: 700;
+            height: 100vh;
+            height: 100dvh;
+            touch-action: manipulation;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+        }
+
+        .kawaii-container {
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 拡張されたヘッダー - 全てのボタンを含む */
+        .header {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 2px 10px var(--shadow);
+            z-index: 1000;
+            padding: 8px 10px;
+            flex-shrink: 0;
+        }
+
+        /* タイトルエリア */
+        .title-area {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .game-title {
+            font-size: 1.2rem;
+            background: linear-gradient(45deg, var(--primary-purple), var(--light-purple), var(--gold));
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rainbow-shift 3s ease-in-out infinite;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 5px;
+        }
+
+        @keyframes rainbow-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .chemistry-icon {
+            display: inline-block;
+            font-size: 1em;
+            margin: 0 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        /* スコアエリア */
+        .score-area {
+            display: flex;
+            justify-content: space-around;
+            padding: 4px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 8px;
+        }
+
+        .score-item {
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .score-number {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary-purple);
+        }
+
+        .score-label {
+            font-size: 0.7em;
+            color: var(--light-purple);
+        }
+
+        /* ボタンエリア - モード選択とコントロールボタン */
+        .buttons-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        /* モード選択ボタン群 - 横幅を狭く */
+        .mode-selector {
+            display: flex;
+            gap: 4px;
+            flex: 1;
+            max-width: calc(100% - 200px);
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 2px 8px 2px 0;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .mode-selector::-webkit-scrollbar {
+            display: none;
+        }
+
+        .mode-btn {
+            background: rgba(255,255,255,0.9);
+            border: 2px solid var(--light-purple);
+            border-radius: 12px;
+            padding: 6px 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--primary-purple);
+            font-weight: 700;
+            backdrop-filter: blur(10px);
+            text-align: center;
+            font-size: 0.7em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            min-width: 65px; /* 横幅を狭く */
+            line-height: 1.2;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .mode-btn:hover {
+            background: rgba(255,255,255,0.95);
+            transform: scale(1.02);
+            box-shadow: 0 3px 12px rgba(0,0,0,0.2);
+        }
+
+        .mode-btn.active {
+            background: var(--light-purple);
+            color: white;
+            border-color: var(--primary-purple);
+            transform: scale(1.05);
+        }
+
+        /* コントロールボタン群 - 5つのボタンに増加 */
+        .controls {
+            display: flex;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+
+        .control-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: none;
+            color: white;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-check { background: linear-gradient(135deg, var(--green), #059669); }
+        .btn-clear { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .btn-hint { background: linear-gradient(135deg, var(--gold), #f59e0b); }
+        .btn-next { background: linear-gradient(135deg, var(--blue), #2563eb); }
+        .btn-answer { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+
+        .control-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .control-btn:active {
+            transform: scale(0.9);
+        }
+
+        /* メインゲームエリア - カードエリアのみ */
+        .game-area {
+            position: relative;
+            flex: 1;
+            overflow: hidden;
+            margin: 8px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.4);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,255,255,0.6);
+        }
+
+        /* カードエリア */
+        .cards-section {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 15px;
+            background: rgba(255,255,255,0.2);
+            overflow: hidden;
+        }
+
+        /* 回答エリア - 問題文も含む（前面に浮く） */
+        .answer-section {
+            background: rgba(255,255,255,0.95);
+            margin: 8px;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px var(--shadow);
+            min-height: 90px;
+            max-height: 120px;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 800; /* カードより前面に */
+            overflow-y: auto;
+            flex-shrink: 0;
+            /* 内側の点線ボーダーのみ */
+            border: 3px dashed var(--light-purple);
+        }
+
+        .answer-section.has-answer {
+            border-color: var(--green);
+            background: rgba(16, 185, 129, 0.15);
+        }
+
+        /* 正解状態のスタイル */
+        .answer-section.correct-state {
+            border-color: var(--gold);
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.2));
+            box-shadow: 0 8px 25px rgba(251, 191, 36, 0.4);
+            animation: correct-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes correct-glow {
+            0%, 100% { 
+                box-shadow: 0 8px 25px rgba(251, 191, 36, 0.4);
+                transform: scale(1);
+            }
+            50% { 
+                box-shadow: 0 12px 35px rgba(251, 191, 36, 0.6);
+                transform: scale(1.02);
+            }
+        }
+
+        /* 問題表示 - 回答エリア内 */
+        .question-in-answer {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary-purple);
+            margin-bottom: 8px;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        /* 回答エリア内の要素配置 */
+        .answer-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            min-height: 40px;
+        }
+
+        .answer-piece {
+            background: linear-gradient(45deg, var(--blue), var(--light-purple));
+            color: white;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: piece-appear 0.5s ease-out;
+        }
+
+        @keyframes piece-appear {
+            0% { transform: scale(0) rotate(180deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .answer-piece:hover {
+            transform: scale(1.1);
+            filter: brightness(1.2);
+        }
+
+        /* 正解時の変換アニメーション */
+        .answer-piece.transforming {
+            animation: piece-transform 0.8s ease-out forwards;
+        }
+
+        @keyframes piece-transform {
+            0% { 
+                transform: scale(1) rotate(0deg);
+                background: linear-gradient(45deg, var(--blue), var(--light-purple));
+            }
+            25% { 
+                transform: scale(1.3) rotate(180deg);
+                background: linear-gradient(45deg, var(--gold), #fbbf24);
+            }
+            50% { 
+                transform: scale(1.5) rotate(360deg);
+                background: linear-gradient(45deg, var(--gold), #f59e0b);
+                box-shadow: 0 8px 25px rgba(251, 191, 36, 0.6);
+            }
+            75% { 
+                transform: scale(1.2) rotate(540deg);
+                background: linear-gradient(45deg, var(--green), #059669);
+            }
+            100% { 
+                transform: scale(1) rotate(720deg);
+                background: linear-gradient(45deg, var(--green), #10b981);
+                box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+            }
+        }
+
+        /* 正解表示テキスト */
+        .correct-answer-display {
+            background: linear-gradient(45deg, var(--gold), #f59e0b);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            box-shadow: 0 8px 25px rgba(251, 191, 36, 0.4);
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+            animation: correct-text-appear 1s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        @keyframes correct-text-appear {
+            0% { 
+                transform: scale(0) rotate(-180deg); 
+                opacity: 0; 
+            }
+            50% { 
+                transform: scale(1.2) rotate(0deg); 
+                opacity: 1; 
+            }
+            100% { 
+                transform: scale(1) rotate(0deg); 
+                opacity: 1; 
+            }
+        }
+
+        /* 原子カード - ドラッグ対応強化 */
+        .atom-card {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1em;
+            cursor: grab;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border: 3px solid rgba(255,255,255,0.4);
+            backdrop-filter: blur(10px);
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+            user-select: none;
+            z-index: 100;
+            touch-action: none;
+        }
+
+        .atom-card:active {
+            cursor: grabbing;
+        }
+
+        .atom-card.dragging {
+            z-index: 500; /* ドラッグ中は高いz-index、ただし回答エリアより低く */
+            transform: scale(1.2);
+            filter: brightness(1.2);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+            cursor: grabbing;
+        }
+
+        .atom-card:hover {
+            transform: scale(1.2);
+            z-index: 200;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+
+        .atom-card.selected {
+            transform: scale(1.4);
+            z-index: 300;
+            filter: brightness(1.3);
+            animation: selected-pulse 0.6s ease-out;
+        }
+
+        @keyframes selected-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.6); }
+            100% { transform: scale(1.4); }
+        }
+
+        .atom-card.spawn-animation {
+            animation: spawn-in 0.8s ease-out;
+        }
+
+        @keyframes spawn-in {
+            0% { 
+                transform: scale(0) rotate(0deg); 
+                opacity: 0; 
+            }
+            50% { 
+                transform: scale(1.3) rotate(180deg); 
+                opacity: 1; 
+            }
+            100% { 
+                transform: scale(1) rotate(360deg); 
+                opacity: 1; 
+            }
+        }
+
+        /* 元素別カラーリング */
+        .atom-hydrogen { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); }
+        .atom-oxygen { background: linear-gradient(135deg, #4ecdc4, #44a08d); }
+        .atom-carbon { background: linear-gradient(135deg, #45484d, #6c757d); }
+        .atom-nitrogen { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .atom-chlorine { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .atom-sulfur { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        .atom-metal { background: linear-gradient(135deg, #95a5a6, #7f8c8d); }
+        .atom-number { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+        .atom-special { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .atom-ion { background: linear-gradient(135deg, #00d2ff, #3a7bd5); }
+
+        /* 下部スペース */
+        .bottom-space {
+            height: 15px;
+            flex-shrink: 0;
+        }
+
+        /* フィードバック */
+        .feedback {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255,255,255,0.95);
+            padding: 18px 30px;
+            border-radius: 18px;
+            font-size: 1.1em;
+            font-weight: 700;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 1000;
+            backdrop-filter: blur(15px);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s ease;
+            max-width: 90%;
+        }
+
+        .feedback.show {
+            opacity: 1;
+            pointer-events: auto;
+            animation: feedback-bounce 0.6s ease-out;
+        }
+
+        @keyframes feedback-bounce {
+            0% { transform: translate(-50%, -50%) scale(0.3); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .feedback.correct {
+            color: var(--green);
+            border: 2px solid var(--green);
+        }
+
+        .feedback.incorrect {
+            color: #ef4444;
+            border: 2px solid #ef4444;
+        }
+
+        /* パーティクル */
+        .kawaii-particle {
+            position: absolute;
+            pointer-events: none;
+            font-size: 1.4em;
+            z-index: 2000;
+            animation: particle-float 2s ease-out forwards;
+        }
+
+        @keyframes particle-float {
+            0% { 
+                opacity: 1; 
+                transform: scale(0) rotate(0deg); 
+            }
+            50% { 
+                opacity: 1; 
+                transform: scale(1.2) rotate(180deg); 
+            }
+            100% { 
+                opacity: 0; 
+                transform: scale(0.5) rotate(360deg) translateY(-80px); 
+            }
+        }
+
+        /* 成功時のお祝い */
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        }
+
+        .celebration.show {
+            display: flex;
+            animation: celebration-in 0.5s ease-out;
+        }
+
+        .celebration-content {
+            background: white;
+            padding: 30px;
+            border-radius: 25px;
+            text-align: center;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            animation: celebration-bounce 0.8s ease-out;
+            max-width: 90%;
+        }
+
+        @keyframes celebration-bounce {
+            0% { transform: scale(0.3); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* エフェクト */
+        .hearts-rain {
+            position: absolute;
+            font-size: 1.3em;
+            pointer-events: none;
+            animation: hearts-fall 3s linear forwards;
+        }
+
+        @keyframes hearts-fall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(150vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* ランダム配置のアニメーション */
+        .atom-card.floating {
+            animation: float-gentle 3s ease-in-out infinite;
+        }
+
+        @keyframes float-gentle {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* モバイル対応の強化 */
+        @media (max-width: 768px) {
+            .atom-card {
+                width: 55px;
+                height: 55px;
+                font-size: 1em;
+            }
+
+            .control-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 0.9em;
+            }
+
+            .mode-btn {
+                min-width: 60px;
+                padding: 5px 6px;
+                font-size: 0.65em;
+            }
+
+            .question-in-answer {
+                font-size: 0.9rem;
+            }
+
+            .answer-section {
+                min-height: 80px;
+                max-height: 105px;
+            }
+
+            .buttons-area {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .mode-selector {
+                order: 2;
+                max-width: 100%;
+            }
+
+            .controls {
+                order: 1;
+                justify-content: center;
+            }
+        }
+
+        @media (max-height: 700px) {
+            .header {
+                padding: 5px 8px;
+            }
+
+            .game-title {
+                font-size: 1.1rem;
+                margin-bottom: 3px;
+            }
+
+            .score-number {
+                font-size: 0.9em;
+            }
+
+            .score-label {
+                font-size: 0.65em;
+            }
+
+            .answer-section {
+                margin: 6px;
+                padding: 12px;
+                min-height: 75px;
+                max-height: 95px;
+            }
+
+            .atom-card {
+                width: 50px;
+                height: 50px;
+                font-size: 0.95em;
+            }
+
+            .mode-btn {
+                min-width: 55px;
+                padding: 4px 5px;
+                font-size: 0.65em;
+            }
+
+            .control-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 0.85em;
+            }
+        }
+
+        @media (max-height: 600px) {
+            .atom-card {
+                width: 45px;
+                height: 45px;
+                font-size: 0.9em;
+            }
+
+            .mode-btn {
+                min-width: 50px;
+                padding: 3px 4px;
+                font-size: 0.6em;
+            }
+
+            .answer-section {
+                min-height: 65px;
+                max-height: 80px;
+            }
+
+            .question-in-answer {
+                font-size: 0.85rem;
+                margin-bottom: 6px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .mode-btn {
+                min-width: 55px;
+                font-size: 0.6em;
+                padding: 4px 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="kawaii-container">
+        <!-- 拡張ヘッダー - 全てのボタンを含む -->
+        <div class="header">
+            <!-- タイトルエリア -->
+            <div class="title-area">
+                <h1 class="game-title" id="gameTitle">
+                    <span class="chemistry-icon" id="leftIcon">🧪</span>
+                    Chemi Quiz
+                    <span class="chemistry-icon" id="rightIcon">⚗️</span>
+                </h1>
+            </div>
+
+            <!-- スコアエリア -->
+            <div class="score-area">
+                <div class="score-item" id="correctScore">
+                    <div class="score-number" id="correctCount">0</div>
+                    <div class="score-label">正解</div>
+                </div>
+                <div class="score-item" id="totalScore">
+                    <div class="score-number" id="totalCount">0</div>
+                    <div class="score-label">問題数</div>
+                </div>
+                <div class="score-item" id="comboScore">
+                    <div class="score-number" id="comboCount">0</div>
+                    <div class="score-label">コンボ</div>
+                </div>
+            </div>
+
+            <!-- ボタンエリア -->
+            <div class="buttons-area">
+                <!-- モード選択 - スクロール式（絵文字削除・横幅縮小） -->
+                <div class="mode-selector">
+                    <button class="mode-btn" data-mode="elements">元素記号</button>
+                    <button class="mode-btn" data-mode="compounds">化学式</button>
+                    <button class="mode-btn" data-mode="reactions">化学反応式</button>
+                    <button class="mode-btn" data-mode="ions">イオン</button>
+                    <button class="mode-btn" data-mode="ionicReactions">イオン反応式</button>
+                </div>
+
+                <!-- コントロールボタン - 正解ボタンを追加 -->
+                <div class="controls">
+                    <button class="control-btn btn-check" id="checkBtn" title="答えをチェック">✓</button>
+                    <button class="control-btn btn-clear" id="clearBtn" title="クリア">🗑️</button>
+                    <button class="control-btn btn-hint" id="hintBtn" title="ヒント">💡</button>
+                    <button class="control-btn btn-answer" id="answerBtn" title="正解を表示">📖</button>
+                    <button class="control-btn btn-next" id="nextBtn" title="次の問題">➡️</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- メインゲームエリア -->
+        <div class="game-area" id="gameArea">
+            <!-- 原子カードエリア -->
+            <div class="cards-section" id="cardsSection">
+                <!-- 原子カードがランダムな位置に配置される -->
+            </div>
+        </div>
+
+        <!-- 回答エリア - 問題文も含む -->
+        <div class="answer-section" id="answerArea">
+            <div class="question-in-answer" id="questionInAnswer">
+                ゲームモードを選んでね 💕
+            </div>
+            <div class="answer-content" id="answerContent">
+                <div style="color: var(--light-purple); font-size: 0.9em;">カードをタップして化学式を作ろう ✨</div>
+            </div>
+        </div>
+
+        <!-- 下部スペース -->
+        <div class="bottom-space"></div>
+
+        <!-- フィードバック -->
+        <div class="feedback" id="feedback"></div>
+
+        <!-- 成功時のお祝い -->
+        <div class="celebration" id="celebration">
+            <div class="celebration-content">
+                <h2 style="color: var(--primary-purple);">🎉 素晴らしい！ 🎉</h2>
+                <p style="color: var(--light-purple); margin: 15px 0;">化学マスターに一歩近づいたね！</p>
+                <button class="mode-btn" onclick="nextProblem()" style="margin: 10px auto; display: block;">次の問題へ ✨</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ゲームデータ
+        const gameData = {
+            elements: [
+                { question: "水素の元素記号は？", answer: ["H"], pool: ["He", "Li", "Be", "B", "C", "N", "O", "F", "Ne", "Na", "Mg", "Al", "Si", "P", "S"] },
+                { question: "酸素の元素記号は？", answer: ["O"], pool: ["H", "C", "N", "F", "Ne", "Na", "Mg", "Al", "Si", "P", "S", "Cl", "Ar", "K", "Ca"] },
+                { question: "炭素の元素記号は？", answer: ["C"], pool: ["H", "O", "N", "S", "P", "Cl", "Ar", "K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe"] },
+                { question: "窒素の元素記号は？", answer: ["N"], pool: ["O", "F", "Ne", "Na", "Mg", "Al", "Si", "P", "S", "Cl", "Ar", "K", "Ca", "Sc", "Ti"] },
+                { question: "塩素の元素記号は？", answer: ["Cl"], pool: ["F", "Br", "I", "S", "P", "N", "O", "H", "C", "Na", "K", "Ca", "Mg", "Al", "Si"] }
+            ],
+
+            compounds: [
+                { question: "水素分子の化学式は？", answer: ["H", "₂"], pool: ["H", "O", "N", "C", "₃", "₄", "₅", "₆", "₇", "₈", "₉", "₁", "₀", "Cl", "S"] },
+                { question: "水分子の化学式は？", answer: ["H", "₂", "O"], pool: ["H", "O", "N", "C", "S", "₂", "₃", "₄", "₅", "₆", "Cl", "F", "Br", "I", "P"] },
+                { question: "塩化ナトリウムの化学式は？", answer: ["Na", "Cl"], pool: ["Na", "K", "Br", "I", "F", "Ca", "Mg", "Sr", "Ba", "Li", "Rb", "Cs", "Fr", "At", "H"] },
+                { question: "二酸化炭素の化学式は？", answer: ["C", "O", "₂"], pool: ["C", "O", "H", "N", "S", "P", "Cl", "F", "Br", "I", "₂", "₃", "₄", "₅", "₁"] }
+            ],
+
+            reactions: [
+                { 
+                    question: "水の電気分解の式は？", 
+                    answer: ["2", "H", "₂", "O", "→", "2", "H", "₂", "+", "O", "₂"], 
+                    pool: ["H", "O", "→", "+", "2", "3", "4", "5", "6", "C", "N", "S", "Fe", "Cu", "₂"]
+                },
+                { 
+                    question: "鉄と硫黄の化合の式は？", 
+                    answer: ["Fe", "+", "S", "→", "Fe", "S"], 
+                    pool: ["Fe", "S", "→", "+", "Cu", "O", "H", "N", "C", "Cl", "F", "Br", "I", "P", "Zn"]
+                }
+            ],
+
+            ions: [
+                { question: "銅イオンの化学式は？", answer: ["Cu", "²⁺"], pool: ["Cu", "Fe", "Ag", "Au", "Zn", "Ni", "Co", "Mn", "Cr", "²⁺", "⁺", "²⁻", "³⁺", "³⁻", "⁻"] },
+                { question: "水素イオンの化学式は？", answer: ["H", "⁺"], pool: ["H", "O", "N", "C", "Li", "Na", "K", "Mg", "Ca", "⁺", "²⁺", "⁻", "²⁻", "³⁺", "³⁻"] }
+            ],
+
+            ionicReactions: [
+                {
+                    question: "塩酸と水酸化ナトリウムの中和反応は？",
+                    answer: ["H", "⁺", "+", "O", "H", "⁻", "→", "H", "₂", "O"],
+                    pool: ["H", "O", "Na", "Cl", "K", "Ca", "Mg", "⁺", "⁻", "²⁺", "²⁻", "→", "+", "₂", "₃"]
+                }
+            ]
+        };
+
+        // ゲーム状態
+        let currentMode = '';
+        let currentProblem = null;
+        let currentProblemIndex = 0;
+        let correctCount = 0;
+        let totalCount = 0;
+        let comboCount = 0;
+        let currentAnswer = [];
+        let isCorrectAnswerShowing = false; // 正解表示状態を追跡
+
+        // ドラッグ状態
+        let isDragging = false;
+        let dragElement = null;
+        let dragOffset = { x: 0, y: 0 };
+        let dragStartTime = 0;
+        let hasMoved = false;
+        let startPosition = { x: 0, y: 0 };
+        let interactionInProgress = false; // 重複防止フラグ
+
+        // 音響システム
+        class KawaiiSoundSystem {
+            constructor() {
+                this.audioContext = null;
+                this.initAudio();
+            }
+
+            initAudio() {
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.log('音声システムを初期化できませんでした');
+                }
+            }
+
+            playTone(frequency, duration, type = 'sine', volume = 0.3) {
+                if (!this.audioContext) return;
+
+                try {
+                    if (this.audioContext.state === 'suspended') {
+                        this.audioContext.resume();
+                    }
+
+                    const oscillator = this.audioContext.createOscillator();
+                    const gainNode = this.audioContext.createGain();
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(this.audioContext.destination);
+
+                    oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+                    oscillator.type = type;
+
+                    gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+                    gainNode.gain.linearRampToValueAtTime(volume, this.audioContext.currentTime + 0.01);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + duration);
+
+                    oscillator.start(this.audioContext.currentTime);
+                    oscillator.stop(this.audioContext.currentTime + duration);
+                } catch (e) {
+                    // エラーは無視
+                }
+            }
+
+            playClick() {
+                this.playTone(800, 0.15, 'sine', 0.2);
+            }
+
+            playCorrect() {
+                const notes = [523, 659, 784, 1047];
+                notes.forEach((freq, i) => {
+                    setTimeout(() => this.playTone(freq, 0.2, 'sine', 0.25), i * 100);
+                });
+            }
+
+            playIncorrect() {
+                this.playTone(300, 0.5, 'sawtooth', 0.2);
+            }
+
+            playMagical() {
+                const notes = [1047, 1175, 1319, 1568, 1760];
+                notes.forEach((freq, i) => {
+                    setTimeout(() => this.playTone(freq, 0.3, 'sine', 0.2), i * 80);
+                });
+            }
+
+            // 正解時の脳汁ドバドバ効果音
+            playVictory() {
+                // 上昇音階
+                const victoryNotes = [523, 659, 784, 1047, 1319, 1568];
+                victoryNotes.forEach((freq, i) => {
+                    setTimeout(() => this.playTone(freq, 0.3, 'sine', 0.3), i * 150);
+                });
+                
+                // キラキラ音
+                setTimeout(() => {
+                    for (let i = 0; i < 8; i++) {
+                        setTimeout(() => {
+                            this.playTone(2093 + Math.random() * 500, 0.2, 'sine', 0.2);
+                        }, i * 100);
+                    }
+                }, 900);
+            }
+
+            // 変換音
+            playTransform() {
+                this.playTone(440, 0.1, 'square', 0.15);
+                setTimeout(() => this.playTone(880, 0.1, 'square', 0.15), 100);
+                setTimeout(() => this.playTone(1320, 0.1, 'square', 0.15), 200);
+            }
+
+            vibrate(pattern) {
+                if ('vibrate' in navigator) {
+                    navigator.vibrate(pattern);
+                }
+            }
+        }
+
+        const soundSystem = new KawaiiSoundSystem();
+
+        // パーティクルシステム（エフェクト削減版）
+        class KawaiiParticleSystem {
+            constructor() {
+                this.particles = [];
+            }
+
+            createParticle(x, y, emoji, color = null) {
+                const particle = document.createElement('div');
+                particle.className = 'kawaii-particle';
+                particle.textContent = emoji;
+                if (color) particle.style.color = color;
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                document.body.appendChild(particle);
+
+                setTimeout(() => {
+                    if (particle.parentNode) {
+                        particle.parentNode.removeChild(particle);
+                    }
+                }, 2000);
+            }
+
+            createExplosion(x, y, emojis, count = 8) {
+                for (let i = 0; i < count; i++) {
+                    setTimeout(() => {
+                        const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+                        const offsetX = (Math.random() - 0.5) * 60;
+                        const offsetY = (Math.random() - 0.5) * 60;
+                        this.createParticle(x + offsetX, y + offsetY, emoji);
+                    }, i * 50);
+                }
+            }
+        }
+
+        const particleSystem = new KawaiiParticleSystem();
+
+        // ドラッグ・タップ機能（修正版）
+        function setupDragEvents(card, atom) {
+            // マウスイベント
+            card.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                startInteraction(e, card, atom);
+            });
+            
+            // タッチイベント
+            card.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                startInteraction(e.touches[0], card, atom);
+            }, { passive: false });
+        }
+
+        function startInteraction(e, card, atom) {
+            if (interactionInProgress) return; // 重複防止
+
+            dragStartTime = Date.now();
+            hasMoved = false;
+            startPosition = { x: e.clientX, y: e.clientY };
+            
+            const rect = card.getBoundingClientRect();
+            dragOffset.x = e.clientX - rect.left;
+            dragOffset.y = e.clientY - rect.top;
+            
+            isDragging = false;
+            dragElement = card;
+            
+            // グローバルイベントリスナーを設定
+            const onMove = (moveEvent) => onInteractionMove(moveEvent, card, atom);
+            const onEnd = (endEvent) => onInteractionEnd(endEvent, atom, card);
+            
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onEnd);
+            document.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                onMove(e.touches[0]);
+            }, { passive: false });
+            document.addEventListener('touchend', (e) => onEnd(e.changedTouches[0]));
+            
+            // リスナー削除関数を保存
+            card._removeListeners = () => {
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup', onEnd);
+                document.removeEventListener('touchmove', onMove);
+                document.removeEventListener('touchend', onEnd);
+            };
+        }
+
+        function onInteractionMove(e, card, atom) {
+            if (!dragElement) return;
+            
+            const currentPos = { x: e.clientX, y: e.clientY };
+            const distance = Math.sqrt(
+                Math.pow(currentPos.x - startPosition.x, 2) + 
+                Math.pow(currentPos.y - startPosition.y, 2)
+            );
+            
+            // 5ピクセル以上動いたらドラッグとして扱う
+            if (distance > 5 && !isDragging) {
+                isDragging = true;
+                hasMoved = true;
+                dragElement.classList.add('dragging');
+            }
+            
+            if (isDragging) {
+                const cardsSection = document.getElementById('cardsSection');
+                const rect = cardsSection.getBoundingClientRect();
+                
+                let x = e.clientX - rect.left - dragOffset.x;
+                let y = e.clientY - rect.top - dragOffset.y;
+                
+                // 境界チェック
+                x = Math.max(0, Math.min(x, rect.width - dragElement.offsetWidth));
+                y = Math.max(0, Math.min(y, rect.height - dragElement.offsetHeight));
+                
+                dragElement.style.left = x + 'px';
+                dragElement.style.top = y + 'px';
+            }
+        }
+
+        function onInteractionEnd(e, atom, card) {
+            const interactionTime = Date.now() - dragStartTime;
+            
+            // ドラッグ状態をクリア
+            if (dragElement) {
+                dragElement.classList.remove('dragging');
+            }
+            
+            // イベントリスナー削除
+            if (card._removeListeners) {
+                card._removeListeners();
+                delete card._removeListeners;
+            }
+            
+            // タップとして処理（ドラッグではない場合）
+            if (!hasMoved && interactionTime < 500 && !interactionInProgress) {
+                interactionInProgress = true;
+                selectAtomCard(atom, card);
+                setTimeout(() => {
+                    interactionInProgress = false;
+                }, 100);
+            }
+            
+            // 状態をリセット
+            isDragging = false;
+            dragElement = null;
+            hasMoved = false;
+        }
+
+        // ゲーム初期化
+        function initGame() {
+            console.log('ゲーム初期化開始');
+            setupEventListeners();
+            
+            // 少し待ってから最初のモードを選択
+            setTimeout(() => {
+                console.log('元素記号モードを自動選択');
+                selectMode('elements');
+            }, 100);
+        }
+
+        // イベントリスナー設定
+        function setupEventListeners() {
+            console.log('イベントリスナー設定開始');
+            
+            // モード選択
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    console.log('モードボタンクリック:', e.target.dataset.mode);
+                    selectMode(e.target.dataset.mode);
+                });
+            });
+
+            // コントロールボタン
+            document.getElementById('checkBtn').addEventListener('click', checkAnswer);
+            document.getElementById('clearBtn').addEventListener('click', clearAnswer);
+            document.getElementById('hintBtn').addEventListener('click', showHint);
+            document.getElementById('answerBtn').addEventListener('click', showCorrectAnswer);
+            document.getElementById('nextBtn').addEventListener('click', nextProblem);
+
+            // タイトルのインタラクション（エフェクト削減）
+            document.getElementById('gameTitle').addEventListener('click', () => {
+                soundSystem.playMagical();
+                soundSystem.vibrate([100, 50, 100, 50, 150]);
+                
+                const rect = document.getElementById('gameTitle').getBoundingClientRect();
+                particleSystem.createExplosion(
+                    rect.left + rect.width / 2,
+                    rect.top + rect.height / 2,
+                    ['🧪', '⚗️', '🔬', '💕', '✨', '🌟'],
+                    6 // エフェクト数を削減
+                );
+            });
+
+            // 音声システムの初期化
+            document.addEventListener('click', () => {
+                if (soundSystem.audioContext && soundSystem.audioContext.state === 'suspended') {
+                    soundSystem.audioContext.resume();
+                }
+            }, { once: true });
+            
+            console.log('イベントリスナー設定完了');
+        }
+
+        // モード選択
+        function selectMode(mode) {
+            console.log('selectMode呼び出し:', mode);
+            
+            if (!gameData[mode]) {
+                console.log('無効なモード:', mode);
+                return;
+            }
+            
+            currentMode = mode;
+            currentProblemIndex = 0;
+            
+            // UI更新
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            const selectedBtn = document.querySelector(`[data-mode="${mode}"]`);
+            if (selectedBtn) {
+                selectedBtn.classList.add('active');
+                console.log('モードボタンアクティブ化:', mode);
+            } else {
+                console.log('モードボタンが見つからない:', mode);
+            }
+
+            soundSystem.playMagical();
+            soundSystem.vibrate([100, 50, 100]);
+
+            // 新しい問題を開始
+            console.log('問題読み込み開始');
+            loadProblem();
+
+            // エフェクト削減
+            if (selectedBtn) {
+                const rect = selectedBtn.getBoundingClientRect();
+                particleSystem.createExplosion(
+                    rect.left + rect.width / 2,
+                    rect.top + rect.height / 2,
+                    ['🎉', '✨', '💕', '🌟'],
+                    4 // エフェクト数を削減
+                );
+            }
+        }
+
+        // 問題読み込み
+        function loadProblem() {
+            console.log('loadProblem呼び出し');
+            
+            if (!currentMode || !gameData[currentMode]) {
+                console.log('無効なモードまたはゲームデータ');
+                return;
+            }
+
+            const problems = gameData[currentMode];
+            if (currentProblemIndex >= problems.length) {
+                currentProblemIndex = 0;
+            }
+
+            currentProblem = problems[currentProblemIndex];
+            isCorrectAnswerShowing = false; // 正解表示状態をリセット
+            console.log('現在の問題:', currentProblem);
+            
+            clearAnswer();
+            
+            // 少し待ってからカード作成
+            setTimeout(() => {
+                createAtomCards();
+            }, 100);
+            
+            // 問題を回答エリア内に表示
+            document.getElementById('questionInAnswer').textContent = currentProblem.question;
+        }
+
+        // 原子カード作成 - ドラッグ対応版
+        function createAtomCards() {
+            console.log('createAtomCards開始');
+            
+            const cardsSection = document.getElementById('cardsSection');
+            cardsSection.innerHTML = '';
+
+            if (!currentProblem) {
+                console.log('現在の問題がありません');
+                return;
+            }
+
+            // 必要な回答要素を必ず含める
+            let selectedAtoms = [...currentProblem.answer];
+            
+            // プールから追加の要素を選択（使わないカードも含める）
+            const uniquePool = currentProblem.pool.filter(atom => !selectedAtoms.includes(atom));
+            const targetCount = 18; // カード数を増やす
+            const additionalCount = Math.min(targetCount - selectedAtoms.length, uniquePool.length);
+            
+            const shuffledPool = shuffleArray(uniquePool);
+            selectedAtoms = [...selectedAtoms, ...shuffledPool.slice(0, additionalCount)];
+            
+            const finalAtoms = shuffleArray(selectedAtoms);
+            console.log('表示するカード:', finalAtoms);
+
+            // カードエリアのサイズを確認
+            const cardsSection_rect = cardsSection.getBoundingClientRect();
+            console.log('カードエリアのサイズ:', cardsSection_rect);
+
+            // ランダム配置でカードを作成
+            const cardSize = 60;
+            const margin = 10; // 重なりを許可するため小さく
+
+            finalAtoms.forEach((atom, index) => {
+                console.log(`カード${index}作成中:`, atom);
+                
+                const card = document.createElement('div');
+                card.className = `atom-card ${getAtomClass(atom)}`;
+                card.textContent = atom;
+
+                // ランダム配置（重なりも許可）
+                let x, y;
+                let attempts = 0;
+                let validPosition = false;
+
+                while (!validPosition && attempts < 50) {
+                    x = Math.random() * (cardsSection_rect.width - cardSize - margin * 2) + margin;
+                    y = Math.random() * (cardsSection_rect.height - cardSize - margin * 2) + margin;
+
+                    validPosition = true;
+                    const existingCards = cardsSection.children;
+                    for (let i = 0; i < existingCards.length; i++) {
+                        const existingCard = existingCards[i];
+                        const existingX = parseFloat(existingCard.style.left);
+                        const existingY = parseFloat(existingCard.style.top);
+                        const distance = Math.sqrt(Math.pow(x - existingX, 2) + Math.pow(y - existingY, 2));
+                        if (distance < cardSize * 0.7) { // 重なりを許可
+                            validPosition = false;
+                            break;
+                        }
+                    }
+                    attempts++;
+                }
+
+                // フォールバック配置
+                if (!validPosition) {
+                    x = Math.random() * (cardsSection_rect.width - cardSize - margin * 2) + margin;
+                    y = Math.random() * (cardsSection_rect.height - cardSize - margin * 2) + margin;
+                    console.log(`フォールバック配置を使用 ${index}:`, { x, y });
+                }
+
+                card.style.left = x + 'px';
+                card.style.top = y + 'px';
+
+                console.log(`カード${index}位置:`, { x, y });
+
+                // ドラッグ・タップイベントを設定
+                setupDragEvents(card, atom);
+
+                // スポーンアニメーション（削減）
+                card.classList.add('spawn-animation');
+                setTimeout(() => {
+                    card.classList.remove('spawn-animation');
+                    card.classList.add('floating');
+                }, 400 + index * 25); // アニメーション時間を短縮
+
+                cardsSection.appendChild(card);
+                console.log(`カード${index}をDOMに追加`);
+            });
+            
+            console.log(`合計${finalAtoms.length}枚のカードを作成`);
+            console.log(`DOM内のカード数: ${cardsSection.children.length}`);
+        }
+
+        // 配列をシャッフル
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // 原子カード選択（修正版）
+        function selectAtomCard(atom, cardElement) {
+            console.log('selectAtomCard呼び出し:', atom);
+            
+            // 正解表示中の場合は何もしない
+            if (isCorrectAnswerShowing) return;
+            
+            // 選択エフェクト
+            cardElement.classList.add('selected');
+            setTimeout(() => {
+                cardElement.classList.remove('selected');
+            }, 600);
+
+            // 回答に追加（重複防止）
+            addToAnswer(atom);
+
+            // 音とバイブレーション
+            soundSystem.playClick();
+            soundSystem.vibrate([50]);
+
+            // パーティクル
+            const rect = cardElement.getBoundingClientRect();
+            particleSystem.createParticle(
+                rect.left + rect.width / 2,
+                rect.top + rect.height / 2,
+                '✨'
+            );
+        }
+
+        // 原子クラス取得
+        function getAtomClass(atom) {
+            if (['H'].includes(atom)) return 'atom-hydrogen';
+            if (['O'].includes(atom)) return 'atom-oxygen';
+            if (['C'].includes(atom)) return 'atom-carbon';
+            if (['N'].includes(atom)) return 'atom-nitrogen';
+            if (['Cl', 'Br', 'I', 'F'].includes(atom)) return 'atom-chlorine';
+            if (['S', 'P'].includes(atom)) return 'atom-sulfur';
+            if (['Fe', 'Cu', 'Na', 'Mg', 'Ba', 'Ag', 'K', 'Ca', 'Zn', 'Al', 'Ti', 'Mn', 'Ni', 'Co', 'Cr', 'V', 'Sc', 'Sr', 'Ra', 'Be', 'Li', 'Rb', 'Cs', 'Fr', 'Pb'].includes(atom)) return 'atom-metal';
+            if (['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉', '₀'].includes(atom)) return 'atom-number';
+            if (['⁺', '⁻', '²⁺', '²⁻', '³⁺', '³⁻', 'e'].includes(atom)) return 'atom-ion';
+            if (['→', '+', '(', ')'].includes(atom)) return 'atom-special';
+            return 'atom-carbon';
+        }
+
+        // 回答に追加（修正版）
+        function addToAnswer(atom) {
+            console.log('addToAnswer:', atom);
+            // 重複を防ぐため、単純に追加
+            currentAnswer.push(atom);
+            updateAnswerDisplay();
+        }
+
+        // 回答表示更新
+        function updateAnswerDisplay() {
+            const answerContent = document.getElementById('answerContent');
+            
+            if (currentAnswer.length === 0) {
+                answerContent.innerHTML = '<div style="color: var(--light-purple); font-size: 0.9em;">カードをタップして化学式を作ろう ✨</div>';
+                document.getElementById('answerArea').classList.remove('has-answer');
+                document.getElementById('answerArea').classList.remove('correct-state');
+            } else {
+                answerContent.innerHTML = currentAnswer.map((atom, index) => 
+                    `<span class="answer-piece" onclick="removeFromAnswer(${index})">${atom}</span>`
+                ).join('');
+                document.getElementById('answerArea').classList.add('has-answer');
+            }
+        }
+
+        // 正解時のアニメーション処理
+        function animateCorrectAnswer() {
+            const answerPieces = document.querySelectorAll('.answer-piece');
+            const answerContent = document.getElementById('answerContent');
+            const answerArea = document.getElementById('answerArea');
+            
+            // 正解状態にする
+            answerArea.classList.add('correct-state');
+            isCorrectAnswerShowing = true;
+            
+            // 各ピースを順番にアニメーション
+            answerPieces.forEach((piece, index) => {
+                setTimeout(() => {
+                    // 変換音を再生
+                    soundSystem.playTransform();
+                    
+                    // アニメーションクラスを追加
+                    piece.classList.add('transforming');
+                    
+                    // 最後のピースの場合、アニメーション完了後に正解表示
+                    if (index === answerPieces.length - 1) {
+                        setTimeout(() => {
+                            showFinalCorrectAnswer();
+                        }, 800);
+                    }
+                }, index * 200);
+            });
+        }
+
+        // 最終的な正解表示
+        function showFinalCorrectAnswer() {
+            const answerContent = document.getElementById('answerContent');
+            const correctAnswerText = currentProblem.answer.join('');
+            
+            // 勝利音を再生
+            soundSystem.playVictory();
+            soundSystem.vibrate([100, 50, 100, 50, 200, 50, 300]);
+            
+            // 正解表示に置き換え
+            answerContent.innerHTML = `
+                <div class="correct-answer-display">
+                    <span>🎉</span>
+                    <span>正解: ${correctAnswerText}</span>
+                    <span>🎉</span>
+                </div>
+            `;
+            
+            // エフェクト
+            const rect = answerContent.getBoundingClientRect();
+            particleSystem.createExplosion(
+                rect.left + rect.width / 2,
+                rect.top + rect.height / 2,
+                ['🎉', '🎊', '✨', '🌟', '💕', '💖', '🏆', '🥇'],
+                12
+            );
+        }
+
+        // 回答から削除
+        function removeFromAnswer(index) {
+            // 正解表示中は削除不可
+            if (isCorrectAnswerShowing) return;
+            
+            currentAnswer.splice(index, 1);
+            updateAnswerDisplay();
+            soundSystem.playClick();
+            soundSystem.vibrate([30]);
+        }
+
+        // 回答をクリア
+        function clearAnswer() {
+            currentAnswer = [];
+            isCorrectAnswerShowing = false;
+            updateAnswerDisplay();
+            soundSystem.playClick();
+            soundSystem.vibrate([50]);
+        }
+
+        // 答えをチェック（修正版）
+        function checkAnswer() {
+            if (!currentProblem || currentAnswer.length === 0) {
+                showFeedback('答えを入力してね 🤔', 'incorrect');
+                return;
+            }
+
+            totalCount++;
+            const isCorrect = arraysEqual(currentAnswer, currentProblem.answer);
+
+            if (isCorrect) {
+                correctCount++;
+                comboCount++;
+                
+                // 正解時のアニメーション開始
+                animateCorrectAnswer();
+                
+                // 軽いフィードバック
+                showFeedback(`正解！ 🎉 コンボ: ${comboCount}`, 'correct');
+
+            } else {
+                comboCount = 0;
+                soundSystem.playIncorrect();
+                soundSystem.vibrate([80, 40, 80]);
+                
+                const correctStr = currentProblem.answer.join('');
+                showFeedback(`残念...正解は「${correctStr}」だよ 😅`, 'incorrect');
+            }
+
+            updateScoreDisplay();
+        }
+
+        // 正解を表示する新機能
+        function showCorrectAnswer() {
+            if (!currentProblem) {
+                showFeedback('問題を選んでね 💕', 'incorrect');
+                return;
+            }
+
+            soundSystem.playMagical();
+            soundSystem.vibrate([100, 50, 100, 50, 100]);
+
+            const correctAnswer = currentProblem.answer.join('');
+            showFeedback(`正解は: ${correctAnswer} 📖✨`, 'correct');
+
+            // 正解表示時のエフェクト
+            const answerBtn = document.getElementById('answerBtn');
+            const rect = answerBtn.getBoundingClientRect();
+            particleSystem.createExplosion(
+                rect.left + rect.width / 2,
+                rect.top + rect.height / 2,
+                ['📖', '✨', '💡', '🌟', '💕'],
+                4 // エフェクト数を削減
+            );
+
+            // 自動的に正解を回答エリアに設定
+            setTimeout(() => {
+                currentAnswer = [...currentProblem.answer];
+                updateAnswerDisplay();
+            }, 1500);
+        }
+
+        // 配列比較
+        function arraysEqual(a, b) {
+            return a.length === b.length && a.every((val, i) => val === b[i]);
+        }
+
+        // ヒント表示
+        function showHint() {
+            if (!currentProblem) return;
+
+            soundSystem.playClick();
+            soundSystem.vibrate([100, 50, 100]);
+
+            const hint = currentProblem.answer[0];
+            showFeedback(`ヒント: 最初は「${hint}」だよ 💡`, 'correct');
+
+            // ヒント時のエフェクト
+            const questionInAnswer = document.getElementById('questionInAnswer');
+            const rect = questionInAnswer.getBoundingClientRect();
+            particleSystem.createExplosion(
+                rect.left + rect.width / 2,
+                rect.top + rect.height / 2,
+                ['💡', '✨', '🌟'],
+                3 // エフェクト数を削減
+            );
+        }
+
+        // 次の問題
+        function nextProblem() {
+            currentProblemIndex++;
+            document.getElementById('celebration').classList.remove('show');
+            loadProblem();
+            
+            soundSystem.playMagical();
+            soundSystem.vibrate([100, 50, 100]);
+        }
+
+        // スコア表示更新
+        function updateScoreDisplay() {
+            document.getElementById('correctCount').textContent = correctCount;
+            document.getElementById('totalCount').textContent = totalCount;
+            document.getElementById('comboCount').textContent = comboCount;
+        }
+
+        // フィードバック表示
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message;
+            feedback.className = `feedback ${type} show`;
+            
+            setTimeout(() => {
+                feedback.classList.remove('show');
+            }, 3000);
+        }
+
+        // 初期化実行（エフェクト削除版）
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM読み込み完了');
+            initGame();
+            
+            // 初期エフェクトは削除
+        });
+    </script>
+</body>
+</html>
