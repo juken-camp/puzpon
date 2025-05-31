@@ -1,0 +1,3678 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+    <title>ONE WORLD Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-coral: #f4a261;
+            --primary-sage: #7fb069;
+            --primary-sky: #6bb6ff;
+            --primary-lavender: #a584c7;
+            --accent-peach: #f9b6a3;
+            --accent-mint: #b8e6b8;
+            --bg-cream: #fdf8f3;
+            --bg-white: #ffffff;
+            --text-dark: #2d3748;
+            --text-warm: #5d4e75;
+            --border-soft: #e6ddd4;
+            --shadow-gentle: rgba(116, 139, 141, 0.15);
+        }
+        body {
+            font-family: "Noto Sans JP", "Inter", sans-serif;
+            background: #faf7f2;
+            min-height: 100vh;
+            touch-action: manipulation;
+            overflow-x: hidden;
+            color: var(--text-dark);
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            padding-top: 2rem;
+            padding-bottom: 8rem;
+        }
+        .container-spacing {
+            margin: 0 auto;
+            max-width: 95%;
+            width: 100%;
+        }
+        @media (min-width: 640px) {
+            .container-spacing {
+                max-width: 500px;
+            }
+        }
+        @media (min-width: 768px) {
+            .container-spacing {
+                max-width: 600px;
+            }
+        }
+        @media (min-width: 1024px) {
+            .container-spacing {
+                max-width: 700px;
+            }
+        }
+        .game-title {
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            color: var(--primary-coral);
+            text-align: center;
+            letter-spacing: -0.025em;
+            margin-bottom: 0.5rem;
+        }
+        .warm-card {
+            background: var(--bg-white);
+            border: 3px solid var(--border-soft);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px var(--shadow-gentle);
+            position: relative;
+            overflow: hidden;
+        }
+        .warm-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--primary-coral);
+            border-radius: 24px 24px 0 0;
+        }
+        .warm-button {
+            background: var(--primary-coral);
+            border: none;
+            color: white;
+            font-weight: 600;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(244, 162, 97, 0.3);
+        }
+        .warm-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(244, 162, 97, 0.4);
+            background: #f19a4e;
+        }
+        .warm-button:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 16px rgba(244, 162, 97, 0.3);
+        }
+        .warm-button:disabled {
+            background: #d1d5db;
+            color: #9ca3af;
+            transform: none;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+        .grade-btn {
+            background: #fef9f5;
+            border: 3px solid var(--border-soft);
+            border-radius: 20px;
+            color: var(--text-warm);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            padding: 1rem 0.75rem;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px var(--shadow-gentle);
+        }
+        .grade-btn:hover {
+            border-color: var(--primary-coral);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(244, 162, 97, 0.25);
+            background: #fdf5ef;
+        }
+        .grade-btn.active {
+            background: #fdf0e7;
+            border-color: var(--primary-coral);
+            color: var(--primary-coral);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(244, 162, 97, 0.3);
+        }
+        .lesson-btn {
+            background: #f0f8ff;
+            border: 2px solid #b8d4f0;
+            border-radius: 16px;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            padding: 0.75rem 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 60px;
+            box-shadow: 0 4px 12px rgba(107, 182, 255, 0.15);
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        .lesson-btn:hover {
+            border-color: var(--primary-sky);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(107, 182, 255, 0.25);
+            background: #e6f3ff;
+        }
+        .lesson-btn.selected {
+            background: #d9edff;
+            border-color: var(--primary-sky);
+            color: var(--primary-sky);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(107, 182, 255, 0.3);
+        }
+        .lesson-btn.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--primary-sky);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .grammar-btn {
+            background: #f8f5ff;
+            border: 2px solid #d6c9e3;
+            border-radius: 12px;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            padding: 0.6rem 0.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 50px;
+            box-shadow: 0 3px 10px rgba(165, 132, 199, 0.15);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .grammar-btn:hover {
+            border-color: var(--primary-lavender);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(165, 132, 199, 0.25);
+            background: #f0ebff;
+        }
+        .grammar-btn.selected {
+            background: #e9dff7;
+            border-color: var(--primary-lavender);
+            color: var(--primary-lavender);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(165, 132, 199, 0.3);
+        }
+        .grammar-btn.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: var(--primary-lavender);
+            color: white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        /* 修正：モーダルの中央配置（特にスマホ対応） */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(12px);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        .modal.show {
+            display: flex;
+            animation: modalFadeIn 0.4s ease-out;
+        }
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        .modal-content {
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            margin: auto;
+        }
+        
+        .lesson-modal-content {
+            width: 100%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            margin: auto;
+            padding-bottom: 2rem;
+        }
+        
+        /* 修正：スマホでのモーダル中央配置 */
+        @media (max-width: 640px) {
+            .modal {
+                padding: 2rem 1rem;
+                align-items: center;
+                justify-content: center;
+            }
+            .modal-content, 
+            .lesson-modal-content {
+                margin: auto;
+                max-height: 80vh;
+            }
+        }
+        
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            font-weight: 600;
+            z-index: 100;
+            animation: particleFloat 2.5s ease-out forwards;
+            font-size: 20px;
+        }
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(0) scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(-40px) scale(1.3) rotate(180deg);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-100px) scale(1.5) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-white);
+            color: var(--text-dark);
+            padding: 16px 20px;
+            border-radius: 16px;
+            border: 3px solid var(--border-soft);
+            transform: translateX(400px);
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1001;
+            box-shadow: 0 8px 24px var(--shadow-gentle);
+        }
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        /* 修正：フッターの背景枠を削除して透明に */
+        .fixed-footer {
+            position: fixed;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            z-index: 1001;
+            animation: floatingFooter 3s ease-in-out infinite;
+            max-width: 90vw;
+            overflow: hidden;
+            /* 背景を完全に透明に */
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            backdrop-filter: none;
+        }
+        
+        @keyframes floatingFooter {
+            0%, 100% { transform: translateX(-50%) translateY(0px); }
+            50% { transform: translateX(-50%) translateY(-3px); }
+        }
+        
+        /* 統計アイテムのデザイン改善 */
+        .footer-stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+            border: 1.5px solid rgba(165, 132, 199, 0.3);
+            border-radius: 18px;
+            padding: 0.4rem 0.7rem;
+            min-width: 60px;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(165, 132, 199, 0.2);
+        }
+        
+        .footer-stat-item:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(165, 132, 199, 0.3);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.95));
+            border-color: rgba(165, 132, 199, 0.5);
+        }
+        
+        /* ナビゲーションボタンのデザイン改善 */
+        .footer-nav-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            color: white;
+            font-size: 22px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .footer-nav-item::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .footer-nav-item:hover::before {
+            opacity: 1;
+        }
+        
+        .footer-nav-item:hover {
+            transform: translateY(-4px) scale(1.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+        }
+        
+        .footer-nav-item:active {
+            transform: translateY(-2px) scale(1.05);
+        }
+        
+        /* 個別のボタンカラー */
+        .footer-nav-item.home {
+            background: linear-gradient(135deg, var(--primary-coral), #f19a4e);
+        }
+        
+        .footer-nav-item.home:hover {
+            box-shadow: 0 8px 25px rgba(244, 162, 97, 0.5);
+        }
+        
+        .footer-nav-item.back {
+            background: linear-gradient(135deg, var(--primary-sage), #6fa055);
+        }
+        
+        .footer-nav-item.back:hover {
+            box-shadow: 0 8px 25px rgba(127, 176, 105, 0.5);
+        }
+        
+        .footer-nav-item.voice {
+            background: linear-gradient(135deg, var(--primary-lavender), #9574b5);
+        }
+        
+        .footer-nav-item.voice:hover {
+            box-shadow: 0 8px 25px rgba(165, 132, 199, 0.5);
+        }
+        
+        .footer-stat-number {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--primary-lavender);
+        }
+        .footer-stat-emoji {
+            font-size: 1.1rem;
+        }
+        
+        .voice-section {
+            margin-bottom: 1.5rem;
+        }
+        .voice-category-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.75rem;
+            text-align: center;
+            padding: 0.5rem;
+            background: linear-gradient(135deg, #f3e8ff, #faf5ff);
+            border-radius: 12px;
+        }
+        .voice-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: var(--bg-white);
+            border: 2px solid var(--border-soft);
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .voice-option:hover {
+            border-color: var(--primary-lavender);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(165, 132, 199, 0.15);
+        }
+        .voice-option.selected {
+            border-color: var(--primary-lavender);
+            background: #f0ebff;
+            box-shadow: 0 4px 12px rgba(165, 132, 199, 0.25);
+        }
+        .voice-option.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--primary-lavender);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .voice-info {
+            flex: 1;
+        }
+        .voice-name {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+        }
+        .voice-description {
+            font-size: 0.8rem;
+            color: var(--text-warm);
+        }
+        .voice-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .preview-btn {
+            background: var(--primary-sky);
+            border: none;
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .preview-btn:hover {
+            background: #5aa3f0;
+            transform: translateY(-1px);
+        }
+        .voice-toggle {
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .toggle-slider {
+            background-color: var(--primary-sage);
+        }
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        .speak-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--primary-sage);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 14px;
+            margin-left: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            vertical-align: middle;
+        }
+        .speak-btn:hover {
+            background: #6fa055;
+            transform: scale(1.1);
+        }
+        .speak-btn.speaking {
+            animation: speakPulse 1s infinite;
+        }
+        @keyframes speakPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+        
+        .timer-display {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            padding: 0.75rem;
+            border-radius: 12px;
+            margin: 0.5rem 0;
+            transition: all 0.3s ease;
+            border: 2px solid;
+            display: inline-block;
+            min-width: 80px;
+        }
+        .timer-normal {
+            background: linear-gradient(135deg, #e8f5e8, #f0fdf0);
+            color: var(--primary-sage);
+            border-color: var(--primary-sage);
+        }
+        .timer-warning {
+            background: linear-gradient(135deg, #fef3cd, #fefce8);
+            color: #d97706;
+            border-color: #d97706;
+            animation: timerPulse 1s infinite;
+        }
+        .timer-danger {
+            background: linear-gradient(135deg, #fee2e2, #fef2f2);
+            color: #dc2626;
+            border-color: #dc2626;
+            animation: timerPulse 0.5s infinite;
+        }
+        .timer-unlimited {
+            background: linear-gradient(135deg, #e0f2fe, #f0f9ff);
+            color: #0284c7;
+            border-color: #0284c7;
+        }
+        @keyframes timerPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .timer-btn {
+            background: var(--bg-white);
+            border: 3px solid var(--border-soft);
+            border-radius: 12px;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+            padding: 0.75rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 10px var(--shadow-gentle);
+        }
+        .timer-btn:hover {
+            border-color: var(--primary-coral);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(244, 162, 97, 0.25);
+        }
+        .timer-btn.active {
+            background: #fdf0e7;
+            border-color: var(--primary-coral);
+            color: var(--primary-coral);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(244, 162, 97, 0.3);
+        }
+        
+        .answer-display {
+            background: var(--bg-cream);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 1rem;
+            border: 3px solid var(--border-soft);
+            text-align: left;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            box-shadow: 0 4px 12px var(--shadow-gentle);
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+        }
+        .answer-display.show {
+            border-color: var(--primary-sage);
+            background: #f0f9f0;
+            box-shadow: 0 4px 12px rgba(127, 176, 105, 0.2);
+        }
+        .answer-text {
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: var(--primary-sage);
+            margin-bottom: 1rem;
+            text-align: center;
+            width: 100%;
+            padding: 1rem;
+            background: rgba(127, 176, 105, 0.1);
+            border-radius: 12px;
+            position: relative;
+        }
+        .explanation-text {
+            color: var(--text-dark);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            text-align: left;
+            width: 100%;
+        }
+        
+        .show-answer-btn {
+            background: var(--primary-sky);
+            border: none;
+            color: white;
+            font-weight: 600;
+            border-radius: 16px;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(107, 182, 255, 0.3);
+            margin: 0.5rem 0;
+        }
+        .show-answer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(107, 182, 255, 0.4);
+            background: #5aa3f0;
+        }
+        .show-answer-btn:disabled {
+            background: #d1d5db;
+            color: #9ca3af;
+            transform: none;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+        
+        .quiz-question {
+            background: #f8fafc;
+            border: 3px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            line-height: 1.5;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .grade-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        .lesson-grid {
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.75rem;
+        }
+        .grammar-grid {
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+        .back-button {
+            background: #f1f5f9;
+            border: 3px solid #cbd5e1;
+            color: var(--text-dark);
+            border-radius: 16px;
+            padding: 0.75rem 1.25rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        .back-button:hover {
+            background: #e2e8f0;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .stats-display {
+            background: var(--bg-cream);
+            border: 3px solid var(--border-soft);
+            border-radius: 20px;
+            padding: 1.25rem;
+            text-align: center;
+            box-shadow: 0 6px 20px var(--shadow-gentle);
+        }
+        .section-divider {
+            height: 2px;
+            background: var(--border-soft);
+            margin: 1.25rem 0;
+        }
+        .mode-btn {
+            background: var(--bg-white);
+            border: 3px solid var(--border-soft);
+            border-radius: 12px;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+            padding: 0.75rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 10px var(--shadow-gentle);
+        }
+        .mode-btn:hover {
+            border-color: var(--primary-coral);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(244, 162, 97, 0.25);
+        }
+        .mode-btn.active {
+            background: #fdf0e7;
+            border-color: var(--primary-coral);
+            color: var(--primary-coral);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(244, 162, 97, 0.3);
+        }
+        .direction-btn {
+            background: var(--bg-white);
+            border: 3px solid #d6c9e3;
+            border-radius: 12px;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+            padding: 0.75rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 10px rgba(165, 132, 199, 0.15);
+        }
+        .direction-btn:hover {
+            border-color: var(--primary-lavender);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(165, 132, 199, 0.25);
+        }
+        .direction-btn.active {
+            background: #e9dff7;
+            border-color: var(--primary-lavender);
+            color: var(--primary-lavender);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(165, 132, 199, 0.3);
+        }
+        
+        @media (max-width: 640px) {
+            .container-spacing {
+                max-width: 95%;
+                margin-bottom: 2rem;
+            }
+            .warm-card {
+                margin: 0.25rem;
+                padding: 1rem;
+            }
+            .game-title {
+                font-size: clamp(1.25rem, 6vw, 2rem);
+            }
+            .grade-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.75rem;
+            }
+            .lesson-grid {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+            .grammar-grid {
+                grid-template-columns: 1fr;
+                gap: 0.4rem;
+            }
+            .grade-btn {
+                padding: 0.75rem 0.5rem;
+                min-height: 70px;
+                font-size: 0.8rem;
+            }
+            .lesson-btn {
+                padding: 0.6rem 0.4rem;
+                min-height: 50px;
+                font-size: 0.75rem;
+            }
+            .grammar-btn {
+                padding: 0.5rem 0.3rem;
+                min-height: 45px;
+                font-size: 0.7rem;
+            }
+            .timer-display {
+                font-size: 1.25rem;
+                padding: 0.5rem;
+                min-width: 60px;
+            }
+            .quiz-question {
+                font-size: 1rem;
+                padding: 1rem;
+            }
+            .answer-display {
+                padding: 1.5rem;
+                min-height: 150px;
+                max-height: 300px;
+            }
+            .answer-text {
+                font-size: 1.2rem;
+                padding: 0.75rem;
+            }
+            .explanation-text {
+                font-size: 1rem;
+            }
+            /* モバイルでのフッター調整 */
+            .fixed-footer {
+                bottom: 0.5rem;
+                padding: 0.6rem 1.2rem;
+                gap: 0.8rem;
+            }
+            .footer-stat-item {
+                min-width: 50px;
+                padding: 0.3rem 0.5rem;
+                gap: 0.3rem;
+                border-radius: 14px;
+            }
+            .footer-stat-number {
+                font-size: 0.8rem;
+            }
+            .footer-stat-emoji {
+                font-size: 0.95rem;
+            }
+            .footer-nav-item {
+                width: 44px;
+                height: 44px;
+                font-size: 18px;
+            }
+        }
+        
+        button, .grade-btn, .lesson-btn, .grammar-btn, .warm-button, .back-button, .mode-btn, .direction-btn, .timer-btn, .show-answer-btn {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            touch-action: manipulation;
+            -webkit-appearance: none;
+        }
+        
+        * {
+            touch-action: manipulation;
+        }
+        
+        input, select, textarea {
+            font-size: 16px;
+        }
+
+        .sparkle {
+            position: relative;
+            overflow: visible;
+        }
+        .sparkle::before,
+        .sparkle::after {
+            content: '✨';
+            position: absolute;
+            opacity: 0;
+            animation: sparkleFloat 3s infinite ease-in-out;
+        }
+        .sparkle::before {
+            top: -10px;
+            left: -10px;
+            animation-delay: 0s;
+        }
+        .sparkle::after {
+            bottom: -10px;
+            right: -10px;
+            animation-delay: 1.5s;
+        }
+        @keyframes sparkleFloat {
+            0%, 100% { opacity: 0; transform: translateY(0) scale(0.8); }
+            50% { opacity: 1; transform: translateY(-20px) scale(1.2); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center gap-6 relative">
+    <!-- メイン学年選択モーダル -->
+    <div id="mainGradeModal" class="modal show">
+        <div class="modal-content">
+            <div class="warm-card p-6 text-center">
+                <h1 class="game-title sparkle">🌍 ONE WORLD Quiz ✨</h1>
+                <h2 class="text-lg font-semibold mb-3 text-gray-700">
+                    🎓 学年を選択しよう
+                </h2>
+                <p class="text-gray-600 text-sm mb-4">あなたの学習レベルを選んでください。</p>
+                
+                <div class="grid grade-grid mb-6">
+                    <button class="grade-btn" data-grade="grade1">
+                        <div class="text-3xl mb-1">🌱</div>
+                        <div class="font-semibold text-sm">中学1年生</div>
+                    </button>
+                    <button class="grade-btn" data-grade="grade2">
+                        <div class="text-3xl mb-1">🌿</div>
+                        <div class="font-semibold text-sm">中学2年生</div>
+                    </button>
+                    <button class="grade-btn" data-grade="grade3">
+                        <div class="text-3xl mb-1">🌳</div>
+                        <div class="font-semibold text-sm">中学3年生</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 中学1年生レッスン選択モーダル -->
+    <div id="grade1Modal" class="modal">
+        <div class="lesson-modal-content">
+            <div class="warm-card p-6 text-center">
+                <h2 class="text-lg font-semibold mb-3 text-gray-700">
+                    🌱 中学1年生のレッスン
+                </h2>
+                <p class="text-gray-600 text-sm mb-4">学習したいレッスンをタップで選んでください。<br><strong>複数選択可能：選択したレッスンにはチェックマーク（✓）が付きます</strong></p>
+                
+                <div class="grid lesson-grid mb-6" id="grade1Lessons">
+                    <!-- JavaScriptで動的に生成 -->
+                </div>
+                
+                <div class="text-center space-y-2">
+                    <button id="startMultipleLessons1" class="warm-button px-8 py-3 text-sm sparkle" style="display: none;" disabled>
+                        🚀 選択してレッスンスタート！
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 中学2年生レッスン選択モーダル -->
+    <div id="grade2Modal" class="modal">
+        <div class="lesson-modal-content">
+            <div class="warm-card p-6 text-center">
+                <h2 class="text-lg font-semibold mb-3 text-gray-700">
+                    🌿 中学2年生のレッスン
+                </h2>
+                <p class="text-gray-600 text-sm mb-4">学習したいレッスンをタップで選んでください。<br><strong>複数選択可能：選択したレッスンにはチェックマーク（✓）が付きます</strong></p>
+                
+                <div class="grid lesson-grid mb-6" id="grade2Lessons">
+                    <!-- JavaScriptで動的に生成 -->
+                </div>
+                
+                <div class="text-center space-y-2">
+                    <button id="startMultipleLessons2" class="warm-button px-8 py-3 text-sm sparkle" style="display: none;" disabled>
+                        🚀 選択してレッスンスタート！
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 中学3年生レッスン選択モーダル -->
+    <div id="grade3Modal" class="modal">
+        <div class="lesson-modal-content">
+            <div class="warm-card p-6 text-center">
+                <h2 class="text-lg font-semibold mb-3 text-gray-700">
+                    🌳 中学3年生のレッスン
+                </h2>
+                <p class="text-gray-600 text-sm mb-4">学習したいレッスンをタップで選んでください。<br><strong>複数選択可能：選択したレッスンにはチェックマーク（✓）が付きます</strong></p>
+                
+                <div class="grid lesson-grid mb-6" id="grade3Lessons">
+                    <!-- JavaScriptで動的に生成 -->
+                </div>
+                
+                <div class="text-center space-y-2">
+                    <button id="startMultipleLessons3" class="warm-button px-8 py-3 text-sm sparkle" style="display: none;" disabled>
+                        🚀 選択してレッスンスタート！
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 文法項目選択モーダル -->
+    <div id="grammarModal" class="modal">
+        <div class="modal-content">
+            <div class="warm-card p-6 text-center">
+                <h2 id="grammarModalTitle" class="text-lg font-semibold mb-3 text-gray-700"></h2>
+                <p class="text-gray-600 text-sm mb-4">学習する内容をタップで選んでください。<br>複数選択もできます。</p>
+                
+                <div class="grid grammar-grid mb-4" id="grammarCategories">
+                    <!-- JavaScriptで動的に生成 -->
+                </div>
+                
+                <div class="text-center space-y-2">
+                    <button id="startGrammarQuiz" class="warm-button px-8 py-3 text-sm sparkle" disabled>
+                        🚀 クイズスタート！
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 修正：音声設定モーダル（男性音声の個別化対応） -->
+    <div id="voiceSettingsModal" class="modal">
+        <div class="modal-content">
+            <div class="warm-card p-6 text-center">
+                <h2 class="text-lg font-semibold mb-6 text-gray-700">
+                    🎤 音声設定
+                </h2>
+                
+                <!-- 音声ON/OFF切り替え -->
+                <div class="voice-toggle">
+                    <div class="text-sm font-semibold text-gray-700 mb-3">🔊 音声機能</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="voiceEnabled" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <div class="text-xs text-gray-600 mt-2" id="voiceToggleDescription">音声機能が有効です</div>
+                </div>
+                
+                <!-- 女性音声セクション -->
+                <div class="voice-section">
+                    <div class="voice-category-title">👩 女性音声</div>
+                    <div class="voice-option" data-voice="Samantha" data-gender="female">
+                        <div class="voice-info">
+                            <div class="voice-name">Samantha</div>
+                            <div class="voice-description">自然で聞き取りやすい女性音声</div>
+                        </div>
+                        <div class="voice-controls">
+                            <button class="preview-btn" onclick="previewVoice('Samantha')">試聴</button>
+                        </div>
+                    </div>
+                    <div class="voice-option" data-voice="Karen" data-gender="female">
+                        <div class="voice-info">
+                            <div class="voice-name">Karen</div>
+                            <div class="voice-description">クリアな発音の女性音声</div>
+                        </div>
+                        <div class="voice-controls">
+                            <button class="preview-btn" onclick="previewVoice('Karen')">試聴</button>
+                        </div>
+                    </div>
+                    <div class="voice-option" data-voice="Victoria" data-gender="female">
+                        <div class="voice-info">
+                            <div class="voice-name">Victoria</div>
+                            <div class="voice-description">親しみやすい女性音声</div>
+                        </div>
+                        <div class="voice-controls">
+                            <button class="preview-btn" onclick="previewVoice('Victoria')">試聴</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 修正：男性音声セクション（個別識別の改善） -->
+                <div class="voice-section">
+                    <div class="voice-category-title">👨 男性音声</div>
+                    <div class="voice-option" data-voice="Alex" data-gender="male">
+                        <div class="voice-info">
+                            <div class="voice-name">Alex</div>
+                            <div class="voice-description">標準的で聞き取りやすい男性音声</div>
+                        </div>
+                        <div class="voice-controls">
+                            <button class="preview-btn" onclick="previewVoice('Alex')">試聴</button>
+                        </div>
+                    </div>
+                    <div class="voice-option" data-voice="Daniel" data-gender="male">
+                        <div class="voice-info">
+                            <div class="voice-name">Daniel</div>
+                            <div class="voice-description">はっきりした発音の男性音声</div>
+                        </div>
+                        <div class="voice-controls">
+                            <button class="preview-btn" onclick="previewVoice('Daniel')">試聴</button>
+                        </div>
+                    </div>
+                    <div class="voice-option" data-voice="Tom" data-gender="male">
+                        <div class="voice-info">
+                            <div class="voice-name">Tom</div>
+                            <div class="voice-description">落ち着いた男性音声</div>
+                        </div>
+                        <div class="voice-controls">
+                            <button class="preview-btn" onclick="previewVoice('Tom')">試聴</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-6">
+                    <button class="warm-button px-8 py-3 text-sm" onclick="closeVoiceSettings()">
+                        ✅ 設定完了
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ゲーム画面 -->
+    <div id="gameScreen" class="hidden">
+        <div class="warm-card p-6 text-center container-spacing mb-6">
+            <h1 class="game-title sparkle">🌍 ONE WORLD Quiz ✨</h1>
+            <div id="currentCategory" class="text-lg font-semibold text-gray-700 mb-4"></div>
+            <div class="stats-display">
+                <div class="grid grid-cols-2 gap-4 text-center mb-4">
+                    <div>
+                        <div class="text-2xl font-bold text-blue-600" id="studyCount">0</div>
+                        <div class="text-xs text-gray-600">📚 学習回数</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-purple-600" id="clickCount">0</div>
+                        <div class="text-xs text-gray-600">🖱️ セッション</div>
+                    </div>
+                </div>
+                
+<!-- 修正：制限時間設定（4つのボタンを2x2グリッドで統一） -->
+<div class="section-divider"></div>
+<div class="text-center">
+    <div class="text-sm font-semibold text-gray-700 mb-3">⏰ 制限時間設定</div>
+    <div class="grid grid-cols-2 gap-2 mb-3">
+        <button id="timer3Btn" class="timer-btn active" data-time="3">
+            ⚡ 3秒
+        </button>
+        <button id="timer5Btn" class="timer-btn" data-time="5">
+            🔥 5秒
+        </button>
+        <button id="timer10Btn" class="timer-btn" data-time="10">
+            🌟 10秒
+        </button>
+        <button id="timerUnlimitedBtn" class="timer-btn" data-time="unlimited">
+            ∞ 無制限
+        </button>
+    </div>
+</div>
+                
+                <!-- 修正：出題形式選択（説明テキスト削除） -->
+                <div class="section-divider"></div>
+                <div class="text-center">
+                    <div class="text-sm font-semibold text-gray-700 mb-3">🎲 出題スタイル</div>
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        <button id="randomModeBtn" class="mode-btn active" data-mode="random">
+                            🎯 ランダム
+                        </button>
+                        <button id="sequentialModeBtn" class="mode-btn" data-mode="sequential">
+                            📖 順番通り
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 修正：出題方向選択（説明テキスト削除） -->
+                <div class="section-divider"></div>
+                <div class="text-center">
+                    <div class="text-sm font-semibold text-gray-700 mb-3">🌏 言語方向</div>
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        <button id="jpToEnBtn" class="direction-btn active" data-direction="jp_to_en">
+                            🇯🇵→🇺🇸
+                        </button>
+                        <button id="enToJpBtn" class="direction-btn" data-direction="en_to_jp">
+                            🇺🇸→🇯🇵
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 gap-2">
+                        <button id="mixedBtn" class="direction-btn" data-direction="mixed">
+                            🔀 ミックスモード
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <button id="startQuizButton" class="warm-button px-8 py-4 text-base font-semibold mt-6 sparkle">
+                🌟 レッツスタート！
+            </button>
+        </div>
+    </div>
+
+    <!-- クイズモーダル -->
+    <div id="quizModal" class="modal">
+        <div class="modal-content">
+            <div class="warm-card p-4 w-full max-w-lg mx-4">
+                <div class="text-center mb-4">
+                    <h2 class="font-semibold text-lg text-gray-700">
+                        🌍 ONE WORLD Quiz Challenge
+                    </h2>
+                    <div class="flex items-center justify-between mt-2">
+                        <div id="remainingCount" class="text-sm text-gray-600"></div>
+                        <div id="timerDisplay" class="timer-display timer-normal">
+                            <span id="timerValue">準備中</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 問題表示エリア -->
+                <div id="quizQuestion" class="quiz-question"></div>
+                
+                <!-- 解答表示ボタン -->
+                <div class="text-center">
+                    <button id="showAnswerBtn" class="show-answer-btn">
+                        💡 解答を見る
+                    </button>
+                </div>
+                
+                <!-- 解答・解説表示エリア（拡大版） -->
+                <div id="answerDisplay" class="answer-display">
+                    <div id="answerContent">
+                        <div class="text-gray-500" style="text-align: center;">頭で考えてから解答ボタンを押してね！</div>
+                    </div>
+                </div>
+                
+                <!-- 操作ボタン -->
+                <div class="flex gap-2 mt-4">
+                    <button id="quizNext" class="flex-1 warm-button py-3 text-sm" disabled>
+                        ⭐ 次のチャレンジ
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 修正：フッター（背景枠削除） -->
+    <div class="fixed-footer">
+        <!-- ホームボタン -->
+        <div class="footer-nav-item home" id="footerHomeBtn" title="ホーム画面に戻る">
+            🏠
+        </div>
+        
+        <!-- 戻るボタン -->
+        <div class="footer-nav-item back" id="footerBackBtn" title="前の画面に戻る">
+            ◀︎
+        </div>
+        
+        <!-- 総クリック統計 -->
+        <div class="footer-stat-item" id="footerTotalStat" title="タップでリセット確認">
+            <span class="footer-stat-emoji">🏆</span>
+            <span class="footer-stat-number" id="footerTotalClick">0</span>
+        </div>
+        
+        <!-- 今日のクリック統計 -->
+        <div class="footer-stat-item" id="footerTodayStat" title="タップでリセット確認">
+            <span class="footer-stat-emoji">📅</span>
+            <span class="footer-stat-number" id="footerTodayClick">0</span>
+        </div>
+        
+        <!-- 音声設定ボタン -->
+        <div class="footer-nav-item voice" id="footerVoiceBtn" title="音声設定">
+            🎤
+        </div>
+    </div>
+
+    <!-- 通知 -->
+    <div id="notification" class="notification">
+        <div class="flex items-center gap-3">
+            <span class="text-2xl">🌟</span>
+            <div>
+                <div class="font-semibold text-sm">ONE WORLD Quiz</div>
+                <div id="notificationText" class="text-xs text-gray-600"></div>
+            </div>
+        </div>
+    </div>
+
+<script>
+        /* ----------------- レッスン・文法項目定義（完全版） ----------------- */
+        const lessons = {
+            grade1: [
+                {
+                    id: 'lesson1',
+                    name: 'Lesson1 - 文の基本',
+                    grammar: [
+                        {id: 'word_order', name: '1. 日本語と英語の語順'},
+                        {id: 'sentence_types', name: '2. 英語の文の代表的な2つの型'},
+                        {id: 'personal_statements', name: '3. 自分のことを述べたり相手のことをたずねる'},
+                        {id: 'various_questions', name: '4. さまざまな疑問文'},
+                        {id: 'requests', name: '5. お願いするとき'}
+                    ]
+                },
+                {
+                    id: 'lesson2',
+                    name: 'Lesson2 - 代名詞',
+                    grammar: [
+                        {id: 'she_he_it', name: '1. she, he, it などの使い方'},
+                        {id: 'pronoun_questions', name: '2. she, he などを使った文の疑問文'},
+                        {id: 'this_that', name: '3. this と that の使い方'},
+                        {id: 'this_that_questions', name: '4. this, that を使った文の疑問文'},
+                        {id: 'we_you_they', name: '5. We, you, they の使い方'},
+                        {id: 'can_usage', name: '6. can の意味と用法'},
+                        {id: 'some_any', name: '7. some と any'}
+                    ]
+                },
+                {
+                    id: 'lesson3',
+                    name: 'Lesson3 - 一般動詞',
+                    grammar: [
+                        {id: 'general_verbs', name: '1. 一般動詞には、どんなものがある？'},
+                        {id: 'verb_s_es', name: '2. 一般動詞につく s, es'},
+                        {id: 'verb_s_es_rules', name: '3. 一般動詞の s, es のつけ方'},
+                        {id: 'noun_singular_plural', name: '4. 「1つ（単数）」なのか「2つ以上（複数）」なのかを表す名詞につく s, es'},
+                        {id: 'plural_rules', name: '5. 複数形のつくり方'},
+                        {id: 'pronoun_i', name: '6. 「私」を表す2つの形'},
+                        {id: 'pronoun_cases', name: '7. 主語として使う場合と主語以外で使う「あなた」「彼」など'}
+                    ]
+                },
+                {
+                    id: 'lesson4',
+                    name: 'Lesson4 - 過去形',
+                    grammar: [
+                        {id: 'past_statements', name: '1. 過去のことを言うとき'},
+                        {id: 'past_questions', name: '2. 過去のことをたずねるとき（疑問文）'},
+                        {id: 'past_negative', name: '3. 過去のことで「しなかった」「でなかった」ことを言うとき（否定文）'}
+                    ]
+                },
+                {
+                    id: 'lesson5',
+                    name: 'Lesson5 - 現在進行形',
+                    grammar: [
+                        {id: 'present_continuous', name: '1. 今していることを伝えるとき'},
+                        {id: 'present_continuous_negative', name: '2. 「〜していません」ということを伝えるとき'},
+                        {id: 'present_continuous_questions', name: '3. 「〜しているのですか」、「何をしているのですか」と質問するとき'}
+                    ]
+                },
+                {
+                    id: 'lesson6',
+                    name: 'Lesson6 - 疑問詞',
+                    grammar: [
+                        {id: 'why_because', name: '1. 「理由」を質問するとき、「理由」を述べるとき'},
+                        {id: 'how_often', name: '2. 「どのくらいよく〜するか」を質問するとき、答えるとき'},
+                        {id: 'which_who_whose', name: '3. 「どの〜」を質問するとき、「どちらを」「だれが」「だれの〜」を質問するとき'}
+                    ]
+                },
+                {
+                    id: 'lesson7',
+                    name: 'Lesson7 - 助動詞',
+                    grammar: [
+                        {id: 'must_prohibition', name: '1. 「強い命令」や「禁止」を伝えるとき'},
+                        {id: 'have_to_necessity', name: '2. 「〜する必要がある」「〜する必要はない」と伝えるとき'},
+                        {id: 'may_able_to', name: '3. 「〜かもしれない」と述べるとき、「〜することができる」と述べるとき'}
+                    ]
+                },
+                {
+                    id: 'lesson8',
+                    name: 'Lesson8 - 未来表現',
+                    grammar: [
+                        {id: 'be_going_to', name: '1. 予定や計画を述べるとき'},
+                        {id: 'will_prediction', name: '2. 未来のことについて「〜だろう」という予想を述べるとき'},
+                        {id: 'should', name: '3. 「〜すべきだ」と述べるとき'}
+                    ]
+                },
+                {
+                    id: 'lesson9',
+                    name: 'Lesson9 - There is/are文',
+                    grammar: [
+                        {id: 'there_is_are', name: '1. 「〜に・・・がある（いる）」を伝えるとき'},
+                        {id: 'there_is_are_questions', name: '2. 「〜に・・・はありますか」「〜に・・・はいくつありますか」と質問する場合'},
+                        {id: 'look_sound', name: '3. 「〜そうに見える／聞こえる」と述べるとき'}
+                    ]
+                }
+            ],
+            grade2: [
+                {
+                    id: 'review_lesson',
+                    name: 'Review Lesson - 1年生の復習',
+                    grammar: [
+                        {id: 'have_to_must_review', name: '1. 「〜する必要がある」や「強い命令」を伝えるとき（have [has] to と must）'},
+                        {id: 'future_review', name: '2. 予定や未来についての予想を述べるとき（be going to と will）'},
+                        {id: 'there_is_are_review', name: '3. ものがあることや、人がいることを述べるとき（There is [are] ~.）'},
+                        {id: 'there_is_are_transformation', name: '4. There is [are] ~. の文の書き換え'}
+                    ]
+                },
+                {
+                    id: 'lesson1',
+                    name: 'Lesson1 - 目的語2つ/接続詞that',
+                    grammar: [
+                        {id: 'double_object', name: '1. 「＜人＞に＜もの＞をあげる・送る」などと述べるとき（目的語を２つとる動詞）'},
+                        {id: 'that_opinion', name: '2. 自分の意見や知っていることを伝えるとき（接続詞のthat）'},
+                        {id: 'that_feeling', name: '3. 自分の気持ちとその理由を伝えるとき（接続詞のthat）'}
+                    ]
+                },
+                {
+                    id: 'lesson2',
+                    name: 'Lesson2 - 過去進行形/接続詞',
+                    grammar: [
+                        {id: 'past_continuous', name: '1. 過去のある時点でしていたことを述べるとき（過去進行形）'},
+                        {id: 'when_conjunction', name: '2. どんな時のことかを述べるとき（接続詞のwhen）'},
+                        {id: 'if_because', name: '3. 条件を述べるとき、理由を述べるとき（接続詞のif）'}
+                    ]
+                },
+                {
+                    id: 'lesson3',
+                    name: 'Lesson3 - 不定詞',
+                    grammar: [
+                        {id: 'infinitive_noun', name: '1. したいこと、なりたいものを述べるとき（名詞的用法「〜すること」）'},
+                        {id: 'infinitive_adverb', name: '2. 目的を述べるとき（副詞的用法「〜するために」）'},
+                        {id: 'infinitive_adjective', name: '3. 「ものの用途、何をするためのものか」を述べるとき（形容詞的用法「〜するための」）'}
+                    ]
+                },
+                {
+                    id: 'lesson4',
+                    name: 'Lesson4 - 動名詞',
+                    grammar: [
+                        {id: 'gerund_object', name: '1. 「〜することを終える・楽しむ・好む」などを伝えるとき（動名詞）'},
+                        {id: 'gerund_subject', name: '2. 「〜すること」を主語にして述べるとき（動名詞）'},
+                        {id: 'teach_tell_that', name: '3. 「だれがだれにどんなことを教えたか・伝えたか」などを述べるとき（接続詞のthat）'}
+                    ]
+                },
+                {
+                    id: 'lesson5',
+                    name: 'Lesson5 - 不定詞の発展',
+                    grammar: [
+                        {id: 'how_to_what_to', name: '1. 「〜の仕方」や「すべきこと」などを述べるとき'},
+                        {id: 'it_is_to', name: '2. 「〜することはおもしろい・難しい・不可能だ」などを述べるとき（It is + 形容詞 + to + 動詞の原形〜.）'},
+                        {id: 'teach_ask_how_to', name: '3. 「だれに〜の仕方、何をすべきかなどを伝える・教える・たずねるか」を述べるとき'}
+                    ]
+                },
+                {
+                    id: 'lesson6',
+                    name: 'Lesson6 - 比較',
+                    grammar: [
+                        {id: 'comparative', name: '1. 2つのものを比べて、その違いを伝えるとき（比較級）'},
+                        {id: 'superlative', name: '2. 3つ以上のものを比べて、「いちばん〜だ」と伝えるとき（最上級）'},
+                        {id: 'as_as', name: '3. 「同じくらい〜だ」「いちばん好きだ」などを伝えるとき（原級など）'},
+                        {id: 'comparison_rules', name: '4. 比較級・最上級の作り方'},
+                        {id: 'comparison_transformation', name: '5. 比較表現の書き換え'},
+                        {id: 'comparison_notes', name: '6. その他に注意すること'}
+                    ]
+                },
+                {
+                    id: 'lesson7',
+                    name: 'Lesson7 - 受動態',
+                    grammar: [
+                        {id: 'passive_voice', name: '1. 「...は〜される」「...は〜されている」のような表現を伝えるとき'},
+                        {id: 'passive_questions', name: '2. 「…は〜されますか」「...は〜されていますか」などと質問するとき'},
+                        {id: 'passive_modal', name: '3. 「〜されるべきだ」「〜されることが可能だ」などを伝えるとき'},
+                        {id: 'past_participle_rules', name: '4. 過去分詞形の作り方'},
+                        {id: 'passive_transformation', name: '5. 受け身の文の書き換え例'}
+                    ]
+                },
+                {
+                    id: 'lesson8',
+                    name: 'Lesson8 - 間接疑問文/感嘆文',
+                    grammar: [
+                        {id: 'indirect_questions_know', name: '1. 「いつ・どこで」などの情報を「知っている・知らない」などと表現するとき'},
+                        {id: 'indirect_questions_tell', name: '2. 「いつ・どこで」などの情報を「だれに言ったか・聞いたか」などと表現するとき'},
+                        {id: 'exclamatory', name: '3. 驚きや感動を表現するとき'}
+                    ]
+                },
+                {
+                    id: 'lesson9',
+                    name: 'Lesson9 - 動詞の様々な使い方',
+                    grammar: [
+                        {id: 'make_call', name: '1. 「どんな気持ちになったか」「呼び名は何か」などを伝えるとき'},
+                        {id: 'want_ask_to', name: '2. 人にしてほしいことを伝えたり頼んだりするとき'},
+                        {id: 'let_help', name: '3. 許可を得るとき、だれが手伝ってくれるのかを述べるとき'}
+                    ]
+                }
+            ],
+            grade3: [
+                {
+                    id: 'review_lesson',
+                    name: 'Review Lesson - 2年生の復習',
+                    grammar: [
+                        {id: 'how_to_what_to_review', name: '1. 「〜の仕方」や「すべきこと」などを述べるとき'},
+                        {id: 'make_call_review', name: '2. 「呼び名は何か」「どんな気持ちになったか」などを述べるとき'},
+                        {id: 'it_is_to_review', name: '3. 「〜することは難しい・やさしい」などを述べるとき'}
+                    ]
+                },
+                {
+                    id: 'lesson1',
+                    name: 'Lesson1 - 現在完了形(1)',
+                    grammar: [
+                        {id: 'present_perfect_completion', name: '1. 「〜し終えた」ことを伝えるとき（現在完了形の完了用法）'},
+                        {id: 'present_perfect_experience', name: '2. 「〜した経験がある」ことを伝えるとき（現在完了形の経験用法）'},
+                        {id: 'present_perfect_experience_questions', name: '3. 「〜した経験があるか」を質問するとき（現在完了形の経験用法）'}
+                    ]
+                },
+                {
+                    id: 'lesson2',
+                    name: 'Lesson2 - 現在完了形(2)',
+                    grammar: [
+                        {id: 'present_perfect_continuation', name: '1. 「ずっと〜している」ことを伝えるとき（現在完了形の継続用法）'},
+                        {id: 'present_perfect_continuation_questions', name: '2. 「どのくらい〜していますか」と質問するとき（現在完了形の継続用法）'},
+                        {id: 'present_perfect_continuous', name: '3. 「ずっと〜している」ことを伝えるとき（現在完了進行形）'}
+                    ]
+                },
+                {
+                    id: 'lesson3',
+                    name: 'Lesson3 - 後置修飾',
+                    grammar: [
+                        {id: 'participle_present', name: '1. 「どんな人か・どんなものか」を説明するとき（その1：現在分詞による後置修飾）'},
+                        {id: 'participle_past', name: '2. 「どんな人か・どんなものか」を説明するとき（その2：過去分詞による後置修飾）'},
+                        {id: 'relative_pronoun_omission', name: '3. 「どんな人か・どんなものか」を説明するとき（その3：目的格の関係代名詞の省略）'}
+                    ]
+                },
+                {
+                    id: 'lesson4',
+                    name: 'Lesson4 - 関係代名詞',
+                    grammar: [
+                        {id: 'relative_pronoun_who', name: '1. 「どんな人か」を説明するとき（主格の関係代名詞）'},
+                        {id: 'relative_pronoun_which', name: '2. 「どんなものか」を説明するとき（主格の関係代名詞）'},
+                        {id: 'relative_pronoun_object', name: '3. 「どんな人か・どんなものか」を説明するとき（目的格の関係代名詞）'}
+                    ]
+                },
+                {
+                    id: 'lesson5',
+                    name: 'Lesson5 - 仮定法',
+                    grammar: [
+                        {id: 'subjunctive_1', name: '1. 実現する可能性がない、または可能性が低いことを「〜ならなあ」と表現する場合（その1）'},
+                        {id: 'subjunctive_2', name: '2. 実現する可能性がない、または可能性が低いことを「〜ならなあ」と表現する場合（その2）'},
+                        {id: 'subjunctive_3', name: '3. 実現する可能性がない、または可能性が低いことを「〜ならなあ」と表現する場合（その3）'}
+                    ]
+                },
+                {
+                    id: 'lesson6',
+                    name: 'Lesson6 - 後置修飾と関係代名詞のまとめ',
+                    grammar: [
+                        {id: 'postposition_ing', name: '1. 〈名詞 ＋ 動詞の-ing形 ＋ 語句〉（現在分詞による後置修飾）'},
+                        {id: 'postposition_past_participle', name: '2. 〈名詞 ＋ 動詞の過去分詞形 ＋ 語句〉（過去分詞による後置修飾）'},
+                        {id: 'postposition_omission', name: '3. 〈名詞 ＋ 主語 ＋ 動詞 〜〉（目的格の関係代名詞の省略）'},
+                        {id: 'relative_summary', name: '4. 〈名詞 ＋ 関係代名詞（who, which, that） ＋ 語句〉（主格の関係代名詞と目的格の関係代名詞）'},
+                        {id: 'sentence_transformation', name: '5. 文の書き換え'}
+                    ]
+                }
+            ]
+        };
+
+        /* ----------------- サンプル問題データ（拡充版） ----------------- */
+        const sampleProblems = {
+            grade1: {
+                lesson1: {
+                    word_order: [
+                        {
+                            jp: "私は学生です。",
+                            en: "I am a student.",
+                            explanation: "日本語の語順と英語の語順の違いを理解しましょう。英語では「主語 + 動詞」の順番が基本です。"
+                        },
+                        {
+                            jp: "あなたは先生ですか？",
+                            en: "Are you a teacher?",
+                            explanation: "疑問文では動詞(be動詞)が主語の前に来ます。"
+                        }
+                    ],
+                    sentence_types: [
+                        {
+                            jp: "これは本です。",
+                            en: "This is a book.",
+                            explanation: "英語の基本文型の一つ「主語 + be動詞 + 補語」の形です。"
+                        }
+                    ]
+                },
+                lesson2: {
+                    she_he_it: [
+                        {
+                            jp: "彼は医者です。",
+                            en: "He is a doctor.",
+                            explanation: "男性を表す時はheを使います。"
+                        }
+                    ]
+                },
+                lesson3: {
+                    general_verbs: [
+                        {
+                            jp: "私は毎日英語を勉強します。",
+                            en: "I study English every day.",
+                            explanation: "一般動詞は動作や状態を表す動詞です。"
+                        }
+                    ]
+                }
+            },
+            grade2: {
+                lesson1: {
+                    double_object: [
+                        {
+                            jp: "私は彼に本をあげました。",
+                            en: "I gave him a book.",
+                            explanation: "目的語を2つとる動詞では「動詞 + 人 + もの」の順番になります。"
+                        }
+                    ]
+                }
+            },
+            grade3: {
+                lesson1: {
+                    present_perfect_completion: [
+                        {
+                            jp: "私は宿題を終えました。",
+                            en: "I have finished my homework.",
+                            explanation: "現在完了形の完了用法では「have/has + 過去分詞」で「〜し終えた」ことを表します。"
+                        }
+                    ]
+                }
+            }
+        };
+
+        /* ----------------- システム初期化（効果音、音声合成等） ----------------- */
+        class SoundSystem {
+            constructor() {
+                this.audioContext = null;
+                this.initAudio();
+            }
+            initAudio() {
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.log('音声システムを初期化できませんでした');
+                }
+            }
+            playClick() {
+                if (!this.audioContext) return;
+                try {
+                    this.createBell(660, 0.08, 0.15);
+                } catch (e) {
+                    console.log('クリック音の再生に失敗しました');
+                }
+            }
+            playStudyComplete() {
+                if (!this.audioContext) return;
+                try {
+                    this.createSoftTone(440, 0.25, 0.2);
+                } catch (e) {
+                    console.log('完了音の再生に失敗しました');
+                }
+            }
+            playSuccess() {
+                if (!this.audioContext) return;
+                try {
+                    this.createSoftTone(523, 0.15, 0.18);
+                } catch (e) {
+                    console.log('成功音の再生に失敗しました');
+                }
+            }
+            playTick() {
+                if (!this.audioContext) return;
+                try {
+                    this.createBell(800, 0.05, 0.1);
+                } catch (e) {
+                    console.log('チック音の再生に失敗しました');
+                }
+            }
+            playTimeUp() {
+                if (!this.audioContext) return;
+                try {
+                    this.createWarmTone(220, 0.4, 0.3);
+                } catch (e) {
+                    console.log('時間切れ音の再生に失敗しました');
+                }
+            }
+            createBell(frequency, duration, volume = 0.2) {
+                if (!this.audioContext) return;
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+                oscillator.type = 'sine';
+                gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(volume, this.audioContext.currentTime + 0.01);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + duration);
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + duration);
+            }
+            createSoftTone(frequency, duration, volume = 0.2) {
+                if (!this.audioContext) return;
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+                oscillator.type = 'triangle';
+                gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(volume, this.audioContext.currentTime + 0.02);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + duration);
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + duration);
+            }
+            createWarmTone(frequency, duration, volume = 0.2) {
+                if (!this.audioContext) return;
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+                oscillator.type = 'square';
+                gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(volume, this.audioContext.currentTime + 0.05);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + duration);
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + duration);
+            }
+        }
+
+        // 修正：男性音声の個別識別を改善した音声システム
+        class VoiceSystem {
+            constructor() {
+                this.synth = null;
+                this.voices = [];
+                this.selectedVoice = null;
+                this.isEnabled = true;
+                this.isLoading = false;
+                this.voiceLoadAttempts = 0;
+                this.maxLoadAttempts = 8;
+                this.voiceMap = new Map();
+                this.maleVoiceNames = []; // 男性音声名を個別管理
+                
+                try {
+                    if ('speechSynthesis' in window) {
+                        this.synth = window.speechSynthesis;
+                        this.initializeVoices();
+                    } else {
+                        console.log('音声合成がサポートされていません');
+                    }
+                } catch (e) {
+                    console.log('音声システムの初期化に失敗しました:', e);
+                }
+            }
+
+            initializeVoices() {
+                this.loadVoices();
+                
+                if (this.synth.onvoiceschanged !== undefined) {
+                    this.synth.onvoiceschanged = () => {
+                        this.loadVoices();
+                    };
+                }
+
+                // より頻繁かつ長期間のリトライ
+                const retryIntervals = [300, 800, 1500, 2500, 4000, 6000, 8000, 10000];
+                retryIntervals.forEach((delay, index) => {
+                    setTimeout(() => {
+                        if (this.voices.length < 5 || this.voiceLoadAttempts < this.maxLoadAttempts) {
+                            console.log(`音声再読み込み試行 ${index + 1}/${retryIntervals.length}`);
+                            this.loadVoices();
+                        }
+                    }, delay);
+                });
+            }
+
+            loadVoices() {
+                if (!this.synth || this.isLoading) return;
+                
+                try {
+                    this.isLoading = true;
+                    this.voiceLoadAttempts++;
+                    
+                    const allVoices = this.synth.getVoices();
+                    console.log(`全音声取得: ${allVoices.length}個 (試行 ${this.voiceLoadAttempts})`);
+                    
+                    // より包括的なフィルタリング
+                    this.voices = allVoices.filter(voice => {
+                        const lang = voice.lang.toLowerCase();
+                        const name = voice.name.toLowerCase();
+                        
+                        const isEnglish = (
+                            lang.startsWith('en') || 
+                            lang.includes('english') || 
+                            lang === 'en' ||
+                            lang.startsWith('en-') ||
+                            voice.lang.includes('US') ||
+                            voice.lang.includes('GB') ||
+                            voice.lang.includes('AU')
+                        );
+                        
+                        const isValidType = (
+                            !name.includes('compact') && 
+                            !name.includes('enhanced') &&
+                            !name.includes('premium') &&
+                            !name.includes('novelty') &&
+                            !name.includes('whisper') &&
+                            !name.includes('x-slow') &&
+                            !name.includes('x-fast')
+                        );
+                        
+                        return isEnglish && isValidType;
+                    });
+                    
+                    // 修正：男性音声の個別識別を強化
+                    this.buildImprovedVoiceMap();
+                    
+                    console.log('音声マップ:', Array.from(this.voiceMap.entries()));
+                    console.log('利用可能男性音声名:', this.maleVoiceNames);
+                    
+                    if (!this.selectedVoice && this.voices.length > 0) {
+                        this.selectedVoice = this.findBestDefaultVoice();
+                        console.log('デフォルト音声設定:', this.selectedVoice?.name);
+                    }
+                    
+                    this.loadSettings();
+                    this.isLoading = false;
+                    
+                } catch (e) {
+                    console.log('音声リストの読み込みに失敗しました:', e);
+                    this.isLoading = false;
+                }
+            }
+
+            // 修正：より詳細な男性音声の個別識別
+            buildImprovedVoiceMap() {
+                this.voiceMap.clear();
+                this.maleVoiceNames = [];
+                
+                // 女性音声のマッピング（従来通り）
+                const femaleNames = ['samantha', 'karen', 'victoria', 'susan', 'vicki', 'allison', 'ava'];
+                femaleNames.forEach(name => {
+                    const voice = this.voices.find(v => v.name.toLowerCase().includes(name));
+                    if (voice) {
+                        this.voiceMap.set(name, voice);
+                        console.log(`女性音声マップ追加: ${name} -> ${voice.name}`);
+                    }
+                });
+                
+                // 修正：男性音声の厳密な分類と個別マッピング
+                const maleVoices = this.voices.filter(v => {
+                    const name = v.name.toLowerCase();
+                    return name.includes('alex') || 
+                           name.includes('daniel') || 
+                           name.includes('tom') ||
+                           name.includes('david') ||
+                           name.includes('fred') ||
+                           name.includes('ralph') ||
+                           name.includes('bob') ||
+                           name.includes('bruce') ||
+                           name.includes('steve') ||
+                           name.includes('male') ||
+                           (name.includes('male') && v.gender && v.gender.includes('male'));
+                });
+                
+                console.log('利用可能な男性音声候補:', maleVoices.map(v => ({
+                    name: v.name,
+                    lang: v.lang,
+                    default: v.default,
+                    localService: v.localService
+                })));
+                
+                // より細かい個別マッピング戦略
+                this.mapMaleVoiceWithStrategy('Alex', 'alex', maleVoices);
+                this.mapMaleVoiceWithStrategy('Daniel', 'daniel', maleVoices);
+                this.mapMaleVoiceWithStrategy('Tom', 'tom', maleVoices);
+                
+                // 追加の男性音声も検索
+                const additionalMaleSearches = [
+                    { key: 'david', patterns: ['david'] },
+                    { key: 'fred', patterns: ['fred'] },
+                    { key: 'ralph', patterns: ['ralph'] },
+                    { key: 'bob', patterns: ['bob'] },
+                    { key: 'steve', patterns: ['steve'] }
+                ];
+                
+                additionalMaleSearches.forEach(search => {
+                    if (!this.voiceMap.has(search.key)) {
+                        const voice = this.findMaleVoiceByPatterns(search.patterns, maleVoices);
+                        if (voice) {
+                            this.voiceMap.set(search.key, voice);
+                            this.maleVoiceNames.push(search.key);
+                            console.log(`追加男性音声マップ: ${search.key} -> ${voice.name}`);
+                        }
+                    }
+                });
+                
+                // 男性音声が不足している場合の代替検索
+                if (this.maleVoiceNames.length < 3) {
+                    console.log('男性音声が不足、代替検索開始...');
+                    this.findAlternativeMaleVoices(maleVoices);
+                }
+            }
+
+            // 新しいメソッド：より戦略的な男性音声マッピング
+            mapMaleVoiceWithStrategy(displayName, mapKey, availableVoices) {
+                const patterns = this.getMaleVoicePatterns(displayName.toLowerCase());
+                const voice = this.findMaleVoiceByPatterns(patterns, availableVoices);
+                
+                if (voice) {
+                    this.voiceMap.set(mapKey, voice);
+                    this.maleVoiceNames.push(mapKey);
+                    console.log(`男性音声マップ成功: ${mapKey} -> ${voice.name} (${voice.lang})`);
+                    return true;
+                } else {
+                    console.log(`男性音声マップ失敗: ${mapKey} のパターンが見つかりません`);
+                    return false;
+                }
+            }
+
+            getMaleVoicePatterns(baseName) {
+                const patterns = [baseName];
+                
+                // 各音声の一般的なバリエーション
+                switch(baseName) {
+                    case 'alex':
+                        patterns.push('alexander', 'al ', 'alex_');
+                        break;
+                    case 'daniel':
+                        patterns.push('dan ', 'danny', 'daniel_');
+                        break;
+                    case 'tom':
+                        patterns.push('thomas', 'tommy', 'tom_');
+                        break;
+                }
+                
+                return patterns;
+            }
+
+            findMaleVoiceByPatterns(patterns, voiceList) {
+                // 完全一致を最優先
+                for (const pattern of patterns) {
+                    const voice = voiceList.find(v => v.name.toLowerCase() === pattern);
+                    if (voice) return voice;
+                }
+                
+                // 前方一致
+                for (const pattern of patterns) {
+                    const voice = voiceList.find(v => v.name.toLowerCase().startsWith(pattern));
+                    if (voice) return voice;
+                }
+                
+                // 部分一致
+                for (const pattern of patterns) {
+                    const voice = voiceList.find(v => v.name.toLowerCase().includes(pattern));
+                    if (voice) return voice;
+                }
+                
+                return null;
+            }
+
+            findAlternativeMaleVoices(maleVoices) {
+                // まだマップされていない男性音声を検索
+                const unmappedVoices = maleVoices.filter(voice => {
+                    return !Array.from(this.voiceMap.values()).includes(voice);
+                });
+                
+                unmappedVoices.forEach((voice, index) => {
+                    const alternativeKey = `male_alt_${index + 1}`;
+                    this.voiceMap.set(alternativeKey, voice);
+                    this.maleVoiceNames.push(alternativeKey);
+                    console.log(`代替男性音声追加: ${alternativeKey} -> ${voice.name}`);
+                });
+            }
+
+            findBestDefaultVoice() {
+                // 優先順位付きで音声を選択
+                const priorities = [
+                    voice => voice.name.toLowerCase().includes('samantha'),
+                    voice => voice.name.toLowerCase().includes('karen'),
+                    voice => voice.name.toLowerCase().includes('alex'),
+                    voice => voice.name.toLowerCase().includes('daniel'),
+                    voice => voice.default,
+                    voice => voice.localService,
+                    voice => true
+                ];
+                
+                for (const priority of priorities) {
+                    const voice = this.voices.find(priority);
+                    if (voice) {
+                        return voice;
+                    }
+                }
+                
+                return this.voices[0] || null;
+            }
+
+            // 修正：音声設定の改善（マップベースで男性音声個別対応）
+            setVoice(voiceName) {
+                if (!this.synth || !voiceName) return false;
+                
+                try {
+                    console.log('音声設定開始:', voiceName);
+                    
+                    const targetNameLower = voiceName.toLowerCase();
+                    
+                    // マップから直接検索
+                    let targetVoice = this.voiceMap.get(targetNameLower);
+                    
+                    // マップにない場合は従来の検索
+                    if (!targetVoice) {
+                        targetVoice = this.findVoiceByNameAdvanced(voiceName);
+                    }
+                    
+                    if (targetVoice) {
+                        this.selectedVoice = targetVoice;
+                        this.saveSettings();
+                        console.log(`音声設定成功: ${targetVoice.name} (${targetVoice.lang})`);
+                        this.updateVoiceSelection(voiceName);
+                        
+                        // 音声の簡単なテスト
+                        this.testVoiceQuiet(targetVoice);
+                        
+                        return true;
+                    } else {
+                        console.log('指定された音声が見つかりません:', voiceName);
+                        
+                        // フォールバック音声の提案
+                        const fallbackVoice = this.findFallbackVoiceAdvanced(voiceName);
+                        if (fallbackVoice) {
+                            console.log('フォールバック音声を使用:', fallbackVoice.name);
+                            this.selectedVoice = fallbackVoice;
+                            this.saveSettings();
+                            this.updateVoiceSelection(voiceName);
+                            showNotification(`💡 ${voiceName}の代わりに${fallbackVoice.name}を使用します`);
+                            return true;
+                        }
+                    }
+                } catch (e) {
+                    console.log('音声設定に失敗しました:', e);
+                }
+                return false;
+            }
+
+            findVoiceByNameAdvanced(voiceName) {
+                const targetNameLower = voiceName.toLowerCase();
+                
+                // 完全一致を最優先
+                let voice = this.voices.find(v => v.name.toLowerCase() === targetNameLower);
+                if (voice) return voice;
+                
+                // 前方一致（より厳密に）
+                voice = this.voices.find(v => v.name.toLowerCase().startsWith(targetNameLower + ' '));
+                if (voice) return voice;
+                
+                voice = this.voices.find(v => v.name.toLowerCase().startsWith(targetNameLower));
+                if (voice) return voice;
+                
+                // 部分一致（単語境界を考慮）
+                const wordBoundaryPattern = new RegExp(`\\b${targetNameLower}\\b`, 'i');
+                voice = this.voices.find(v => wordBoundaryPattern.test(v.name));
+                if (voice) return voice;
+                
+                // 最後の手段：部分一致
+                voice = this.voices.find(v => v.name.toLowerCase().includes(targetNameLower));
+                if (voice) return voice;
+                
+                return null;
+            }
+
+            findFallbackVoiceAdvanced(originalVoiceName) {
+                const nameLower = originalVoiceName.toLowerCase();
+                
+                // 男性音声のフォールバック（マップベース）
+                if (['alex', 'daniel', 'tom'].includes(nameLower)) {
+                    for (const maleName of this.maleVoiceNames) {
+                        if (maleName !== nameLower) {
+                            const voice = this.voiceMap.get(maleName);
+                            if (voice) {
+                                return voice;
+                            }
+                        }
+                    }
+                }
+                
+                // 女性音声のフォールバック
+                if (['samantha', 'karen', 'victoria'].includes(nameLower)) {
+                    const femaleOptions = ['samantha', 'karen', 'victoria', 'susan'];
+                    for (const option of femaleOptions) {
+                        if (option !== nameLower) {
+                            const voice = this.voiceMap.get(option);
+                            if (voice) {
+                                return voice;
+                            }
+                        }
+                    }
+                }
+                
+                return null;
+            }
+
+            testVoiceQuiet(voice) {
+                try {
+                    // より短く、無音でのテスト
+                    const testUtterance = new SpeechSynthesisUtterance('a');
+                    testUtterance.voice = voice;
+                    testUtterance.volume = 0.01; // ほぼ無音
+                    testUtterance.rate = 5; // 高速
+                    testUtterance.pitch = 1;
+                    
+                    testUtterance.onerror = (event) => {
+                        console.log(`${voice.name}でエラー:`, event.error);
+                    };
+                    
+                    this.synth.speak(testUtterance);
+                } catch (e) {
+                    console.log(`${voice.name}のテストに失敗:`, e);
+                }
+            }
+
+            speak(text) {
+                if (!this.isEnabled || !text.trim() || !this.synth) return;
+                
+                try {
+                    this.synth.cancel();
+                    
+                    const cleanText = this.cleanEnglishText(text);
+                    const utterance = new SpeechSynthesisUtterance(cleanText);
+                    
+                    if (this.selectedVoice) {
+                        utterance.voice = this.selectedVoice;
+                    }
+                    
+                    utterance.rate = 0.9;
+                    utterance.pitch = 1.0;
+                    utterance.volume = 0.85;
+                    
+                    if (this.selectedVoice && this.selectedVoice.lang) {
+                        utterance.lang = this.selectedVoice.lang;
+                    } else {
+                        utterance.lang = 'en-US';
+                    }
+                    
+                    utterance.onerror = (event) => {
+                        console.log('音声再生エラー:', event.error);
+                        console.log('エラー詳細:', {
+                            voice: this.selectedVoice?.name,
+                            text: cleanText,
+                            lang: utterance.lang
+                        });
+                    };
+                    
+                    utterance.onstart = () => {
+                        console.log('音声再生開始:', {
+                            voice: this.selectedVoice?.name,
+                            text: cleanText.substring(0, 30) + '...',
+                            lang: utterance.lang
+                        });
+                    };
+                    
+                    this.synth.speak(utterance);
+                    return utterance;
+                    
+                } catch (e) {
+                    console.log('音声再生に失敗しました:', e);
+                }
+            }
+
+            cleanEnglishText(text) {
+                return text
+                    .replace(/[^\w\s.!?',\-]/g, '')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+            }
+
+            updateVoiceSelection(selectedVoiceName) {
+                document.querySelectorAll('.voice-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                
+                const targetOption = document.querySelector(`[data-voice="${selectedVoiceName}"]`);
+                if (targetOption) {
+                    targetOption.classList.add('selected');
+                }
+            }
+
+            setEnabled(enabled) {
+                this.isEnabled = enabled;
+                this.saveSettings();
+                
+                if (!enabled && this.synth) {
+                    try {
+                        this.synth.cancel();
+                    } catch (e) {
+                        console.log('音声停止に失敗しました:', e);
+                    }
+                }
+            }
+
+            // 修正：プレビューで異なる音声を確実に再生
+            previewVoice(voiceName) {
+                console.log('音声プレビュー開始:', voiceName);
+                
+                const originalVoice = this.selectedVoice;
+                const originalEnabled = this.isEnabled;
+                
+                if (this.setVoice(voiceName)) {
+                    this.isEnabled = true;
+                    
+                    // 各音声に固有のプレビューテキストを使用
+                    let previewText = this.getUniquePreviewText(voiceName);
+                    
+                    const utterance = this.speak(previewText);
+                    
+                    if (utterance) {
+                        utterance.onend = () => {
+                            this.isEnabled = originalEnabled;
+                            console.log('プレビュー終了、音声設定維持:', this.selectedVoice?.name);
+                        };
+                        
+                        utterance.onerror = (event) => {
+                            console.log('プレビューエラー:', event.error);
+                            this.isEnabled = originalEnabled;
+                            showNotification(`🔇 ${voiceName}の音声テストでエラーが発生しました`);
+                        };
+                    }
+                } else {
+                    this.selectedVoice = originalVoice;
+                    this.isEnabled = originalEnabled;
+                    showNotification(`🔇 ${voiceName}音声は現在利用できません`);
+                }
+            }
+
+            // 修正：各音声に完全にユニークなプレビューテキスト
+            getUniquePreviewText(voiceName) {
+                const uniqueTexts = {
+                    'Alex': "Hello! My name is Alex. I am a standard English male voice. I speak clearly with American pronunciation.",
+                    'Daniel': "Greetings! I am Daniel, speaking with distinct clarity. My voice has a different tone from other male voices.",
+                    'Tom': "Hi there! This is Tom speaking. I have my own unique vocal characteristics and speaking style.",
+                    'Samantha': "Hello! I'm Samantha, and I'll help you learn English with clear female pronunciation.",
+                    'Karen': "Hi! I'm Karen. My voice is crisp and perfect for English language learning.",
+                    'Victoria': "Hello! I'm Victoria. I speak with friendly and natural English pronunciation."
+                };
+                
+                return uniqueTexts[voiceName] || 
+                       `Hello! This is ${voiceName} speaking. Each voice has unique characteristics for English learning.`;
+            }
+
+            saveSettings() {
+                try {
+                    const settings = {
+                        voiceName: this.selectedVoice ? this.selectedVoice.name : null,
+                        isEnabled: this.isEnabled,
+                        voiceAttempts: this.voiceLoadAttempts
+                    };
+                    localStorage.setItem('oneWorldQuizVoiceSettings', JSON.stringify(settings));
+                    console.log('音声設定保存:', settings);
+                } catch (e) {
+                    console.log('音声設定の保存に失敗しました:', e);
+                }
+            }
+
+            loadSettings() {
+                try {
+                    const saved = localStorage.getItem('oneWorldQuizVoiceSettings');
+                    if (saved) {
+                        const settings = JSON.parse(saved);
+                        this.isEnabled = settings.isEnabled !== false;
+                        
+                        if (settings.voiceName && this.voices.length > 0) {
+                            const savedVoice = this.voices.find(v => v.name === settings.voiceName);
+                            if (savedVoice) {
+                                this.selectedVoice = savedVoice;
+                                this.updateVoiceSelection(settings.voiceName);
+                                console.log('保存済み音声設定復元:', savedVoice.name);
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.log('音声設定の読み込みに失敗しました:', e);
+                }
+            }
+
+            getSelectedVoiceName() {
+                return this.selectedVoice ? this.selectedVoice.name : 'デフォルト';
+            }
+
+            getAvailableVoices() {
+                return this.voices;
+            }
+
+            getVoiceInfo() {
+                return {
+                    total: this.voices.length,
+                    selected: this.selectedVoice ? this.selectedVoice.name : 'なし',
+                    enabled: this.isEnabled,
+                    loadAttempts: this.voiceLoadAttempts,
+                    voiceMap: Array.from(this.voiceMap.entries()),
+                    maleVoiceNames: this.maleVoiceNames,
+                    voices: this.voices.map(v => ({
+                        name: v.name,
+                        lang: v.lang,
+                        default: v.default,
+                        localService: v.localService
+                    }))
+                };
+            }
+        }
+
+        let soundSystem, voiceSystem;
+        try {
+            soundSystem = new SoundSystem();
+            voiceSystem = new VoiceSystem();
+        } catch (e) {
+            console.log('システム初期化に失敗しました');
+            soundSystem = { playClick: () => {}, playStudyComplete: () => {}, playSuccess: () => {}, playTick: () => {}, playTimeUp: () => {} };
+            voiceSystem = { speak: () => {}, setVoice: () => false, setEnabled: () => {}, previewVoice: () => {}, isEnabled: true };
+        }
+
+
+        /* ----------------- ゲーム変数 ----------------- */
+        let selectedGrammarItems = [];
+        let selectedLessons = [];
+        let currentQuestionIndex = 0;
+        let studyCount = 0;
+        let sessionClickCount = 0;
+        let usedQuestions = [];
+        let particleOffset = 0;
+        let currentGrade = '';
+        let currentLesson = '';
+        let questionMode = 'random';
+        let sequentialIndex = 0;
+        let questionDirection = 'jp_to_en';
+        let timerLimit = 3; // 修正：無制限の場合は'unlimited'文字列を使用
+        let timerInterval = null;
+        let currentTimerValue = 0;
+        let isTimerRunning = false;
+        let isQuizAnswered = false;
+        let allQuestions = [];
+        let currentScreen = 'main';
+
+        /* ----------------- クリック数管理機能 ----------------- */
+        let clickStats = { total: 0, daily: {} };
+
+        function getTodayDateString() {
+            const today = new Date();
+            return today.getFullYear() + '-' + 
+                   String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                   String(today.getDate()).padStart(2, '0');
+        }
+
+        function incrementClickCount() {
+            const today = getTodayDateString();
+            
+            clickStats.total++;
+            sessionClickCount++;
+            
+            if (!clickStats.daily[today]) {
+                clickStats.daily[today] = 0;
+            }
+            clickStats.daily[today]++;
+            
+            updateClickDisplays();
+            saveClickStats();
+            
+            if (clickStats.total % 10 === 0) {
+                showNotification(`🎉 ${clickStats.total}回クリック達成！学習が積み重なってますね！`);
+                createParticle('✨', '#a584c7', window.innerWidth / 2, window.innerHeight / 2);
+            }
+            
+            if (clickStats.total % 100 === 0) {
+                soundSystem.playSuccess();
+                showNotification(`🏆 ${clickStats.total}回クリック記念！素晴らしい継続力です！`);
+                createParticle('🏆', '#f4a261', window.innerWidth / 2, window.innerHeight / 2);
+            }
+            
+            return true;
+        }
+
+        function updateClickDisplays() {
+            try {
+                const today = getTodayDateString();
+                const todayClicks = clickStats.daily[today] || 0;
+                
+                const footerTotalElement = document.getElementById('footerTotalClick');
+                const footerTodayElement = document.getElementById('footerTodayClick');
+                const sessionElement = document.getElementById('clickCount');
+                
+                if (footerTotalElement) {
+                    footerTotalElement.textContent = clickStats.total;
+                }
+                if (footerTodayElement) {
+                    footerTodayElement.textContent = todayClicks;
+                }
+                if (sessionElement) {
+                    sessionElement.textContent = sessionClickCount;
+                }
+                
+            } catch (e) {
+                console.log('クリック表示更新に失敗しました');
+            }
+        }
+
+        function saveClickStats() {
+            try {
+                localStorage.setItem('oneWorldQuizClickStats', JSON.stringify(clickStats));
+            } catch (e) {
+                console.log('クリック統計の保存に失敗しました');
+            }
+        }
+
+        function loadClickStats() {
+            try {
+                const saved = localStorage.getItem('oneWorldQuizClickStats');
+                if (saved) {
+                    clickStats = JSON.parse(saved);
+                    updateClickDisplays();
+                }
+            } catch (e) {
+                console.log('クリック統計の読み込みに失敗しました');
+                clickStats = { total: 0, daily: {} };
+            }
+        }
+
+        function confirmResetTotal() {
+            if (confirm('🏆 総クリック数をリセットしますか？\n（この操作は元に戻せません）')) {
+                clickStats.total = 0;
+                saveClickStats();
+                updateClickDisplays();
+                showNotification('🔄 総クリック数をリセットしました！');
+                soundSystem.playClick();
+            }
+        }
+
+        function confirmResetToday() {
+            if (confirm('📅 今日のクリック数をリセットしますか？\n（この操作は元に戻せません）')) {
+                const today = getTodayDateString();
+                clickStats.daily[today] = 0;
+                saveClickStats();
+                updateClickDisplays();
+                showNotification('🔄 今日のクリック数をリセットしました！');
+                soundSystem.playClick();
+            }
+        }
+
+        /* ----------------- エフェクト・通知関数 ----------------- */
+        function createParticle(text, color, x, y) {
+            try {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.textContent = text;
+                particle.style.color = color;
+                particle.style.left = (x + particleOffset) + 'px';
+                particle.style.top = (y + particleOffset) + 'px';
+                particle.style.fontSize = '20px';
+                document.body.appendChild(particle);
+
+                particleOffset += 40;
+                if (particleOffset > 160) particleOffset = 0;
+
+                setTimeout(() => {
+                    if (particle.parentNode) {
+                        particle.parentNode.removeChild(particle);
+                    }
+                }, 2500);
+            } catch (e) {
+                console.log('パーティクル作成に失敗しました');
+            }
+        }
+
+        function showNotification(text) {
+            try {
+                const notification = document.getElementById('notification');
+                const notificationText = document.getElementById('notificationText');
+                if (notification && notificationText) {
+                    notificationText.textContent = text;
+                    notification.classList.add('show');
+                    setTimeout(() => {
+                        notification.classList.remove('show');
+                    }, 3500);
+                }
+            } catch (e) {
+                console.log('通知表示に失敗しました');
+            }
+        }
+
+        /* ----------------- 画面遷移関数 ----------------- */
+        function updateBackButton() {
+            const backBtn = document.getElementById('footerBackBtn');
+            const homeBtn = document.getElementById('footerHomeBtn');
+            
+            if (currentScreen === 'main') {
+                backBtn.style.opacity = '0.5';
+                backBtn.style.pointerEvents = 'none';
+                homeBtn.style.opacity = '0.5';
+                homeBtn.style.pointerEvents = 'none';
+            } else {
+                backBtn.style.opacity = '1';
+                backBtn.style.pointerEvents = 'auto';
+                homeBtn.style.opacity = '1';
+                homeBtn.style.pointerEvents = 'auto';
+            }
+        }
+
+        function hideAllModals() {
+            try {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    modal.classList.remove('show');
+                });
+            } catch (e) {
+                console.log('モーダル非表示に失敗しました');
+            }
+        }
+
+        function goBackToMain() {
+            try {
+                hideAllModals();
+                const gameScreen = document.getElementById('gameScreen');
+                if (gameScreen) {
+                    gameScreen.classList.add('hidden');
+                }
+                const mainModal = document.getElementById('mainGradeModal');
+                if (mainModal) {
+                    mainModal.classList.add('show');
+                }
+                currentScreen = 'main';
+                updateBackButton();
+                soundSystem.playClick();
+                currentGrade = '';
+                selectedLessons = [];
+                selectedGrammarItems = [];
+            } catch (e) {
+                console.log('メイン画面への遷移に失敗しました');
+            }
+        }
+
+        function goBackToGrade(grade) {
+            try {
+                hideAllModals();
+                const gradeModal = document.getElementById(`${grade}Modal`);
+                if (gradeModal) {
+                    gradeModal.classList.add('show');
+                }
+                currentScreen = 'grade';
+                updateBackButton();
+                soundSystem.playClick();
+                selectedGrammarItems = [];
+            } catch (e) {
+                console.log('学年画面への遷移に失敗しました');
+            }
+        }
+
+        function goBackToGameSettings() {
+            try {
+                hideAllModals();
+                const gameScreen = document.getElementById('gameScreen');
+                if (gameScreen) {
+                    gameScreen.classList.remove('hidden');
+                }
+                currentScreen = 'game';
+                updateBackButton();
+                soundSystem.playClick();
+            } catch (e) {
+                console.log('ゲーム設定画面への遷移に失敗しました');
+            }
+        }
+
+        function goBack() {
+            try {
+                incrementClickCount();
+                soundSystem.playClick();
+                
+                if (currentScreen === 'quiz') {
+                    goBackToGameSettings();
+                } else if (currentScreen === 'game') {
+                    goBackToGrade(currentGrade);
+                } else if (currentScreen === 'grammar') {
+                    goBackToGrade(currentGrade);
+                } else if (currentScreen === 'grade') {
+                    goBackToMain();
+                } else if (currentScreen === 'voice') {
+                    closeVoiceSettings();
+                } else {
+                    goBackToMain();
+                }
+            } catch (e) {
+                console.log('戻る動作に失敗しました');
+            }
+        }
+
+        /* ----------------- 音声機能関数 ----------------- */
+        function openVoiceSettings() {
+            try {
+                const modal = document.getElementById('voiceSettingsModal');
+                const enabledCheckbox = document.getElementById('voiceEnabled');
+                const toggleDescription = document.getElementById('voiceToggleDescription');
+                
+                if (enabledCheckbox && toggleDescription) {
+                    enabledCheckbox.checked = voiceSystem.isEnabled;
+                    toggleDescription.textContent = voiceSystem.isEnabled ? '音声機能が有効です' : '音声機能が無効です';
+                }
+                
+                if (voiceSystem.selectedVoice) {
+                    voiceSystem.updateVoiceSelection(voiceSystem.selectedVoice.name);
+                }
+                
+                currentScreen = 'voice';
+                updateBackButton();
+                
+                if (modal) {
+                    modal.classList.add('show');
+                }
+                
+                console.log('音声設定画面表示 - 音声情報:', voiceSystem.getVoiceInfo());
+                
+            } catch (e) {
+                console.log('音声設定画面の表示に失敗しました:', e);
+                showNotification('🔇 音声設定の表示に失敗しました');
+            }
+        }
+
+        function closeVoiceSettings() {
+            try {
+                const modal = document.getElementById('voiceSettingsModal');
+                if (modal) {
+                    modal.classList.remove('show');
+                }
+                currentScreen = 'main';
+                updateBackButton();
+                showNotification(`🎤 音声設定を保存しました！現在の音声: ${voiceSystem.getSelectedVoiceName()}`);
+            } catch (e) {
+                console.log('音声設定画面の閉じるに失敗しました');
+            }
+        }
+
+        function previewVoice(voiceName) {
+            try {
+                console.log('プレビュー開始:', voiceName);
+                voiceSystem.previewVoice(voiceName);
+            } catch (e) {
+                console.log('音声プレビューに失敗しました:', e);
+                showNotification('🔇 音声プレビューに失敗しました');
+            }
+        }
+
+        function toggleVoiceEnabled() {
+            try {
+                const checkbox = document.getElementById('voiceEnabled');
+                const description = document.getElementById('voiceToggleDescription');
+                
+                if (checkbox && description) {
+                    voiceSystem.setEnabled(checkbox.checked);
+                    description.textContent = checkbox.checked ? '音声機能が有効です' : '音声機能が無効です';
+                }
+            } catch (e) {
+                console.log('音声切り替えに失敗しました');
+            }
+        }
+
+        function addSpeakButton(text, container) {
+            try {
+                const englishRegex = /[a-zA-Z]/;
+                if (!englishRegex.test(text)) return container;
+                
+                const speakBtn = document.createElement('button');
+                speakBtn.className = 'speak-btn';
+                speakBtn.innerHTML = '🔊';
+                speakBtn.title = '英語で読み上げ';
+                speakBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    speakEnglishText(text, speakBtn);
+                };
+                
+                const wrapper = document.createElement('span');
+                wrapper.style.display = 'inline-flex';
+                wrapper.style.alignItems = 'center';
+                wrapper.appendChild(document.createTextNode(text));
+                wrapper.appendChild(speakBtn);
+                
+                return wrapper;
+            } catch (e) {
+                console.log('スピーカーボタンの追加に失敗しました');
+                return container;
+            }
+        }
+
+        function speakEnglishText(text, button = null) {
+            try {
+                if (!voiceSystem.isEnabled) {
+                    showNotification('🔇 音声機能が無効になっています。設定で有効にしてください。');
+                    return;
+                }
+                
+                if (button) {
+                    button.classList.add('speaking');
+                }
+                
+                const utterance = voiceSystem.speak(text);
+                
+                if (utterance) {
+                    utterance.onend = () => {
+                        if (button) {
+                            button.classList.remove('speaking');
+                        }
+                    };
+                }
+            } catch (e) {
+                console.log('音声再生に失敗しました');
+                if (button) {
+                    button.classList.remove('speaking');
+                }
+            }
+        }
+
+        /* ----------------- レッスン選択機能（チェックマーク対応） ----------------- */
+        function toggleLessonSelection(grade, lessonId, lessonName) {
+            try {
+                console.log('レッスン選択切り替え:', { grade, lessonId, lessonName });
+                
+                const lessonBtn = document.querySelector(`#${grade}Lessons [data-lesson-id="${lessonId}"]`);
+                console.log('見つかったボタン:', lessonBtn);
+                
+                if (!lessonBtn) {
+                    console.error('レッスンボタンが見つかりません:', lessonId);
+                    return;
+                }
+
+                const isSelected = lessonBtn.classList.contains('selected');
+                console.log('現在の選択状態:', isSelected);
+                
+                if (isSelected) {
+                    lessonBtn.classList.remove('selected');
+                    selectedLessons = selectedLessons.filter(lesson => lesson.id !== lessonId);
+                    console.log('選択解除しました');
+                } else {
+                    lessonBtn.classList.add('selected');
+                    selectedLessons.push({id: lessonId, name: lessonName, grade: grade});
+                    console.log('選択追加しました');
+                }
+                
+                console.log('現在の選択レッスン:', selectedLessons);
+                updateSelectedLessonsDisplay(grade);
+                
+            } catch (e) {
+                console.error('レッスン選択切り替えに失敗しました:', e);
+            }
+        }
+
+        function updateSelectedLessonsDisplay(grade) {
+            try {
+                const gradeNum = grade.replace('grade', '');
+                const startButton = document.getElementById(`startMultipleLessons${gradeNum}`);
+                
+                const gradeSelectedLessons = selectedLessons.filter(lesson => lesson.grade === grade);
+                console.log('学年別選択レッスン:', gradeSelectedLessons);
+                
+                if (gradeSelectedLessons.length > 0) {
+                    startButton.style.display = 'inline-block';
+                    startButton.disabled = false;
+                    console.log('スタートボタンを有効化');
+                } else {
+                    startButton.style.display = 'none';
+                    startButton.disabled = true;
+                    console.log('スタートボタンを無効化');
+                }
+                
+            } catch (e) {
+                console.log('選択レッスン表示更新に失敗しました');
+            }
+        }
+
+        function startSelectedLessons(grade) {
+            try {
+                if (selectedLessons.length === 0) {
+                    showNotification('❌ レッスンが選択されていません');
+                    return;
+                }
+                
+                currentGrade = grade;
+                showGrammarSelection();
+                
+            } catch (e) {
+                console.log('レッスン開始に失敗しました');
+            }
+        }
+
+        function showGrammarSelection() {
+            try {
+                hideAllModals();
+                
+                const modal = document.getElementById('grammarModal');
+                const title = document.getElementById('grammarModalTitle');
+                const container = document.getElementById('grammarCategories');
+                
+                title.textContent = `📚 ${selectedLessons.map(l => l.name).join(', ')} - 文法項目選択`;
+                
+                container.innerHTML = '';
+                selectedGrammarItems = [];
+                
+                selectedLessons.forEach(lesson => {
+                    const lessonData = lessons[lesson.grade].find(l => l.id === lesson.id);
+                    if (lessonData) {
+                        lessonData.grammar.forEach(grammar => {
+                            const btn = document.createElement('button');
+                            btn.className = 'grammar-btn';
+                            btn.textContent = grammar.name;
+                            btn.dataset.grammarId = `${lesson.id}_${grammar.id}`;
+                            btn.dataset.lessonId = lesson.id;
+                            btn.dataset.grade = lesson.grade;
+                            
+                            btn.addEventListener('click', () => {
+                                incrementClickCount();
+                                soundSystem.playClick();
+                                toggleGrammarSelection(btn, grammar, lesson);
+                            });
+                            
+                            container.appendChild(btn);
+                        });
+                    }
+                });
+                
+                currentScreen = 'grammar';
+                updateBackButton();
+                modal.classList.add('show');
+                
+            } catch (e) {
+                console.log('文法選択画面表示に失敗しました');
+            }
+        }
+
+        function toggleGrammarSelection(btn, grammar, lesson) {
+            try {
+                const isSelected = btn.classList.contains('selected');
+                const grammarKey = `${lesson.id}_${grammar.id}`;
+                
+                if (isSelected) {
+                    btn.classList.remove('selected');
+                    selectedGrammarItems = selectedGrammarItems.filter(item => item.key !== grammarKey);
+                } else {
+                    btn.classList.add('selected');
+                    selectedGrammarItems.push({
+                        key: grammarKey,
+                        lessonId: lesson.id,
+                        grammarId: grammar.id,
+                        name: grammar.name,
+                        grade: lesson.grade
+                    });
+                }
+                
+                const startButton = document.getElementById('startGrammarQuiz');
+                if (selectedGrammarItems.length > 0) {
+                    startButton.disabled = false;
+                } else {
+                    startButton.disabled = true;
+                }
+                
+            } catch (e) {
+                console.log('文法選択切り替えに失敗しました');
+            }
+        }
+
+        function startGrammarQuiz() {
+            try {
+                if (selectedGrammarItems.length === 0) {
+                    showNotification('❌ 文法項目が選択されていません');
+                    return;
+                }
+                
+                prepareQuestions();
+                showGameScreen();
+                
+            } catch (e) {
+                console.log('文法クイズ開始に失敗しました');
+            }
+        }
+
+        function prepareQuestions() {
+            try {
+                allQuestions = [];
+                
+                selectedGrammarItems.forEach(item => {
+                    const problems = sampleProblems[item.grade]?.[item.lessonId]?.[item.grammarId];
+                    if (problems) {
+                        problems.forEach(problem => {
+                            allQuestions.push({
+                                ...problem,
+                                grammarName: item.name,
+                                lessonId: item.lessonId,
+                                grade: item.grade
+                            });
+                        });
+                    }
+                });
+                
+                if (allQuestions.length === 0) {
+                    allQuestions = [
+                        {
+                            jp: "私は学生です。",
+                            en: "I am a student.",
+                            explanation: "日本語の語順と英語の語順の違いを理解しましょう。英語では「主語 + 動詞」の順番が基本です。",
+                            grammarName: "サンプル問題",
+                            lessonId: "sample",
+                            grade: "sample"
+                        },
+                        {
+                            jp: "あなたは先生ですか？",
+                            en: "Are you a teacher?",
+                            explanation: "疑問文では動詞(be動詞)が主語の前に来ます。",
+                            grammarName: "サンプル問題",
+                            lessonId: "sample",
+                            grade: "sample"
+                        }
+                    ];
+                }
+                
+                usedQuestions = [];
+                currentQuestionIndex = 0;
+                sequentialIndex = 0;
+                
+            } catch (e) {
+                console.log('問題準備に失敗しました');
+            }
+        }
+
+        function showGameScreen() {
+            try {
+                hideAllModals();
+                const gameScreen = document.getElementById('gameScreen');
+                gameScreen.classList.remove('hidden');
+                
+                const categoryElement = document.getElementById('currentCategory');
+                categoryElement.textContent = selectedGrammarItems.map(item => item.name).join(', ');
+                
+                updateClickDisplays();
+                
+                currentScreen = 'game';
+                updateBackButton();
+                
+            } catch (e) {
+                console.log('ゲーム画面表示に失敗しました');
+            }
+        }
+
+        /* ----------------- 修正：タイマー機能（無制限対応） ----------------- */
+        function startTimer() {
+            try {
+                // 修正：無制限の場合はタイマーを開始しない
+                if (timerLimit === 'unlimited') {
+                    updateTimerDisplayUnlimited();
+                    return;
+                }
+                
+                currentTimerValue = timerLimit;
+                isTimerRunning = true;
+                updateTimerDisplay();
+                
+                timerInterval = setInterval(() => {
+                    currentTimerValue--;
+                    updateTimerDisplay();
+                    
+                    if (currentTimerValue <= 0) {
+                        clearInterval(timerInterval);
+                        isTimerRunning = false;
+                        handleTimerExpired();
+                    } else if (currentTimerValue <= 2) {
+                        soundSystem.playTick();
+                    }
+                }, 1000);
+                
+            } catch (e) {
+                console.log('タイマー開始に失敗しました');
+            }
+        }
+
+        function updateTimerDisplay() {
+            try {
+                const timerValue = document.getElementById('timerValue');
+                const timerDisplay = document.getElementById('timerDisplay');
+                
+                if (timerValue && timerDisplay) {
+                    timerValue.textContent = currentTimerValue;
+                    
+                    if (currentTimerValue > 3) {
+                        timerDisplay.className = 'timer-display timer-normal';
+                    } else if (currentTimerValue > 1) {
+                        timerDisplay.className = 'timer-display timer-warning';
+                    } else {
+                        timerDisplay.className = 'timer-display timer-danger';
+                    }
+                }
+            } catch (e) {
+                console.log('タイマー表示更新に失敗しました');
+            }
+        }
+
+        // 新しいメソッド：無制限表示
+        function updateTimerDisplayUnlimited() {
+            try {
+                const timerValue = document.getElementById('timerValue');
+                const timerDisplay = document.getElementById('timerDisplay');
+                
+                if (timerValue && timerDisplay) {
+                    timerValue.textContent = '∞';
+                    timerDisplay.className = 'timer-display timer-unlimited';
+                }
+            } catch (e) {
+                console.log('無制限タイマー表示更新に失敗しました');
+            }
+        }
+
+        function handleTimerExpired() {
+            try {
+                soundSystem.playTimeUp();
+                showNotification('⏰ 時間切れ！解答を見てみましょう。');
+                
+                if (!isQuizAnswered) {
+                    showAnswer();
+                }
+                
+            } catch (e) {
+                console.log('タイマー期限切れ処理に失敗しました');
+            }
+        }
+
+        function stopTimer() {
+            try {
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+                isTimerRunning = false;
+            } catch (e) {
+                console.log('タイマー停止に失敗しました');
+            }
+        }
+
+        /* ----------------- クイズ機能 ----------------- */
+        function startQuiz() {
+            try {
+                if (allQuestions.length === 0) {
+                    showNotification('❌ 問題データがありません');
+                    return;
+                }
+                
+                hideAllModals();
+                const gameScreenElement = document.getElementById('gameScreen');
+                gameScreenElement.classList.add('hidden');
+                
+                const modal = document.getElementById('quizModal');
+                modal.classList.add('show');
+                
+                currentScreen = 'quiz';
+                updateBackButton();
+                
+                showNextQuestion();
+                
+            } catch (e) {
+                console.log('クイズ開始に失敗しました');
+            }
+        }
+
+        function showNextQuestion() {
+            try {
+                if (usedQuestions.length >= allQuestions.length) {
+                    showNotification('🎉 すべての問題を完了しました！');
+                    endQuiz();
+                    return;
+                }
+                
+                let nextQuestion;
+                
+                if (questionMode === 'random') {
+                    const availableQuestions = allQuestions.filter((_, index) => !usedQuestions.includes(index));
+                    const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+                    nextQuestion = availableQuestions[randomIndex];
+                    currentQuestionIndex = allQuestions.indexOf(nextQuestion);
+                } else {
+                    if (sequentialIndex >= allQuestions.length) {
+                        sequentialIndex = 0;
+                    }
+                    nextQuestion = allQuestions[sequentialIndex];
+                    currentQuestionIndex = sequentialIndex;
+                }
+                
+                displayQuestion(nextQuestion);
+                isQuizAnswered = false;
+                
+                const remainingElement = document.getElementById('remainingCount');
+                if (remainingElement) {
+                    remainingElement.textContent = `残り: ${allQuestions.length - usedQuestions.length}問`;
+                }
+                
+                startTimer();
+                
+            } catch (e) {
+                console.log('次の問題表示に失敗しました');
+            }
+        }
+
+        function displayQuestion(question) {
+            try {
+                const questionElement = document.getElementById('quizQuestion');
+                const answerDisplay = document.getElementById('answerDisplay');
+                const answerContent = document.getElementById('answerContent');
+                const showAnswerBtn = document.getElementById('showAnswerBtn');
+                const nextBtn = document.getElementById('quizNext');
+                
+                let questionText = '';
+                let currentQuestionType = '';
+                
+                if (questionDirection === 'jp_to_en') {
+                    questionText = question.jp;
+                    currentQuestionType = 'jp_to_en';
+                } else if (questionDirection === 'en_to_jp') {
+                    questionText = question.en;
+                    currentQuestionType = 'en_to_jp';
+                } else {
+                    const isJpToEn = Math.random() < 0.5;
+                    questionText = isJpToEn ? question.jp : question.en;
+                    currentQuestionType = isJpToEn ? 'jp_to_en' : 'en_to_jp';
+                }
+                
+                questionElement.dataset.questionType = currentQuestionType;
+                questionElement.textContent = questionText;
+                
+                answerDisplay.classList.remove('show');
+                answerContent.innerHTML = '<div class="text-gray-500" style="text-align: center;">頭で考えてから解答ボタンを押してね！</div>';
+                
+                showAnswerBtn.disabled = false;
+                showAnswerBtn.textContent = '💡 解答を見る';
+                nextBtn.disabled = true;
+                
+            } catch (e) {
+                console.log('問題表示に失敗しました');
+            }
+        }
+
+        function showAnswer() {
+            try {
+                const question = allQuestions[currentQuestionIndex];
+                const questionElement = document.getElementById('quizQuestion');
+                const answerDisplay = document.getElementById('answerDisplay');
+                const answerContent = document.getElementById('answerContent');
+                const showAnswerBtn = document.getElementById('showAnswerBtn');
+                const nextBtn = document.getElementById('quizNext');
+                
+                stopTimer();
+                isQuizAnswered = true;
+                
+                const currentQuestionType = questionElement.dataset.questionType;
+                
+                let answerText = '';
+                if (currentQuestionType === 'jp_to_en') {
+                    answerText = question.en;
+                } else {
+                    answerText = question.jp;
+                }
+                
+                let answerElement;
+                if (currentQuestionType === 'jp_to_en' && answerText.match(/[a-zA-Z]/)) {
+                    answerElement = addSpeakButton(answerText, document.createElement('div'));
+                } else {
+                    answerElement = document.createElement('div');
+                    answerElement.textContent = answerText;
+                }
+                
+                answerContent.innerHTML = '';
+                
+                const answerTextDiv = document.createElement('div');
+                answerTextDiv.className = 'answer-text';
+                answerTextDiv.appendChild(answerElement);
+                
+                const explanationDiv = document.createElement('div');
+                explanationDiv.className = 'explanation-text';
+                explanationDiv.textContent = question.explanation || '解説はありません。';
+                
+                answerContent.appendChild(answerTextDiv);
+                answerContent.appendChild(explanationDiv);
+                
+                answerDisplay.classList.add('show');
+                
+                if (currentQuestionType === 'jp_to_en' && answerText.match(/[a-zA-Z]/)) {
+                    setTimeout(() => {
+                        speakEnglishText(answerText);
+                    }, 500);
+                }
+                
+                showAnswerBtn.disabled = true;
+                showAnswerBtn.textContent = '✅ 解答済み';
+                nextBtn.disabled = false;
+                
+                studyCount++;
+                document.getElementById('studyCount').textContent = studyCount;
+                
+                soundSystem.playStudyComplete();
+                createParticle('⭐', '#f4a261', window.innerWidth / 2, window.innerHeight / 3);
+
+            } catch (e) {
+                console.log('解答表示に失敗しました');
+            }
+        }
+
+        function nextQuestion() {
+            try {
+                usedQuestions.push(currentQuestionIndex);
+                
+                if (questionMode === 'sequential') {
+                    sequentialIndex++;
+                }
+                
+                incrementClickCount();
+                soundSystem.playClick();
+                showNextQuestion();
+                
+            } catch (e) {
+                console.log('次の問題への移動に失敗しました');
+            }
+        }
+
+        function endQuiz() {
+            try {
+                hideAllModals();
+                showNotification(`🎉 お疲れ様でした！${studyCount}問学習しました！`);
+                
+                const gameScreen = document.getElementById('gameScreen');
+                gameScreen.classList.remove('hidden');
+                
+                currentScreen = 'game';
+                updateBackButton();
+                
+            } catch (e) {
+                console.log('クイズ終了処理に失敗しました');
+            }
+        }
+
+        /* ----------------- 修正：設定関数（無制限タイマー対応） ----------------- */
+        function setTimerLimit(seconds) {
+            try {
+                timerLimit = seconds;
+                
+                document.querySelectorAll('.timer-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                if (seconds === 'unlimited') {
+                    document.getElementById('timerUnlimitedBtn').classList.add('active');
+                } else {
+                    document.getElementById(`timer${seconds}Btn`).classList.add('active');
+                }
+                
+            } catch (e) {
+                console.log('タイマー設定に失敗しました');
+            }
+        }
+
+        function setQuestionMode(mode) {
+            try {
+                questionMode = mode;
+                
+                document.querySelectorAll('.mode-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+
+                document.getElementById(`${mode}ModeBtn`).classList.add('active');
+                
+            } catch (e) {
+                console.log('問題モード設定に失敗しました');
+            }
+        }
+
+        function setQuestionDirection(direction) {
+            try {
+                questionDirection = direction;
+                
+                document.querySelectorAll('.direction-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                if (direction === 'jp_to_en') {
+                    document.getElementById('jpToEnBtn').classList.add('active');
+                } else if (direction === 'en_to_jp') {
+                    document.getElementById('enToJpBtn').classList.add('active');
+                } else {
+                    document.getElementById('mixedBtn').classList.add('active');
+                }
+                
+            } catch (e) {
+                console.log('言語方向設定に失敗しました');
+            }
+        }
+
+        /* ----------------- 修正：イベントリスナー設定（無制限タイマー対応） ----------------- */
+        function initEventListeners() {
+            try {
+                // 学年選択ボタン
+                document.querySelectorAll('[data-grade]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        incrementClickCount();
+                        soundSystem.playClick();
+                        const grade = e.currentTarget.dataset.grade;
+                        currentGrade = grade;
+                        hideAllModals();
+                        const targetModal = document.getElementById(grade + 'Modal');
+                        if (targetModal) {
+                            targetModal.classList.add('show');
+                        }
+                        currentScreen = 'grade';
+                        updateBackButton();
+                    });
+                });
+
+                // レッスン開始ボタン（複数）
+                ['1', '2', '3'].forEach(gradeNum => {
+                    const startBtn = document.getElementById(`startMultipleLessons${gradeNum}`);
+                    if (startBtn) {
+                        startBtn.addEventListener('click', () => {
+                            incrementClickCount();
+                            soundSystem.playClick();
+                            startSelectedLessons(`grade${gradeNum}`);
+                        });
+                    }
+                });
+
+                // 文法クイズ開始ボタン
+                const startGrammarBtn = document.getElementById('startGrammarQuiz');
+                if (startGrammarBtn) {
+                    startGrammarBtn.addEventListener('click', () => {
+                        incrementClickCount();
+                        soundSystem.playClick();
+                        startGrammarQuiz();
+                    });
+                }
+
+                // クイズ開始ボタン
+                const startQuizBtn = document.getElementById('startQuizButton');
+                if (startQuizBtn) {
+                    startQuizBtn.addEventListener('click', () => {
+                        incrementClickCount();
+                        soundSystem.playClick();
+                        startQuiz();
+                    });
+                }
+
+                // 解答表示ボタン
+                const showAnswerBtn = document.getElementById('showAnswerBtn');
+                if (showAnswerBtn) {
+                    showAnswerBtn.addEventListener('click', () => {
+                        incrementClickCount();
+                        soundSystem.playClick();
+                        showAnswer();
+                    });
+                }
+
+                // 次の問題ボタン
+                const nextBtn = document.getElementById('quizNext');
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', () => {
+                        nextQuestion();
+                    });
+                }
+
+                // フッターのボタンイベント
+                const footerHomeBtn = document.getElementById('footerHomeBtn');
+                if (footerHomeBtn) {
+                    footerHomeBtn.addEventListener('click', () => {
+                        incrementClickCount();
+                        soundSystem.playClick();
+                        goBackToMain();
+                    });
+                }
+
+                const footerBackBtn = document.getElementById('footerBackBtn');
+                if (footerBackBtn) {
+                    footerBackBtn.addEventListener('click', () => {
+                        goBack();
+                    });
+                }
+
+                const footerVoiceBtn = document.getElementById('footerVoiceBtn');
+                if (footerVoiceBtn) {
+                    footerVoiceBtn.addEventListener('click', () => {
+                        incrementClickCount();
+                        soundSystem.playClick();
+                        openVoiceSettings();
+                    });
+                }
+
+                // 統計クリックでリセット確認
+                const footerTotalStat = document.getElementById('footerTotalStat');
+                if (footerTotalStat) {
+                    footerTotalStat.addEventListener('click', () => {
+                        incrementClickCount();
+                        soundSystem.playClick();
+                        confirmResetTotal();
+                    });
+                }
+
+                const footerTodayStat = document.getElementById('footerTodayStat');
+                if (footerTodayStat) {
+                    footerTodayStat.addEventListener('click', () => {
+                        incrementClickCount();
+                        soundSystem.playClick();
+                        confirmResetToday();
+                    });
+                }
+
+                // 音声ON/OFF切り替え
+                const voiceEnabled = document.getElementById('voiceEnabled');
+                if (voiceEnabled) {
+                    voiceEnabled.addEventListener('change', toggleVoiceEnabled);
+                }
+
+                // 音声オプション選択
+                document.querySelectorAll('.voice-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        incrementClickCount();
+                        soundSystem.playClick();
+                        const voiceName = option.dataset.voice;
+                        previewVoice(voiceName);
+                    });
+                });
+
+                // 修正：タイマー設定ボタン（無制限対応）
+                document.querySelectorAll('.timer-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        incrementClickCount();
+                        soundSystem.playClick();
+                        const time = btn.dataset.time;
+                        // 修正：数値または'unlimited'文字列を設定
+                        setTimerLimit(time === 'unlimited' ? 'unlimited' : parseInt(time));
+                    });
+                });
+
+                // 問題モード設定ボタン
+                document.querySelectorAll('.mode-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        incrementClickCount();
+                        soundSystem.playClick();
+                        const mode = btn.dataset.mode;
+                        setQuestionMode(mode);
+                    });
+                });
+
+                // 言語方向設定ボタン
+                document.querySelectorAll('.direction-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        incrementClickCount();
+                        soundSystem.playClick();
+                        const direction = btn.dataset.direction;
+                        setQuestionDirection(direction);
+                    });
+                });
+
+                console.log('全イベントリスナー設定完了');
+
+            } catch (e) {
+                console.error('イベントリスナー初期化エラー:', e);
+            }
+        }
+
+        /* ----------------- レッスン初期化（チェックマーク機能対応） ----------------- */
+        function initLessonsAndGrammar() {
+            try {
+                console.log('レッスン初期化開始...');
+                
+                ['grade1', 'grade2', 'grade3'].forEach(grade => {
+                    const container = document.getElementById(`${grade}Lessons`);
+                    if (!container) {
+                        console.error(`コンテナが見つかりません: ${grade}Lessons`);
+                        return;
+                    }
+                    
+                    console.log(`${grade}のレッスン数: ${lessons[grade].length}`);
+                    
+                    lessons[grade].forEach(lesson => {
+                        const btn = document.createElement('button');
+                        btn.className = 'lesson-btn';
+                        btn.innerHTML = lesson.name;
+                        btn.setAttribute('data-lesson-id', lesson.id);
+                        
+                        btn.addEventListener('click', (e) => {
+                            console.log('レッスンボタンクリック:', lesson.id, lesson.name);
+                            incrementClickCount();
+                            soundSystem.playClick();
+                            toggleLessonSelection(grade, lesson.id, lesson.name);
+                            e.preventDefault();
+                        });
+                        
+                        container.appendChild(btn);
+                        console.log(`${grade} - ${lesson.id}のボタンを追加`);
+                    });
+                    
+                    console.log(`${grade}のレッスン初期化完了`);
+                });
+                
+                console.log('全レッスン初期化完了');
+                
+            } catch (e) {
+                console.error('レッスン初期化エラー:', e);
+            }
+        }
+
+        /* ----------------- ページ読み込み時の初期化（完全版） ----------------- */
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('=== ONE WORLD Quiz 初期化開始 ===');
+            
+            try {
+                console.log('1. クリック統計読み込み開始');
+                loadClickStats();
+                console.log('✅ クリック統計読み込み完了');
+                
+                console.log('2. レッスン初期化開始');
+                initLessonsAndGrammar();
+                console.log('✅ レッスン初期化完了');
+                
+                console.log('3. イベントリスナー初期化開始');
+                initEventListeners();
+                console.log('✅ イベントリスナー初期化完了');
+                
+                // 隠しておくべき要素
+                const gameScreen = document.getElementById('gameScreen');
+                if (gameScreen) {
+                    gameScreen.classList.add('hidden');
+                }
+                
+                // 初期画面設定
+                currentScreen = 'main';
+                updateBackButton();
+                
+                // 修正：初期値設定（無制限タイマー対応）
+                setTimerLimit(3);
+                setQuestionMode('random');
+                setQuestionDirection('jp_to_en');
+                
+                console.log('4. 初期設定完了');
+                
+                // 初回メッセージ（遅延実行）
+                setTimeout(() => {
+                    if (clickStats.total === 0) {
+                        showNotification('🌟 ようこそONE WORLD Quizへ！学年を選んで学習を始めましょう！');
+                    } else {
+                        showNotification('🎤 音声機能が利用できます！右下のマイクボタンで設定できます。');
+                    }
+                }, 1000);
+                
+                // 音声システムの追加初期化（遅延実行）
+                setTimeout(() => {
+                    if (voiceSystem.voices.length === 0) {
+                        console.log('音声再初期化実行');
+                        voiceSystem.loadVoices();
+                    }
+                }, 2000);
+                
+                console.log('=== 初期化完了 ===');
+                console.log(`学年別レッスン数: 1年生=${lessons.grade1.length}, 2年生=${lessons.grade2.length}, 3年生=${lessons.grade3.length}`);
+                
+            } catch (error) {
+                console.error('=== 初期化エラー ===', error);
+                alert('初期化中にエラーが発生しました。ページを再読み込みしてください。');
+            }
+        });
+
+        /* ----------------- デバッグ用コンソール情報 ----------------- */
+        console.log('ONE WORLD Quiz スクリプト読み込み完了');
+        console.log('利用可能な学年:', Object.keys(lessons));
+        console.log('各学年のレッスン数:', {
+            grade1: lessons.grade1.length,
+            grade2: lessons.grade2.length,
+            grade3: lessons.grade3.length
+        });
+
+        // グローバル関数として公開（デバッグ用）
+        window.oneWorldQuizDebug = {
+            lessons,
+            sampleProblems,
+            clickStats,
+            selectedLessons,
+            selectedGrammarItems,
+            allQuestions,
+            showNotification,
+            incrementClickCount,
+            currentScreen,
+            voiceSystem,
+            soundSystem,
+            // デバッグ用関数
+            testVoice: () => {
+                console.log('音声テスト開始');
+                voiceSystem.speak("This is a voice test. Hello World!");
+            },
+            getVoiceInfo: () => voiceSystem.getVoiceInfo(),
+            resetClickStats: () => {
+                clickStats = { total: 0, daily: {} };
+                saveClickStats();
+                updateClickDisplays();
+                showNotification('🔄 クリック統計をリセットしました');
+            },
+            checkLessonButtons: () => {
+                console.log('=== レッスンボタンチェック ===');
+                ['grade1', 'grade2', 'grade3'].forEach(grade => {
+                    const container = document.getElementById(`${grade}Lessons`);
+                    const buttons = container ? container.querySelectorAll('.lesson-btn') : [];
+                    console.log(`${grade}: ${buttons.length}個のボタン`);
+                    buttons.forEach((btn, index) => {
+                        console.log(`  ${index + 1}. ID: ${btn.dataset.lessonId}, テキスト: ${btn.textContent.substring(0, 30)}...`);
+                    });
+                });
+            },
+            testLessonSelection: (grade, lessonId) => {
+                console.log('レッスン選択テスト:', grade, lessonId);
+                const lesson = lessons[grade].find(l => l.id === lessonId);
+                if (lesson) {
+                    toggleLessonSelection(grade, lessonId, lesson.name);
+                } else {
+                    console.error('レッスンが見つかりません');
+                }
+            },
+            testSpecificVoice: (voiceName) => {
+                console.log(`${voiceName}音声テスト開始`);
+                voiceSystem.previewVoice(voiceName);
+            }
+        };
+
+        // グローバル関数として公開（リセット機能）
+        window.confirmResetTotal = confirmResetTotal;
+        window.confirmResetToday = confirmResetToday;
+        window.previewVoice = previewVoice;
+        window.closeVoiceSettings = closeVoiceSettings;
+
+    </script>
+</body>
+</html>
