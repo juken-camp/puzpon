@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Quiz - 中学生向け学習クイズ</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f39c12;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --background-color: #f8f9fa;
+            --text-color: #2c3e50;
+            --border-color: #e9ecef;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .subject-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .subject-card {
+            background: white;
+            border: 3px solid var(--border-color);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .subject-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 20px rgba(74, 144, 226, 0.3);
+        }
+
+        .subject-card .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .subject-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+
+        .category-selection {
+            margin-bottom: 30px;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .category-item {
+            background: #f8f9fa;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .category-item:hover {
+            border-color: var(--primary-color);
+            background: #e3f2fd;
+        }
+
+        .category-item.selected {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .category-item h4 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .category-item p {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            background: #357abd;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+        }
+
+        .btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+        }
+
+        .btn-secondary:hover {
+            background: #d68910;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .quiz-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: var(--background-color);
+            padding: 10px 15px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .question-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: 500;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        .options-container {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .option {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            text-align: left;
+        }
+
+        .option:hover {
+            border-color: var(--primary-color);
+            background: #e3f2fd;
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            min-height: 100px;
+        }
+
+        .result.correct {
+            background: linear-gradient(135deg, #d5f4e6, #80e5a3);
+            border: 2px solid var(--success-color);
+        }
+
+        .result.incorrect {
+            background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+            border: 2px solid var(--danger-color);
+        }
+
+        .result h3 {
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .result p {
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .ai-explanation {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .ai-explanation h4 {
+            margin: 0 0 15px 0;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .ai-content {
+            line-height: 1.6;
+            white-space: pre-wrap;
+            color: var(--text-color);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading p {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .audio-controls {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .audio-btn {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin: 0 5px;
+            transition: all 0.3s ease;
+        }
+
+        .audio-btn:hover {
+            background: #d68910;
+        }
+
+        .settings-panel {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .settings-panel h3 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .setting-group {
+            margin-bottom: 15px;
+        }
+
+        .setting-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .back-btn {
+            background: #6c757d;
+            margin-bottom: 20px;
+        }
+
+        .back-btn:hover {
+            background: #545b62;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .subject-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quiz-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .stats {
+                justify-content: center;
+            }
+
+            .question-text {
+                font-size: 1.1rem;
+            }
+        }
+
+        .error-message {
+            background: #ffe6e6;
+            border: 2px solid var(--danger-color);
+            color: var(--danger-color);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .success-message {
+            background: #e6ffe6;
+            border: 2px solid var(--success-color);
+            color: var(--success-color);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✨ Quick Quiz</h1>
+            <p>中学生向け学習クイズ - AIが詳しく解説します</p>
+        </div>
+
+        <div class="main-content">
+            <!-- 教科選択セクション -->
+            <div id="subject-selection" class="section active">
+                <h2>📚 教科を選択</h2>
+                <p>学習したい教科を選んでください。</p>
+                
+                <div class="subject-grid">
+                    <div class="subject-card" onclick="selectSubject('social')">
+                        <div class="icon">🌍</div>
+                        <h3>社会</h3>
+                        <p>分野を選んでください。</p>
+                    </div>
+                    <div class="subject-card" onclick="selectSubject('science')">
+                        <div class="icon">🔬</div>
+                        <h3>理科</h3>
+                        <p>分野を選んでください。</p>
+                    </div>
+                    <div class="subject-card" onclick="selectSubject('english')">
+                        <div class="icon">📖</div>
+                        <h3>英語</h3>
+                        <p>分野を選んでください。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 社会の分野選択 -->
+            <div id="social-fields" class="section">
+                <button class="btn back-btn" onclick="goBack('subject-selection')">← 戻る</button>
+                <h2>🌍 社会</h2>
+                <div class="subject-grid">
+                    <div class="subject-card" onclick="selectField('geography')">
+                        <div class="icon">🗺️</div>
+                        <h3>地理</h3>
+                        <p>学習する単元を選んでください。</p>
+                    </div>
+                    <div class="subject-card" onclick="selectField('history')">
+                        <div class="icon">🏛️</div>
+                        <h3>歴史</h3>
+                        <p>学習する単元を選んでください。</p>
+                    </div>
+                    <div class="subject-card" onclick="selectField('civics')">
+                        <div class="icon">⚖️</div>
+                        <h3>公民</h3>
+                        <p>学習する単元を選んでください。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 理科の分野選択 -->
+            <div id="science-fields" class="section">
+                <button class="btn back-btn" onclick="goBack('subject-selection')">← 戻る</button>
+                <h2>🔬 理科</h2>
+                <div class="subject-grid">
+                    <div class="subject-card" onclick="selectField('chemistry')">
+                        <div class="icon">🧪</div>
+                        <h3>化学</h3>
+                        <p>学習する単元を選んでください。</p>
+                    </div>
+                    <div class="subject-card" onclick="selectField('biology')">
+                        <div class="icon">🧬</div>
+                        <h3>生物</h3>
+                        <p>学習する単元を選んでください。</p>
+                    </div>
+                    <div class="subject-card" onclick="selectField('physics')">
+                        <div class="icon">⚛️</div>
+                        <h3>物理</h3>
+                        <p>学習する単元を選んでください。</p>
+                    </div>
+                    <div class="subject-card" onclick="selectField('earth')">
+                        <div class="icon">🌍</div>
+                        <h3>地学</h3>
+                        <p>学習する単元を選んでください。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 英語の分野選択 -->
+            <div id="english-fields" class="section">
+                <button class="btn back-btn" onclick="goBack('subject-selection')">← 戻る</button>
+                <h2>📖 英語</h2>
+                <div class="subject-grid">
+                    <div class="subject-card" onclick="selectField('words')">
+                        <div class="icon">📝</div>
+                        <h3>英単語</h3>
+                        <p>学習する単元を選んでください。</p>
+                    </div>
+                    <div class="subject-card" onclick="selectField('phrases')">
+                        <div class="icon">💬</div>
+                        <h3>英熟語</h3>
+                        <p>学習する単元を選んでください。</p>
+                    </div>
+                    <div class="subject-card" onclick="selectField('grammar')">
+                        <div class="icon">📘</div>
+                        <h3>語形変化</h3>
+                        <p>学習する単元を選んでください。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- カテゴリ選択セクション -->
+            <div id="category-selection" class="section">
+                <button class="btn back-btn" onclick="goBackToSubject()">← 戻る</button>
+                <div class="category-selection">
+                    <h2 id="category-title">単元を選択</h2>
+                    <p>学習する単元を選んでください。複数選択もできます。</p>
+                    
+                    <!-- 音声設定 -->
+                    <div id="audio-settings" class="settings-panel" style="display: none;">
+                        <h3>🔊 音声設定</h3>
+                        <p>英語の発音設定を変更できます</p>
+                        
+                        <div class="setting-group">
+                            <label>音声再生</label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="audioEnabled" checked>
+                                <span class="slider"></span>
+                            </label>
+                            <small>英語の問題で自動発音を行います</small>
+                        </div>
+                        
+                        <div class="setting-group">
+                            <label>音声の種類</label>
+                            <div>
+                                <label><input type="radio" name="voice" value="female" checked> 👩 女性音声</label>
+                                <label><input type="radio" name="voice" value="male"> 👨 男性音声</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="category-grid" class="category-grid">
+                        <!-- カテゴリがここに動的に追加されます -->
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="btn btn-success" onclick="startQuiz()" disabled id="start-btn">
+                            📋 出題形式<br>
+                            <small>問題をランダムに出題します</small>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- クイズセクション -->
+            <div id="quiz-section" class="section">
+                <div class="quiz-container">
+                    <div class="quiz-header">
+                        <button class="btn back-btn" onclick="goBack('category-selection')">← 戻る</button>
+                        <div class="stats">
+                            <div class="stat-item">
+                                <div class="stat-label">正解数</div>
+                                <div class="stat-value" id="correct-count">0</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">不正解数</div>
+                                <div class="stat-value" id="incorrect-count">0</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">総問題数</div>
+                                <div class="stat-value" id="total-count">0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="question-container">
+                        <div class="question-text" id="question-text">
+                            問題を読み込み中...
+                        </div>
+                        
+                        <div class="audio-controls" id="audio-controls" style="display: none;">
+                            <button class="audio-btn" onclick="speakQuestion()">🔊 問題を読み上げ</button>
+                            <button class="audio-btn" onclick="speakOptions()">📝 選択肢を読み上げ</button>
+                        </div>
+                    </div>
+
+                    <div class="options-container" id="options-container">
+                        <!-- 選択肢がここに表示されます -->
+                    </div>
+
+                    <div style="text-align: center;">
+                        <button class="btn btn-secondary" onclick="nextQuestion()">次の問題 →</button>
+                    </div>
+
+                    <div id="result" class="result" style="display: none;">
+                        <!-- 結果がここに表示されます -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- problems.jsを読み込み -->
+    <script src="problems.js"></script>
+
+    <script>
+        // 設定
+        const DIFY_API_KEY = 'YOUR_DIFY_API_KEY'; // ここにあなたのDify APIキーを入力
+        const DIFY_API_URL = 'https://api.dify.ai/v1/chat-messages'; // Dify APIのエンドポイント
+
+        // グローバル変数
+        let currentSubject = '';
+        let currentField = '';
+        let selectedCategories = [];
+        let currentProblems = [];
+        let currentProblem = null;
+        let currentProblemIndex = 0;
+        let stats = {
+            correct: 0,
+            incorrect: 0,
+            total: 0
+        };
+
+        // カテゴリ定義
+        const categoryDefinitions = {
+            geography: {
+                title: '🗺️ 地理',
+                categories: {
+                    geo_world_overview: { title: '世界の姿', description: '大陸・海洋・気候など' },
+                    geo_japan_overview: { title: '日本の姿', description: '領土・時差・標準時など' },
+                    geo_world_life: { title: '世界各地の人々の生活と環境', description: '気候帯・宗教・文化など' },
+                    geo_asia: { title: 'アジア州', description: '中国・インド・東南アジアなど' },
+                    geo_europe: { title: 'ヨーロッパ州', description: 'EU・工業・農業など' },
+                    geo_africa: { title: 'アフリカ州', description: '植民地・モノカルチャー・資源など' },
+                    geo_north_america: { title: '北アメリカ州', description: 'アメリカ・カナダ・工業など' },
+                    geo_south_america: { title: '南アメリカ州', description: 'ブラジル・アマゾン・農業など' },
+                    geo_oceania: { title: 'オセアニア', description: 'オーストラリア・多文化社会など' },
+                    geo_japan_features: { title: '日本の地域的特色', description: '気候・災害・産業・人口など' }
+                }
+            },
+            history: {
+                title: '🏛️ 歴史',
+                categories: {
+                    hist_ancient: { title: '文明のおこりと日本の成り立ち', description: '四大文明・縄文・弥生時代など' },
+                    hist_ancient_state: { title: '古代国家の歩みと東アジア', description: '飛鳥・奈良・平安時代など' },
+                    hist_kamakura: { title: '武士のおこりと鎌倉幕府', description: '源平合戦・執権政治など' },
+                    hist_muromachi: { title: 'モンゴルの襲来と室町幕府', description: '元寇・南北朝・応仁の乱など' },
+                    hist_unification: { title: 'ヨーロッパ人との出会いと全国統一', description: '織田・豊臣・戦国時代など' },
+                    hist_edo_early: { title: '江戸幕府の成立と鎖国', description: '徳川政治・参勤交代など' },
+                    hist_edo_develop: { title: '産業の発達と幕府政治の展開', description: '元禄・化政文化・改革など' },
+                    hist_opening: { title: '欧米の進出と日本の開国', description: 'ペリー来航・明治維新など' },
+                    hist_meiji: { title: '明治維新', description: '廃藩置県・文明開化・憲法など' },
+                    hist_wars: { title: '日清・日露戦争と日本の産業革命', description: '条約改正・帝国主義など' },
+                    hist_wwi: { title: '第一次世界大戦と日本', description: '大正デモクラシー・民主化など' },
+                    hist_wwii: { title: '世界恐慌と第二次世界大戦', description: 'ファシズム・太平洋戦争など' },
+                    hist_postwar: { title: '戦後の日本の発展と国際社会', description: '民主化・高度成長・冷戦など' }
+                }
+            },
+            civics: {
+                title: '⚖️ 公民',
+                categories: {
+                    civics_modern: { title: '現代社会と私たち', description: 'グローバル化・情報化・多文化など' },
+                    civics_constitution: { title: '人間の尊重と日本国憲法', description: '人権・憲法の原理など' },
+                    civics_democracy: { title: '現代の民主政治', description: '国会・内閣・裁判所・地方自治など' },
+                    civics_economy: { title: '暮らしと経済', description: '市場経済・企業・金融・財政など' }
+                }
+            },
+            chemistry: {
+                title: '🧪 化学',
+                categories: {
+                    chemistry_basic: { title: '物質とその性質', description: '有機物・無機物・金属・密度など' },
+                    chemistry_gas: { title: '気体の性質', description: '酸素・二酸化炭素・水素・アンモニアなど' },
+                    chemistry_solution: { title: '水溶液の性質', description: '濃度・溶解度・再結晶など' },
+                    chemistry_state: { title: '状態変化', description: '融点・沸点・蒸留など' },
+                    chemistry_change: { title: '物質の変化', description: '分解・電気分解・化学反応式など' },
+                    chemistry_structure: { title: '物質の成り立ち', description: '原子・分子・化学式・化学反応式など' },
+                    chemistry_reaction: { title: '物質どうしの化学変化', description: '酸化・還元・燃焼など' },
+                    chemistry_mass: { title: '化学変化と質量', description: '質量保存の法則・定比例の法則など' },
+                    chemistry_ion: { title: 'イオンと電池', description: '電解質・電離・電池など' },
+                    chemistry_acid: { title: '酸、アルカリ、塩', description: 'pH・中和・指示薬など' }
+                }
+            },
+            biology: {
+                title: '🧬 生物',
+                categories: {
+                    biology_flower: { title: '花のつくり', description: 'めしべ・おしべ・受粉・被子植物など' },
+                    biology_plant: { title: '根・葉のつくり、植物の特徴と分類', description: '根・葉脈・単子葉類・双子葉類など' },
+                    biology_animal: { title: '動物の特徴と分類', description: '脊椎動物・無脊椎動物・分類など' },
+                    biology_microscope: { title: '顕微鏡の使い方', description: '対物レンズ・接眼レンズ・倍率など' },
+                    biology_cell: { title: '生物と細胞', description: '細胞膜・核・細胞壁・単細胞生物など' },
+                    biology_plant_body: { title: '植物のからだのつくり、植物と日光', description: '道管・師管・光合成・蒸散など' },
+                    biology_digestion: { title: '消化と吸収', description: '消化酵素・小腸・柔毛など' },
+                    biology_breathing: { title: '呼吸', description: '肺胞・横隔膜・外呼吸など' },
+                    biology_circulation: { title: '血液の循環、排出のしくみ', description: '心臓・血液・腎臓・肝臓など' },
+                    biology_response: { title: '刺激と反応、動物のからだ', description: '感覚器官・神経・反射など' },
+                    biology_growth: { title: '生物の成長と細胞の変化', description: '細胞分裂・成長点など' },
+                    biology_reproduction: { title: '生物の生殖', description: '有性生殖・無性生殖・受精・遺伝など' },
+                    biology_heredity: { title: '遺伝の規則性と遺伝子', description: 'メンデル・対立形質・分離の法則など' },
+                    biology_evolution: { title: '生物の進化、生態系と食物連鎖', description: '進化・相同器官・食物連鎖・生態系など' },
+                    biology_environment: { title: '自然と環境、人間と自然環境', description: '外来種・地球温暖化・再生可能エネルギーなど' }
+                }
+            },
+            physics: {
+                title: '⚛️ 物理',
+                categories: {
+                    physics_light: { title: '光による現象', description: '光の反射・屈折・凸レンズなど' },
+                    physics_sound: { title: '音による現象', description: '振幅・振動数・音の速さなど' },
+                    physics_force: { title: '力による現象', description: '重力・弾性力・摩擦力・フックの法則など' },
+                    physics_current: { title: '電流と電圧', description: '直列回路・並列回路・オームの法則など' },
+                    physics_energy: { title: '電気エネルギー', description: '電力・電力量・発熱量など' },
+                    physics_magnetic: { title: '電流と磁界', description: '磁界・電磁誘導・発電など' },
+                    physics_balance: { title: '力のつり合いと合成・分解', description: '力の合成・分解・つり合いなど' },
+                    physics_motion: { title: '物体の運動', description: '等速直線運動・慣性の法則・作用反作用など' },
+                    physics_pressure: { title: '水圧と浮力', description: '水圧・浮力・圧力など' },
+                    physics_work: { title: 'エネルギーと仕事', description: '運動エネルギー・位置エネルギー・仕事など' },
+                    physics_energy_change: { title: 'エネルギーの移り変わり', description: 'エネルギー保存の法則・熱伝導など' },
+                    physics_resources: { title: 'エネルギー資源の利用', description: '化石燃料・原子力・再生可能エネルギーなど' }
+                }
+            },
+            earth: {
+                title: '🌍 地学',
+                categories: {
+                    earth_volcano: { title: '火山', description: 'マグマ・火成岩・火山岩・深成岩など' },
+                    earth_earthquake: { title: '地震', description: '震源・震度・マグニチュード・断層・津波など' },
+                    earth_strata: { title: '地層のでき方', description: '風化・侵食・堆積・化石・地質年代など' },
+                    earth_weather: { title: '気象の観測、大気圧と圧力', description: '天気・気圧・高気圧・低気圧など' },
+                    earth_front: { title: '気団と前線、日本の天気', description: '前線・季節風・台風・梅雨など' },
+                    earth_cloud: { title: '雲のでき方と水蒸気', description: '湿度・露点・飽和水蒸気量など' },
+                    earth_celestial: { title: '地球の動きと天体の動き', description: '自転・公転・地軸・南中など' },
+                    earth_solar: { title: '太陽系の天体', description: '太陽系・銀河系・恒星・惑星など' },
+                    earth_moon: { title: '月と惑星の見え方、自然の恵みと災害', description: '月食・日食・内惑星・火山災害など' }
+                }
+            },
+            words: {
+                title: '📝 英単語',
+                categories: {
+                    words_time: { title: '月・序数', description: 'January, first, secondなど' },
+                    words_week: { title: '曜日', description: 'Sunday, Monday, Tuesdayなど' },
+                    words_timeday: { title: '時・時間帯など', description: 'morning, afternoon, eveningなど' },
+                    words_season: { title: '季節・家族', description: 'spring, summer, family, fatherなど' },
+                    words_sports: { title: 'スポーツ・教科', description: 'baseball, soccer, English, mathなど' },
+                    words_job: { title: '職業・人・建物・施設', description: 'teacher, doctor, school, hospitalなど' },
+                    words_uncountable: { title: '数えられない名詞', description: 'water, money, news, homeworkなど' },
+                    words_verb_important: { title: '入試必出重要動詞', description: 'like, play, go, come, want, studyなど' },
+                    words_verb_various: { title: 'いろいろな意味をもつ動詞', description: 'have, take, get, see, hearなど' },
+                    words_verb_set: { title: 'セットで覚えておきたい動詞', description: 'ask-answer, learn-teach, buy-sellなど' },
+                    words_verb_other: { title: 'その他の重要動詞', description: 'enjoy, eat, drink, work, helpなど' },
+                    words_adj_quantity: { title: '数・量を表す形容詞', description: 'many, much, some, few, littleなど' },
+                    words_adj_various: { title: 'いろいろな形容詞', description: 'good, bad, big, small, hot, coldなど' },
+                    words_adj_adv: { title: 'その他の重要形容詞・副詞', description: 'always, usually, often, well, fastなど' },
+                    words_adv_manner: { title: '様子を表す副詞', description: 'well, fast, slowly, hard, againなど' }
+                }
+            },
+            phrases: {
+                title: '💬 英熟語',
+                categories: {
+                    phrases_verb: { title: 'よく出る動詞の熟語', description: 'listen to, get up, go to schoolなど' },
+                    phrases_set: { title: 'セットで覚えておきたい熟語', description: 'stand up - sit down, get on - get offなど' },
+                    phrases_similar: { title: '意味の似ている熟語', description: 'go home, come home, get homeなど' },
+                    phrases_verb_other: { title: 'その他の動詞の熟語', description: 'go shopping, go fishing, give upなど' },
+                    phrases_be: { title: 'be動詞を使った熟語', description: 'be good at, be interested in, be late forなど' },
+                    phrases_quantity: { title: '数や量を表す熟語', description: 'a lot of, lots of, one of, some ofなど' },
+                    phrases_time_place: { title: '時・場所を表す熟語', description: 'next week, last Sunday, after schoolなど' },
+                    phrases_important: { title: 'その他の重要熟語', description: 'over there, at home, for example, of courseなど' }
+                }
+            },
+            grammar: {
+                title: '📘 語形変化',
+                categories: {
+                    grammar_irregular_past: { title: '不規則動詞 - 過去形・過去分詞', description: 'do-did-done, go-went-goneなど' },
+                    grammar_irregular_same: { title: '不規則動詞 - 過去形と過去分詞が同じ', description: 'have-had-had, make-made-madeなど' },
+                    grammar_irregular_special: { title: '不規則動詞 - 特殊なケース', description: 'come-came-come, run-ran-runなど' },
+                    grammar_be_past: { title: 'be動詞 - 過去形・過去分詞', description: 'am/is→was, are→were, be→beenなど' },
+                    grammar_regular: { title: '規則動詞 - 過去形・過去分詞', description: 'help→helped, study→studiedなど' },
+                    grammar_third_person: { title: '三人称単数現在形', description: 'give→gives, go→goes, study→studiesなど' },
+                    grammar_ing: { title: '動詞の-ing形', description: 'make→making, run→running, study→studyingなど' },
+                    grammar_comparative: { title: '形容詞 - 比較級・最上級', description: 'tall→taller→tallest, happy→happier→happiestなど' },
+                    grammar_more_most: { title: 'more、mostをつける形容詞', description: 'famous→more famous→most famousなど' },
+                    grammar_noun_plural: { title: '名詞の複数形', description: 'girl→girls, box→boxes, city→citiesなど' },
+                    grammar_irregular_plural: { title: '不規則な複数形', description: 'child→children, man→men, foot→feetなど' },
+                    grammar_pronoun: { title: '人称代名詞', description: 'I→my→me→mine, he→his→him→hisなど' }
+                }
+            }
+        };
+
+        // 初期化
+        function init() {
+            console.log('Quick Quiz初期化中...');
+            
+            // データベースが読み込まれているかチェック
+            if (typeof window.problemDatabase === 'undefined') {
+                showError('問題データベースが読み込まれていません。problems.jsファイルを確認してください。');
+                return;
+            }
+            
+            console.log('問題データベース読み込み完了');
+            updateStats();
+        }
+
+        // エラー表示
+        function showError(message) {
+            const container = document.querySelector('.main-content');
+            container.innerHTML = `
+                <div class="error-message">
+                    <h3>⚠️ エラー</h3>
+                    <p>${message}</p>
+                    <button class="btn" onclick="location.reload()">ページを再読み込み</button>
+                </div>
+            `;
+        }
+
+        // 教科選択
+        function selectSubject(subject) {
+            currentSubject = subject;
+            hideAllSections();
+            document.getElementById(`${subject}-fields`).classList.add('active');
+        }
+
+        // 分野選択
+        function selectField(field) {
+            currentField = field;
+            selectedCategories = [];
+            setupCategorySelection();
+            hideAllSections();
+            document.getElementById('category-selection').classList.add('active');
+        }
+
+        // カテゴリ選択のセットアップ
+        function setupCategorySelection() {
+            const fieldData = categoryDefinitions[currentField];
+            const titleElement = document.getElementById('category-title');
+            const gridElement = document.getElementById('category-grid');
+            const audioSettings = document.getElementById('audio-settings');
+            
+            titleElement.textContent = fieldData.title;
+            
+            // 英語の場合は音声設定を表示
+            if (currentSubject === 'english') {
+                audioSettings.style.display = 'block';
+            } else {
+                audioSettings.style.display = 'none';
+            }
+            
+            gridElement.innerHTML = '';
+            
+            Object.entries(fieldData.categories).forEach(([key, category]) => {
+                // 問題データが存在するかチェック
+                if (!window.problemDatabase[key] || window.problemDatabase[key].length === 0) {
+                    return; // データがない場合はスキップ
+                }
+                
+                const categoryElement = document.createElement('div');
+                categoryElement.className = 'category-item';
+                categoryElement.onclick = () => toggleCategory(key, categoryElement);
+                
+                categoryElement.innerHTML = `
+                    <h4>${category.title}</h4>
+                    <p>${category.description}</p>
+                    <small>${window.problemDatabase[key].length}問</small>
+                `;
+                
+                gridElement.appendChild(categoryElement);
+            });
+        }
+
+        // カテゴリの選択/解除
+        function toggleCategory(categoryId, element) {
+            const index = selectedCategories.indexOf(categoryId);
+            if (index === -1) {
+                selectedCategories.push(categoryId);
+                element.classList.add('selected');
+            } else {
+                selectedCategories.splice(index, 1);
+                element.classList.remove('selected');
+            }
+            
+            const startBtn = document.getElementById('start-btn');
+            startBtn.disabled = selectedCategories.length === 0;
+        }
+
+        // クイズ開始
+        function startQuiz() {
+            if (selectedCategories.length === 0) {
+                alert('少なくとも1つのカテゴリを選択してください。');
+                return;
+            }
+            
+            // 選択されたカテゴリから問題を収集
+            currentProblems = [];
+            selectedCategories.forEach(categoryId => {
+                if (window.problemDatabase[categoryId]) {
+                    window.problemDatabase[categoryId].forEach(problem => {
+                        currentProblems.push({
+                            ...problem,
+                            category: categoryId
+                        });
+                    });
+                }
+            });
+            
+            if (currentProblems.length === 0) {
+                alert('選択されたカテゴリに問題がありません。');
+                return;
+            }
+            
+            // 問題をシャッフル
+            currentProblems = shuffleArray(currentProblems);
+            currentProblemIndex = 0;
+            
+            // 統計をリセット
+            stats = { correct: 0, incorrect: 0, total: 0 };
+            updateStats();
+            
+            hideAllSections();
+            document.getElementById('quiz-section').classList.add('active');
+            
+            showNextQuestion();
+        }
+
+        // 配列をシャッフル
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // 次の問題を表示
+        function showNextQuestion() {
+            if (currentProblemIndex >= currentProblems.length) {
+                // 問題をシャッフルして最初から
+                currentProblems = shuffleArray(currentProblems);
+                currentProblemIndex = 0;
+            }
+            
+            currentProblem = currentProblems[currentProblemIndex];
+            displayQuestion();
+            hideResult();
+        }
+
+        // 問題を表示
+        function displayQuestion() {
+            const questionText = document.getElementById('question-text');
+            const optionsContainer = document.getElementById('options-container');
+            const audioControls = document.getElementById('audio-controls');
+            
+            questionText.textContent = currentProblem.q;
+            
+            // 英語の問題の場合は音声コントロールを表示
+            if (currentSubject === 'english' && document.getElementById('audioEnabled').checked) {
+                audioControls.style.display = 'block';
+                // 自動で問題を読み上げ
+                setTimeout(() => speakQuestion(), 500);
+            } else {
+                audioControls.style.display = 'none';
+            }
+            
+            // 選択肢を表示
+            optionsContainer.innerHTML = '';
+            currentProblem.opts.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = `${String.fromCharCode(65 + index)}. ${option}`;
+                optionElement.onclick = () => selectOption(index, optionElement);
+                optionsContainer.appendChild(optionElement);
+            });
+        }
+
+        // 選択肢を選択
+        function selectOption(index, element) {
+            // 他の選択を解除
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // 選択した選択肢をハイライト
+            element.classList.add('selected');
+            
+            // 少し待ってから結果を表示
+            setTimeout(() => checkAnswer(index), 300);
+        }
+
+        // 回答をチェックしてAI解説を表示
+        async function checkAnswer(selectedIndex) {
+            const isCorrect = selectedIndex === currentProblem.ans;
+            const correctAnswer = currentProblem.opts[currentProblem.ans];
+            
+            // 統計を更新
+            if (isCorrect) {
+                stats.correct++;
+            } else {
+                stats.incorrect++;
+            }
+            stats.total++;
+            updateStats();
+            
+            // AIによる詳しい解説を取得して表示
+            await showResultWithAI(isCorrect, correctAnswer, selectedIndex);
+            
+            currentProblemIndex++;
+        }
+
+        // AI解説付きで結果を表示
+        async function showResultWithAI(isCorrect, correctAnswer, selectedIndex) {
+            const result = document.getElementById('result');
+            const selectedAnswer = currentProblem.opts[selectedIndex];
+            
+            // まず基本的な結果を表示
+            if (isCorrect) {
+                result.className = 'result correct';
+                result.innerHTML = `
+                    <h3>🎉 正解です！素晴らしい！</h3>
+                    <p><strong>正解：</strong> ${correctAnswer}</p>
+                    <p><strong>基本解説：</strong> ${currentProblem.exp}</p>
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>AI先生が詳しい解説を準備中...</p>
+                    </div>
+                `;
+            } else {
+                result.className = 'result incorrect';
+                result.innerHTML = `
+                    <h3>❌ 不正解です</h3>
+                    <p><strong>あなたの回答：</strong> ${selectedAnswer}</p>
+                    <p><strong>正解：</strong> ${correctAnswer}</p>
+                    <p><strong>基本解説：</strong> ${currentProblem.exp}</p>
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>AI先生が詳しい解説を準備中...</p>
+                    </div>
+                `;
+            }
+            
+            result.style.display = 'block';
+            
+            // AIによる詳しい解説を取得
+            try {
+                const aiExplanation = await getAIExplanation({
+                    question: currentProblem.q,
+                    correctAnswer: correctAnswer,
+                    selectedAnswer: selectedAnswer,
+                    explanation: currentProblem.exp,
+                    options: currentProblem.opts,
+                    isCorrect: isCorrect,
+                    category: getCategoryTitle(currentProblem.category),
+                    subject: getCurrentSubjectTitle()
+                });
+                
+                // AI解説を表示
+                const loadingDiv = result.querySelector('.loading');
+                if (loadingDiv) {
+                    loadingDiv.outerHTML = `
+                        <div class="ai-explanation">
+                            <h4>🤖 AI先生の詳しい解説</h4>
+                            <div class="ai-content">${aiExplanation}</div>
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('AI解説の取得に失敗:', error);
+                const loadingDiv = result.querySelector('.loading');
+                if (loadingDiv) {
+                    loadingDiv.outerHTML = `
+                        <div class="ai-explanation">
+                            <h4>📖 詳しい解説</h4>
+                            <div class="ai-content">申し訳ございません。AI解説の生成に失敗しました。基本解説をご参照ください。</div>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // AI解説を取得
+        async function getAIExplanation(problemData) {
+            // APIキーが設定されていない場合
+            if (!DIFY_API_KEY || DIFY_API_KEY === 'YOUR_DIFY_API_KEY') {
+                return `この問題について詳しく解説いたします。
+
+【問題の解説】
+${problemData.explanation}
+
+【覚え方のコツ】
+この分野（${problemData.category}）は、基本的な知識を体系的に整理することが重要です。
+
+【関連知識】
+${problemData.subject}の学習では、概念同士のつながりを意識することで理解が深まります。
+
+【アドバイス】
+${problemData.isCorrect ? 
+'素晴らしい正解です！この調子で他の問題にも挑戦してみましょう。' : 
+'間違いを恐れずに学習を続けることが大切です。正解の理由を理解して次に活かしましょう。'}`;
+            }
+            
+            const prompt = createPromptForProblem(problemData);
+            
+            try {
+                const response = await fetch(DIFY_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${DIFY_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        inputs: {},
+                        query: prompt,
+                        response_mode: 'blocking',
+                        conversation_id: '',
+                        user: 'quiz-user'
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                return data.answer || problemData.explanation;
+                
+            } catch (error) {
+                console.error('Dify API エラー:', error);
+                throw error;
+            }
+        }
+
+        // AI用のプロンプトを作成
+        function createPromptForProblem(problemData) {
+            const { question, correctAnswer, selectedAnswer, explanation, isCorrect, category, subject } = problemData;
+            
+            if (isCorrect) {
+                return `中学生向け${subject}のクイズで正解した問題について、さらに詳しく解説してください。
+
+【問題】${question}
+【正解】${correctAnswer}
+【基本解説】${explanation}
+【分野】${category}
+
+以下の内容を含めて、中学生にも分かりやすく詳しく解説してください：
+1. なぜその答えが正しいのかの詳しい理由
+2. 覚え方やコツ
+3. 関連する知識や概念
+4. 実生活での応用例があれば
+
+励ましの言葉も含めて、興味を持って学習を続けられるような解説をお願いします。`;
+            } else {
+                return `中学生向け${subject}のクイズで間違えた問題について、詳しく解説してください。
+
+【問題】${question}
+【選んだ答え】${selectedAnswer}
+【正解】${correctAnswer}
+【基本解説】${explanation}
+【分野】${category}
+
+以下の内容を含めて、中学生にも分かりやすく詳しく解説してください：
+1. 正しい答えの詳しい理由
+2. なぜ間違えやすいのか、よくある勘違い
+3. 正解を導くためのポイントや覚え方
+4. 関連する知識
+
+間違いを恐れずに学習を続けることの大切さも伝えて、次は正解できるよう励ましの言葉も含めてください。`;
+            }
+        }
+
+        // カテゴリタイトルを取得
+        function getCategoryTitle(categoryId) {
+            for (const field of Object.values(categoryDefinitions)) {
+                if (field.categories[categoryId]) {
+                    return field.categories[categoryId].title;
+                }
+            }
+            return categoryId;
+        }
+
+        // 現在の教科タイトルを取得
+        function getCurrentSubjectTitle() {
+            const fieldData = categoryDefinitions[currentField];
+            return fieldData ? fieldData.title : '学習';
+        }
+
+        // 結果を非表示
+        function hideResult() {
+            document.getElementById('result').style.display = 'none';
+        }
+
+        // 次の問題へ
+        function nextQuestion() {
+            showNextQuestion();
+        }
+
+        // 統計を更新
+        function updateStats() {
+            document.getElementById('correct-count').textContent = stats.correct;
+            document.getElementById('incorrect-count').textContent = stats.incorrect;
+            document.getElementById('total-count').textContent = stats.total;
+        }
+
+        // 音声読み上げ機能
+        function speakQuestion() {
+            if (currentSubject !== 'english' || !currentProblem) return;
+            
+            const text = currentProblem.q;
+            const voice = document.querySelector('input[name="voice"]:checked').value;
+            speak(text, voice);
+        }
+
+        function speakOptions() {
+            if (currentSubject !== 'english' || !currentProblem) return;
+            
+            const text = currentProblem.opts.join(', ');
+            const voice = document.querySelector('input[name="voice"]:checked').value;
+            speak(text, voice);
+        }
+
+        function speak(text, voiceType) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.8;
+                
+                const voices = speechSynthesis.getVoices();
+                const preferredVoice = voices.find(voice => 
+                    voiceType === 'female' ? 
+                    voice.name.toLowerCase().includes('female') || voice.name.toLowerCase().includes('samantha') :
+                    voice.name.toLowerCase().includes('male') || voice.name.toLowerCase().includes('daniel')
+                );
+                
+                if (preferredVoice) {
+                    utterance.voice = preferredVoice;
+                }
+                
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        // ナビゲーション関数
+        function hideAllSections() {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+        }
+
+        function goBack(sectionId) {
+            hideAllSections();
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        function goBackToSubject() {
+            hideAllSections();
+            document.getElementById(`${currentSubject}-fields`).classList.add('active');
+        }
+
+        // ページ読み込み時の初期化
+        window.addEventListener('DOMContentLoaded', init);
+
+        // 音声合成の準備
+        window.addEventListener('load', () => {
+            if ('speechSynthesis' in window) {
+                speechSynthesis.getVoices();
+            }
+        });
+    </script>
+</body>
+</html>
